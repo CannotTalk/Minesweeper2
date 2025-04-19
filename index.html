@@ -27,7 +27,7 @@
             align-items: center;
             margin-bottom: 12px;
             position: relative; /* Set position context for absolute positioning */
-            padding-top: 40px; /* Add padding to prevent overlap with button */
+            padding-top: 30px; /* Adjust top padding if needed for rules button */
         }
         #board {
             display: grid;
@@ -35,8 +35,8 @@
             border: 2px solid #333;
             background-color: #b4c687;
             padding: 4px;
-            /* Add margin top to ensure space below buttons if visible */
-            margin-top: 5px;
+            margin-top: 5px; /* Space below timer/mode buttons */
+            margin-bottom: 10px; /* Space above info-controls */
         }
         .square {
             width: 20px;
@@ -59,55 +59,65 @@
         .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
         .flag-wrong { background-color: #fdd !important; }
 
-        #reset-button { /* Keep reset button styling separate */
+        #reset-button {
             padding: 6px 12px;
             font-size: 12px;
             cursor: pointer;
             margin-top: 8px;
             font-family: 'Press Start 2P', cursive;
         }
-        /* Rules & Settings Button Styling */
         #rules-button {
             position: absolute;
-            top: 10px; /* Adjust as needed */
-            right: 10px; /* Adjust as needed */
-            padding: 5px 8px; /* Slightly smaller padding */
-            font-size: 10px; /* Smaller font */
+            top: 10px;
+            right: 10px;
+            padding: 5px 8px;
+            font-size: 10px;
             cursor: pointer;
             font-family: 'Press Start 2P', cursive;
             background-color: #e0e0e0;
             border: 1px solid #999;
             border-radius: 3px;
-            z-index: 10; /* Ensure it's above other elements if needed */
-            margin-top: 0; /* Remove default margin */
+            z-index: 10;
+            margin-top: 0;
         }
-        #rules-button:hover {
-            background-color: #d0d0d0;
+        #rules-button:hover { background-color: #d0d0d0; }
+
+        /* ★★★ Timer moved above board, adjust styles ★★★ */
+        .timer {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px; /* Space below timer */
+            text-align: center; /* Center align timer */
+            width: 100%; /* Ensure it takes width for centering */
+        }
+
+        #info-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 314px;
         }
 
         #message-box {
-            margin-top: 8px;
+            /* margin-top: 5px; /* No longer needed */
             font-size: 12px;
             color: #333;
-            margin-bottom: 2px; /* Reduced margin bottom */
+            margin-bottom: 2px;
             height: 14px;
             text-align: center;
         }
-        /* Active Rules Display Styles */
         #active-rules-display {
-            font-size: 9px; /* Smaller font */
+            font-size: 9px;
             color: #555;
-            margin-top: 0px; /* Space below message box */
-            margin-bottom: 8px; /* Space above timer/reset */
+            margin-top: 0px;
+            margin-bottom: 8px;
             line-height: 1.3;
             text-align: center;
-            min-height: 40px; /* Allocate some space */
+            min-height: 40px;
         }
-        #active-rules-display div {
-            margin-bottom: 2px; /* Small space between lines */
-        }
+        #active-rules-display div { margin-bottom: 2px; }
 
-        .timer { font-size: 14px; margin-top: 0px; color: #333; }
 
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -232,11 +242,13 @@
         <!-- Rules Button Moved Here -->
         <button id="rules-button">Rules & Settings</button>
 
+        <!-- ★★★ Timer Moved Above Board ★★★ -->
+        <div class="timer">Time: <span id="timer">00.00</span></div>
+
         <div id="board"></div>
 
         <!-- Info and Controls Container -->
         <div id="info-controls">
-            <div class="timer">Time: <span id="timer">00.00</span></div>
             <div id="message-box"></div>
             <div id="active-rules-display"></div>
             <button id="reset-button">Reset</button>
@@ -303,8 +315,7 @@
 
             <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
-            <!-- ★ Removed probability text ★ -->
-            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
+            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
 
             <div class="setting-section">
                 <h4>ハイドマス (Concealment Squares)</h4>
@@ -321,9 +332,8 @@
             <!-- Directional Square Section -->
             <div class="setting-section">
                 <h4>ディレクションマス (Directional Squares)</h4>
-                 <!-- ★ Removed probability text ★ -->
                  <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。<br>
                    <b>（現在この機能は調整中のため生成されません）</b></p>
                 <div class="setting-label">
                      有効
@@ -336,7 +346,6 @@
 
              <div class="setting-section">
                 <h4>オッドイーブンマス (OddEven Squares)</h4>
-                 <!-- ★ Removed redundant text ★ -->
                  <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。</p>
                 <div class="setting-label">
                      有効
@@ -349,7 +358,6 @@
 
              <div class="setting-section">
                 <h4>エリアバリューマス (Range Value Squares)</h4>
-                 <!-- ★ Removed redundant text ★ -->
                  <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。</p>
                  <div class="setting-label">
                       有効
