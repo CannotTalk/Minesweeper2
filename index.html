@@ -139,7 +139,7 @@
             <h3>基本ルール</h3>
             <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
                地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
-               マスを右クリックすると旗 (🚩) を立てたり外したりできます。
+               マスを右クリック (または長押し) すると旗 (🚩) を立てたり外したりできます。
             </p>
 
             <!-- Mine Count Setting Section -->
@@ -149,7 +149,7 @@
                      <span>地雷の数:</span>
                      <span id="mine-count-display">30</span> <!-- Initial value display -->
                  </div>
-                 <input type="range" id="mine-slider" min="0" max="225" value="30">
+                 <input type="range" id="mine-slider" min="0" max="225" value="30"> <!-- Updated min/max -->
                  <p style="font-size:10px; margin-top: 5px;">変更後、自動でリセットされます。</p>
              </div>
             <!-- End of Mine Count Section -->
@@ -188,13 +188,13 @@
             <!-- Directional Square Section -->
             <div class="setting-section">
                 <h4>ディレクションマス (矢印+数字)</h4>
-                <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
-                   <b>（現在この機能は調整中のため生成されません）</b></p> <!-- ★ 確率表記を削除 ★ -->
+                 <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。<br>
+                   **（現在この機能は調整中のため生成されません）**</p>
                 <div class="setting-label">
                      有効
                     <label class="switch">
-                        <input type="checkbox" id="directional-switch" checked>
+                        <input type="checkbox" id="directional-switch"> <!-- 'checked' removed -->
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -203,7 +203,7 @@
 
              <div class="setting-section">
                 <h4>オッドイーブンマス (Od/Ev)</h4>
-                 <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。(これもハイドマスの一種です)</p> <!-- ★ 確率表記を削除 ★ -->
+                 <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。(これもハイドマスの一種です)</p>
                 <div class="setting-label">
                      有効
                      <label class="switch">
@@ -215,7 +215,7 @@
 
              <div class="setting-section">
                 <h4>エリアバリューマス (-3/4-6/7+)</h4>
-                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。(これもハイドマスの一種です)</p> <!-- ★ 確率表記を削除 ★ -->
+                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。(これもハイドマスの一種です)</p>
                  <div class="setting-label">
                       有効
                      <label class="switch">
@@ -236,7 +236,7 @@
         const minHideRate = 0;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
-        const maxDirectionalRate = 0.10; // Keep definition but generation is disabled
+        // const maxDirectionalRate = 0.10; // Keep for potential future use
 
         // --- Board State ---
         let board = [];
@@ -272,7 +272,7 @@
         // --- Settings ---
         let enableNumbers = numberSwitch.checked;
         let enableHide = hideSwitch.checked;
-        let enableDirectional = directionalSwitch.checked;
+        let enableDirectional = directionalSwitch.checked; // Will be false initially
         let enableOddEven = oddEvenSwitch.checked;
         let enableAreaValue = areaValueSwitch.checked;
 
@@ -379,7 +379,7 @@
 
         function plantMines() {
             let minesPlanted = 0;
-             const maxPossibleMines = gridSize * gridSize;
+            const maxPossibleMines = gridSize * gridSize;
              if (numMines >= maxPossibleMines) {
                   numMines = maxPossibleMines - 1;
                   console.warn(`Mine count capped at ${numMines}`);
@@ -543,7 +543,7 @@
                 // ★★★ Directional generation is temporarily disabled ★★★
                  const maxDir = 0; // Force 0 generation
                  /*
-                 if (enableDirectional && maxDir > 0) { // Also check if maxDir > 0
+                 if (enableDirectional && maxDir > 0) {
                     let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
                         if (count >= maxDir) break; const k = `${r}-${c}`;
@@ -728,6 +728,7 @@
                 }
             }
         }
+
 
         function updateTimer() { seconds++; updateTimerDisplay(); }
 
