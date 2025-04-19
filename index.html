@@ -26,8 +26,7 @@
             flex-direction: column;
             align-items: center;
             margin-bottom: 12px;
-            position: relative; /* Keep for potential absolute elements inside */
-            /* padding-top: 40px; /* Removed */
+            position: relative;
              width: 90%; /* Ensure container has width */
              max-width: 350px; /* Adjust max-width as needed */
         }
@@ -80,7 +79,6 @@
             margin-top: 8px;
             font-family: 'Press Start 2P', cursive;
         }
-        /* Rules & Settings Button Styling */
         #rules-button {
             position: static; /* Removed absolute positioning */
             padding: 5px 8px;
@@ -92,12 +90,9 @@
             border-radius: 3px;
             z-index: 10;
             margin-top: 0;
-             /* Order last in flex container */
-             order: 3;
+             order: 3; /* Order last in flex container */
         }
-        #rules-button:hover {
-            background-color: #d0d0d0;
-        }
+        #rules-button:hover { background-color: #d0d0d0; }
 
         /* Info Controls Container Styling */
         #info-controls {
@@ -109,7 +104,6 @@
         }
 
         #message-box {
-            /* margin-top: 5px; /* Removed */
             font-size: 12px;
             color: #333;
             margin-bottom: 2px;
@@ -131,10 +125,9 @@
             font-size: 14px;
             color: #333;
             text-align: center;
-            /* margin: 0 10px; /* Adjust margin as needed */
-            /* Order second in flex container */
-            order: 2;
+            order: 2; /* Order second in flex container */
             flex-grow: 1; /* Allow timer to take space if needed */
+            margin: 0; /* Reset margin */
         }
 
 
@@ -165,9 +158,7 @@
         #mode-toggle-buttons {
             display: none; /* Initially hidden */
             user-select: none;
-            /* Order first in flex container */
-            order: 1;
-             /* Remove margin-bottom */
+            order: 1; /* Order first in flex container */
         }
         #mode-toggle-buttons.visible {
             display: flex;
@@ -360,7 +351,7 @@
             <div class="setting-section">
                 <h4>ディレクションマス (Directional Squares)</h4>
                  <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
                    <b>（現在この機能は調整中のため生成されません）</b></p>
                 <div class="setting-label">
                      有効
@@ -635,7 +626,7 @@
                     });
                     let pressTimer;
                     squareElement.addEventListener('touchstart', (event) => {
-                        // Logic adjusted: Long press always flags on touch devices regardless of mode buttons visibility
+                        // Logic adjusted: Long press always flags on touch devices
                         if (isTouch) {
                              clearTimeout(pressTimer);
                              pressTimer = setTimeout(() => {
@@ -729,14 +720,59 @@
 
             if (!enableNumbers) { // Uses current global enableNumbers
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) { /* ... */ }
-                if (enableOddEven) { /* ... */ }
-                for (const { r, c } of potentialNumberSquares) { /* Hide remaining */ }
+                if (enableAreaValue) {
+                     for (const { r, c } of potentialNumberSquares) {
+                         const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
+                             const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
+                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
+                             assignedSpecial.add(k);
+                         }
+                    }
+                }
+                if (enableOddEven) {
+                     for (const { r, c } of potentialNumberSquares) {
+                         const k = `${r}-${c}`; const sq = board[r][c];
+                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
+                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             assignedSpecial.add(k);
+                         }
+                    }
+                }
+                for (const { r, c } of potentialNumberSquares) {
+                     if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
+                 }
             } else {
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) { /* ... */ }
-                if (enableOddEven) { /* ... */ }
-                if (enableHide) { /* ... */ }
+                if (enableAreaValue) {
+                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
+                     for (const { r, c } of potentialNumberSquares) {
+                         if (count >= max) break; const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
+                             const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
+                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
+                             assignedSpecial.add(k); count++;
+                         }
+                     }
+                }
+                if (enableOddEven) {
+                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
+                     for (const { r, c } of potentialNumberSquares) {
+                         if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
+                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
+                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             assignedSpecial.add(k); count++;
+                         }
+                     }
+                }
+                if (enableHide) {
+                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
+                     const max = Math.floor(totalSquares * rate); let count = 0;
+                     for (const { r, c } of potentialNumberSquares) {
+                         if (count >= max) break; const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k)) { board[r][c].isHide = true; count++; }
+                     }
+                 }
             }
         }
 
