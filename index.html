@@ -95,6 +95,31 @@
         #debug-buttons button { margin-left: 4px; padding: 6px 10px; font-size: 10px; cursor: pointer; font-family: 'Press Start 2P', cursive; }
         #debug-buttons button:first-child { margin-left: 0; }
 
+        /* Mode Toggle Button Styles */
+        #mode-toggle-buttons {
+            display: none; /* Initially hidden */
+            margin-bottom: 10px; /* Space below buttons */
+            user-select: none; /* Prevent text selection */
+        }
+        #mode-toggle-buttons.visible {
+            display: flex; /* Show buttons */
+            gap: 10px; /* Space between buttons */
+        }
+        .mode-button {
+            font-size: 20px; /* Larger icons */
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 2px solid #888;
+            background-color: #eee;
+            border-radius: 5px;
+            line-height: 1;
+        }
+        .mode-button.active {
+            background-color: #ccc;
+            border-color: #333;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+
         /* --- Popup Styles --- */
          #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
          #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; padding: 15px 20px 20px 20px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; }
@@ -115,12 +140,37 @@
          #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px;}
          .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
 
+         /* PC Operation Mode Setting Styles */
+        .pc-op-mode-label {
+            display: block; /* Each option on a new line */
+            margin-bottom: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .pc-op-mode-label input[type="radio"] {
+            margin-right: 5px;
+        }
+         /* Hide PC settings on touch devices by default */
+        #pc-op-mode-section {
+            display: block; /* Show by default, JS will hide if needed */
+        }
+        body.touch-device #pc-op-mode-section {
+            display: none; /* Hide PC specific settings on touch */
+        }
+
     </style>
 </head>
 <body>
     <div id="game-container">
+         <!-- Mode Toggle Buttons (Initially Hidden) -->
+        <div id="mode-toggle-buttons">
+            <button id="dig-mode-button" class="mode-button active" title="掘るモード (クリック/タップでマスを開く)">⛏️</button>
+            <button id="flag-mode-button" class="mode-button" title="旗モード (クリック/タップで旗を立てる/外す)">🚩</button>
+        </div>
+        <!-- End of Mode Toggle Buttons -->
+
         <div id="board"></div>
-        <div class="timer">Time: <span id="timer">00.00</span></div> <!-- Initial display updated -->
+        <div class="timer">Time: <span id="timer">00.00</span></div>
         <div id="message-box"></div>
         <button id="reset-button">Reset</button>
         <button id="rules-button">ルール説明</button>
@@ -139,7 +189,8 @@
             <h3>基本ルール</h3>
             <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
                地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
-               マスを右クリック (または長押し) すると旗 (🚩) を立てたり外したりできます。
+               マウス操作の場合、右クリックで旗 (🚩) を立てたり外したりできます。<br>
+               タッチ操作またはボタン切り替え操作の場合、⛏️(掘る)モードと🚩(旗)モードを切り替えてタップします。
             </p>
 
             <!-- Mine Count Setting Section -->
@@ -152,7 +203,18 @@
                  <input type="range" id="mine-slider" min="0" max="225" value="30">
                  <p style="font-size:10px; margin-top: 5px;">変更後、自動でリセットされます。</p>
              </div>
-            <!-- End of Mine Count Section -->
+
+            <!-- PC Operation Mode Setting (Hidden on Touch) -->
+            <div class="setting-section" id="pc-op-mode-section">
+                <h4>PC操作モード</h4>
+                <label class="pc-op-mode-label">
+                    <input type="radio" name="pc-op-mode" value="mouse" checked> マウス操作 (右クリックで旗)
+                </label>
+                <label class="pc-op-mode-label">
+                    <input type="radio" name="pc-op-mode" value="button"> ボタン切り替え操作 (⛏️/🚩)
+                </label>
+            </div>
+            <!-- End of PC Operation Mode Setting -->
 
             <!-- Number Setting Section -->
             <h3>表示設定</h3>
@@ -230,23 +292,27 @@
     <script>
         // --- Constants ---
         const gridSize = 15;
-        let numMines = 30; // Default value, adjustable
+        let numMines = 30;
         const maxHideRate = 0.15;
         const minHideRate = 0;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
-        // const maxDirectionalRate = 0.10; // Keep for potential future use
+        // const maxDirectionalRate = 0.10;
 
         // --- Board State ---
         let board = [];
         let minesLeft = numMines;
         let gameOver = false;
         let timerInterval;
-        // Use milliseconds for timer
         let elapsedMilliseconds = 0;
-        const timerUpdateInterval = 50; // Update timer logic every 50ms
+        const timerUpdateInterval = 50;
         let gameStarted = false;
-        let startTime = 0; // To calculate elapsed time accurately
+        let startTime = 0;
+
+        // Interaction Mode State
+        let currentInteractionMode = 'dig'; // 'dig' or 'flag'
+        let pcOperationMode = 'mouse'; // 'mouse' or 'button', relevant only for PC
+        let isTouch = false; // Flag for touch device detection
 
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
@@ -269,11 +335,18 @@
         // Mine Count Slider Elements
         const mineSlider = document.getElementById('mine-slider');
         const mineCountDisplay = document.getElementById('mine-count-display');
+        // Mode Buttons
+        const modeToggleButtonsContainer = document.getElementById('mode-toggle-buttons');
+        const digModeButton = document.getElementById('dig-mode-button');
+        const flagModeButton = document.getElementById('flag-mode-button');
+        // PC Operation Mode Radios
+        const pcOpModeRadios = document.querySelectorAll('input[name="pc-op-mode"]');
+        const pcOpModeSection = document.getElementById('pc-op-mode-section');
 
         // --- Settings ---
         let enableNumbers = numberSwitch.checked;
         let enableHide = hideSwitch.checked;
-        let enableDirectional = directionalSwitch.checked; // Will be false initially
+        let enableDirectional = directionalSwitch.checked;
         let enableOddEven = oddEvenSwitch.checked;
         let enableAreaValue = areaValueSwitch.checked;
 
@@ -283,6 +356,27 @@
         mineSlider.value = numMines;
         mineCountDisplay.textContent = numMines;
         minesLeft = numMines;
+
+        // --- Device Detection and UI Initialization ---
+        function detectTouch() {
+            isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            if (isTouch) {
+                document.body.classList.add('touch-device');
+            } else {
+                 document.body.classList.remove('touch-device');
+                 // Read initial PC operation mode setting only if NOT touch
+                 pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
+            }
+             updateModeButtonsVisibility();
+        }
+
+        function updateModeButtonsVisibility() {
+            if (isTouch || pcOperationMode === 'button') {
+                modeToggleButtonsContainer.classList.add('visible');
+            } else {
+                modeToggleButtonsContainer.classList.remove('visible');
+            }
+        }
 
         // --- Event Listeners ---
         resetButton.addEventListener('click', resetGame);
@@ -298,13 +392,18 @@
         oddEvenSwitch.addEventListener('change', handleSettingChange);
         areaValueSwitch.addEventListener('change', handleSettingChange);
         // Mine Slider Listeners
-        mineSlider.addEventListener('input', () => {
-            mineCountDisplay.textContent = mineSlider.value;
-        });
+        mineSlider.addEventListener('input', () => { mineCountDisplay.textContent = mineSlider.value; });
         mineSlider.addEventListener('change', () => {
             numMines = parseInt(mineSlider.value, 10);
             mineCountDisplay.textContent = numMines;
             resetGame();
+        });
+        // Mode Button Listeners
+        digModeButton.addEventListener('click', () => switchMode('dig'));
+        flagModeButton.addEventListener('click', () => switchMode('flag'));
+        // PC Operation Mode Listener
+        pcOpModeRadios.forEach(radio => {
+            radio.addEventListener('change', handlePcOperationModeChange);
         });
 
 
@@ -325,17 +424,37 @@
             enableAreaValue = areaValueSwitch.checked;
             resetGame();
         }
+        // Handle PC Operation Mode Change
+        function handlePcOperationModeChange(event) {
+             pcOperationMode = event.target.value;
+             updateModeButtonsVisibility();
+             switchMode('dig'); // Default to dig mode when switching PC op mode
+        }
+
+        // Function to Switch Interaction Mode
+        function switchMode(newMode) {
+            if (newMode === currentInteractionMode) return;
+            currentInteractionMode = newMode;
+            if (newMode === 'dig') {
+                digModeButton.classList.add('active');
+                flagModeButton.classList.remove('active');
+            } else { // 'flag' mode
+                digModeButton.classList.remove('active');
+                flagModeButton.classList.add('active');
+            }
+        }
+
 
         // --- Game Logic Functions ---
         function resetGame() {
             gameOver = true;
-            clearInterval(timerInterval); // Stop existing timer
-            // Reset timer variables
+            clearInterval(timerInterval);
             elapsedMilliseconds = 0;
             startTime = 0;
             gameStarted = false;
-            updateTimerDisplay(); // Display 00.00
             minesLeft = numMines;
+            switchMode('dig'); // Reset mode to dig
+            updateTimerDisplay();
             messageBox.textContent = '';
             body.classList.remove('game-over');
             body.style.backgroundColor = '#f0f0f0';
@@ -355,22 +474,38 @@
                     board[i][j] = {
                         isMine: false, isRevealed: false, isFlagged: false,
                         adjacentMines: 0,
-                        isHide: false,
-                        isOddEven: false, oddEvenValue: null,
-                        isAreaValue: false, areaValue: null,
-                        isDirectional: false, direction: null, directionalCount: null, directionalSymbol: null,
+                        isHide: false, isOddEven: false, isAreaValue: false, isDirectional: false,
+                        oddEvenValue: null, areaValue: null, direction: null, directionalCount: null, directionalSymbol: null,
                         element: document.createElement('div')
                     };
                     const square = board[i][j];
                     const squareElement = square.element;
                     squareElement.classList.add('square', 'hidden');
                     squareElement.dataset.row = i; squareElement.dataset.col = j;
-                    squareElement.addEventListener('click', () => handleSquareClick(i, j));
-                    squareElement.addEventListener('contextmenu', (event) => { event.preventDefault(); handleRightClick(i, j); });
+                    // Use unified interaction handler for click/tap
+                    squareElement.addEventListener('click', () => handleSquareInteraction(i, j));
+                    // Right-click listener (PC mouse mode only)
+                    squareElement.addEventListener('contextmenu', (event) => {
+                        event.preventDefault();
+                        if (!isTouch && pcOperationMode === 'mouse') {
+                             handleFlagAction(i, j);
+                        }
+                    });
+                    // Long-press listener (Touch devices, acts like flag mode click)
                     let pressTimer;
-                    squareElement.addEventListener('touchstart', (event) => { pressTimer = setTimeout(() => { event.preventDefault(); handleRightClick(i, j); }, 500); }, { passive: false });
-                    squareElement.addEventListener('touchend', () => { clearTimeout(pressTimer); });
-                    squareElement.addEventListener('touchmove', () => { clearTimeout(pressTimer); });
+                    squareElement.addEventListener('touchstart', (event) => {
+                        // Only trigger long press if touch device AND (not button mode OR flag mode active)
+                        if (isTouch && (!modeToggleButtonsContainer.classList.contains('visible') || currentInteractionMode === 'flag')) {
+                             clearTimeout(pressTimer);
+                             pressTimer = setTimeout(() => {
+                                 event.preventDefault();
+                                 handleFlagAction(i, j);
+                             }, 500);
+                         }
+                    }, { passive: false });
+                    squareElement.addEventListener('touchend', () => clearTimeout(pressTimer));
+                    squareElement.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
                     boardElement.appendChild(squareElement);
                 }
             }
@@ -378,25 +513,27 @@
             calculateAdjacentMines();
             applySpecialSquares();
             updateMinesLeftDisplay();
+            // Initialize UI based on device/settings after board exists
+            detectTouch();
         }
 
         function plantMines() {
-            let minesPlanted = 0;
-            const maxPossibleMines = gridSize * gridSize;
-             if (numMines >= maxPossibleMines) {
-                  numMines = maxPossibleMines - 1;
-                  console.warn(`Mine count capped at ${numMines}`);
-                  mineSlider.value = numMines;
-                  mineCountDisplay.textContent = numMines;
-                  minesLeft = numMines;
-             }
-            if (numMines < 0) numMines = 0; // Ensure not negative
+             let minesPlanted = 0;
+             const maxPossibleMines = gridSize * gridSize;
+              if (numMines >= maxPossibleMines) {
+                   numMines = maxPossibleMines - 1;
+                   console.warn(`Mine count capped at ${numMines}`);
+                   mineSlider.value = numMines;
+                   mineCountDisplay.textContent = numMines;
+                   minesLeft = numMines;
+              }
+             if (numMines < 0) numMines = 0;
 
-            while (minesPlanted < numMines) {
-                const r = Math.floor(Math.random() * gridSize);
-                const c = Math.floor(Math.random() * gridSize);
-                if (!board[r][c].isMine) { board[r][c].isMine = true; minesPlanted++; }
-            }
+             while (minesPlanted < numMines) {
+                 const r = Math.floor(Math.random() * gridSize);
+                 const c = Math.floor(Math.random() * gridSize);
+                 if (!board[r][c].isMine) { board[r][c].isMine = true; minesPlanted++; }
+             }
         }
 
         function calculateAdjacentMines() {
@@ -416,7 +553,6 @@
              }
         }
 
-        // Helper to count mines in a specific direction
         function countMinesInDirection(startRow, startCol, dx, dy) {
              let count = 0; let r = startRow + dx; let c = startCol + dy;
              while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
@@ -425,7 +561,6 @@
              } return count;
         }
 
-         // Helper to check if any neighbor has a specific property
         function hasNeighborOfType(r, c, key) {
              for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
                  if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
@@ -433,10 +568,8 @@
              } return false;
         }
 
-        // Applies special square types based on settings
         function applySpecialSquares() {
             const potentialNumberSquares = [];
-            // Reset flags and collect potential squares
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
                     const square = board[i][j];
@@ -447,150 +580,67 @@
                     }
                 }
             }
-            potentialNumberSquares.sort(() => Math.random() - 0.5); // Shuffle
+            potentialNumberSquares.sort(() => Math.random() - 0.5);
 
-            const assignedSpecial = new Set(); // Track assigned squares
+            const assignedSpecial = new Set();
             const totalSquares = gridSize * gridSize;
             const numPotential = potentialNumberSquares.length;
-
-            // Base directions (Up, Down, Left, Right)
             const baseDirections = [
-                 { dx: -1, dy: 0, symbol: '↑', name: 'up' },
-                 { dx: 1, dy: 0, symbol: '↓', name: 'down' },
-                 { dx: 0, dy: -1, symbol: '←', name: 'left' },
-                 { dx: 0, dy: 1, symbol: '→', name: 'right' }
+                 { dx: -1, dy: 0, symbol: '↑', name: 'up' }, { dx: 1, dy: 0, symbol: '↓', name: 'down' },
+                 { dx: 0, dy: -1, symbol: '←', name: 'left' }, { dx: 0, dy: 1, symbol: '→', name: 'right' }
              ];
+            function hasDirectionalChain(r, c, dx, dy) { /* ... */ }
+            function getValidDirections(r, c) { /* ... */ }
 
-            // Helper function to check for directional chains
-            function hasDirectionalChain(startRow, startCol, dx, dy) {
-                 let r = startRow + dx; let c = startCol + dy;
-                 while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-                     const nextSquare = board[r][c];
-                     if (nextSquare?.isDirectional && nextSquare.direction?.dx === dx && nextSquare.direction?.dy === dy) return true;
-                     r += dx; c += dy;
-                 } return false;
-            }
-
-            // Helper to get valid directions for a given cell
-            function getValidDirections(r, c) {
-                 return baseDirections.filter(dir => {
-                     const nextR = r + dir.dx;
-                     const nextC = c + dir.dy;
-                     return nextR >= 0 && nextR < gridSize && nextC >= 0 && nextC < gridSize;
-                 });
-            }
-
-            // --- Apply Special Square Logic ---
             if (!enableNumbers) {
-                // --- Numbers OFF: Apply deterministically ---
-                // Order: Directional -> AreaValue -> OddEven -> Hide
-
-                // ★★★ Directional generation is temporarily disabled ★★★
-                /*
-                if (enableDirectional) {
-                    for (const { r, c } of potentialNumberSquares) {
-                        const k = `${r}-${c}`;
-                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
-                            const sq = board[r][c];
-                            let assignedDir = false;
-                            const validDirs = getValidDirections(r, c);
-                            if (validDirs.length > 0) {
-                                const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
-                                for (const dir of shuffledValidDirs) {
-                                    if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
-                                        const count = countMinesInDirection(r, c, dir.dx, dir.dy);
-                                        sq.isDirectional = sq.isHide = true;
-                                        sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
-                                        sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
-                                        assignedSpecial.add(k);
-                                        assignedDir = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                */
-
-                // Apply AreaValue if not assigned and no AreaValue neighbor
+                // ★★★ Directional generation disabled ★★★
+                /* if (enableDirectional) { ... } */
                 if (enableAreaValue) {
                     for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
-                             if (sq.adjacentMines <= 3) sq.areaValue = '-3';
-                             else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
+                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
                              assignedSpecial.add(k);
                          }
                     }
                 }
-                // Apply OddEven if not assigned and no OddEven neighbor
                 if (enableOddEven) {
                     for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = sq.isHide = true;
-                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
                              assignedSpecial.add(k);
                          }
                     }
                 }
-                // Remaining become Hide
                 for (const { r, c } of potentialNumberSquares) {
                     if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
                 }
-
             } else {
-                // --- Numbers ON: Apply probabilistically ---
-                // Order: Directional -> AreaValue -> OddEven -> Hide
-
-                // ★★★ Directional generation is temporarily disabled ★★★
-                 const maxDir = 0; // Force 0 generation
-                 /*
-                 if (enableDirectional && maxDir > 0) { // Check maxDir > 0 as well
-                    let count = 0;
-                    for (const { r, c } of potentialNumberSquares) {
-                        if (count >= maxDir) break; const k = `${r}-${c}`;
-                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
-                             const sq = board[r][c];
-                             let assignedDir = false;
-                             const validDirs = getValidDirections(r, c);
-                             if (validDirs.length > 0) {
-                                const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
-                                for (const dir of shuffledValidDirs) { // ... rest of logic ... }
-                            }
-                        }
-                    }
-                 }
-                 */
-
-                // Apply AreaValue probabilistically if not assigned and no AreaValue neighbor
+                // ★★★ Directional generation disabled ★★★
+                 /* if (enableDirectional) { ... } */
                 if (enableAreaValue) {
                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
-                             if (sq.adjacentMines <= 3) sq.areaValue = '-3';
-                             else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
+                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
                              assignedSpecial.add(k); count++;
                          }
                      }
                 }
-                // Apply OddEven probabilistically if not assigned and no OddEven neighbor
                 if (enableOddEven) {
                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = sq.isHide = true;
-                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
                              assignedSpecial.add(k); count++;
                          }
                      }
                 }
-                // Apply simple Hide probabilistically if enabled and not assigned
                 if (enableHide) {
                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
                     const max = Math.floor(totalSquares * rate); let count = 0;
@@ -602,18 +652,46 @@
             }
         }
 
-        // --- Other Game Logic Functions ---
+        // Unified interaction handler
+        function handleSquareInteraction(r, c) {
+             if (gameOver) return;
 
-        function handleSquareClick(r, c) {
-            if (gameOver || board[r][c].isRevealed || board[r][c].isFlagged) return;
-            if (!gameStarted) {
-                gameStarted = true;
-                startTime = Date.now();
-                timerInterval = setInterval(updateTimer, timerUpdateInterval);
-            }
-            const square = board[r][c];
-            if (square.isMine) { revealMine(r, c); endGame(false); }
-            else { revealSquare(r, c); checkWinCondition(); }
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
+
+             const square = board[r][c];
+             if (square.isRevealed) return;
+
+             if (currentInteractionMode === 'flag') {
+                 handleFlagAction(r, c);
+             } else { // 'dig' mode
+                 if (square.isFlagged) return;
+                 if (square.isMine) {
+                     revealMine(r, c);
+                     endGame(false);
+                 } else {
+                     revealSquare(r, c);
+                     checkWinCondition();
+                 }
+             }
+        }
+
+        // Handles flagging logic
+        function handleFlagAction(r, c) {
+            if (gameOver || board[r][c].isRevealed) return;
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
+            const sq = board[r][c];
+            sq.isFlagged = !sq.isFlagged;
+            if (sq.isFlagged) minesLeft--; else minesLeft++;
+            renderSquareContent(sq);
+            updateMinesLeftDisplay();
         }
 
         function revealMine(r, c) {
@@ -630,9 +708,9 @@
 
             sq.isRevealed = true;
             revealedNonMineCount++;
-            renderSquareContent(sq); // Update display
+            renderSquareContent(sq);
 
-            if (sq.adjacentMines === 0) { // If blank, reveal neighbors
+            if (sq.adjacentMines === 0) {
                 for (let x = -1; x <= 1; x++) {
                     for (let y = -1; y <= 1; y++) {
                         revealSquare(r + x, c + y);
@@ -655,7 +733,7 @@
                     el.classList.add('mine');
                     el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣';
                 } else if (sq.adjacentMines >= 0) {
-                    if (sq.isDirectional) { // Render logic remains
+                    if (sq.isDirectional) {
                         el.classList.add('directional-square');
                         el.textContent = sq.directionalSymbol + sq.directionalCount;
                     } else if (sq.isAreaValue) {
@@ -673,48 +751,33 @@
                         el.textContent = '';
                     }
                 }
-                 // Handle display of incorrectly flagged squares ('X')
-                 if (el.classList.contains('flag-wrong')) {
+                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added by revealAllMines
                     el.textContent = '❌';
                     el.classList.add('flag-wrong'); // Ensure class stays
                  }
             }
         }
 
-        function handleRightClick(r, c) {
-            if (gameOver || board[r][c].isRevealed) return;
-            if (!gameStarted) {
-                gameStarted = true;
-                startTime = Date.now();
-                timerInterval = setInterval(updateTimer, timerUpdateInterval);
-            }
-            const sq = board[r][c]; sq.isFlagged = !sq.isFlagged;
-            if (sq.isFlagged) minesLeft--; else minesLeft++;
-            renderSquareContent(sq); updateMinesLeftDisplay();
-        }
-
         function updateMinesLeftDisplay() { messageBox.textContent = `Mines: ${minesLeft}`; }
 
         function checkWinCondition() {
-            const totalNonMine = gridSize * gridSize - numMines; // Use current numMines
-            if (revealedNonMineCount >= totalNonMine) { // Use >= for safety
+            const totalNonMine = gridSize * gridSize - numMines;
+            if (revealedNonMineCount >= totalNonMine) {
                 let allRevealed = true;
                 for(let i=0; i<gridSize; i++) for(let j=0; j<gridSize; j++) if(!board[i][j].isMine && !board[i][j].isRevealed) {allRevealed = false; break;}
-                if(!allRevealed) return; // Exit if not all non-mines are revealed
+                if(!allRevealed) return;
                 endGame(true);
             }
         }
 
-
         function endGame(isWin) {
-             // Prevent stopping timer multiple times or processing loss after win
-             if(gameOver) return;
+             if(gameOver) return; // Prevent multiple calls
 
              gameOver = true;
              clearInterval(timerInterval);
-             if(gameStarted) { // Calculate final elapsed time if game actually started
+             if(gameStarted) {
                  elapsedMilliseconds = Date.now() - startTime;
-                 updateTimerDisplay(); // Update display one last time with final millis
+                 updateTimerDisplay();
              }
 
             if (isWin) {
@@ -722,11 +785,10 @@
                 for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (board[i][j].isMine && !board[i][j].isFlagged) { board[i][j].isFlagged = true; renderSquareContent(board[i][j]); }
                 minesLeft = 0; updateMinesLeftDisplay();
             } else {
-                // Only show game over message if not already cleared
                 if(messageBox.textContent !== 'Game Clear!') {
                    messageBox.textContent = 'Game Over!'; body.classList.add('game-over');
                 }
-                revealAllMines(true); // Show results
+                revealAllMines(true);
             }
         }
 
@@ -735,17 +797,17 @@
                 for (let j=0; j<gridSize; j++) {
                     const sq = board[i][j]; const el = sq.element;
                     if (sq.isMine) {
-                        if (sq.isFlagged) continue; // Keep correct flag
-                        if (el.classList.contains('mine-clicked')) continue; // Keep clicked style
+                        if (sq.isFlagged) continue;
+                        if (el.classList.contains('mine-clicked')) continue;
                         sq.isRevealed = true;
-                        renderSquareContent(sq); // Will show '💣'
+                        renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true; // Mark revealed to override default hidden style
+                            sq.isRevealed = true;
                             el.className = 'square revealed flag-wrong'; // Set classes directly
                             el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
-                             revealSquare(i, j);
+                            revealSquare(i, j);
                         }
                     }
                 }
@@ -761,18 +823,17 @@
 
         function updateTimerDisplay() {
             let formattedTime;
-             // Use Math.max to prevent negative display briefly on reset
-             const displayMillis = Math.max(0, elapsedMilliseconds);
+            const displayMillis = Math.max(0, elapsedMilliseconds);
 
-            if (displayMillis < 60000) { // Less than 1 minute
+            if (displayMillis < 60000) {
                 const secondsPart = Math.floor(displayMillis / 1000);
                 const centisecondsPart = Math.floor((displayMillis % 1000) / 10);
                 formattedTime = `${String(secondsPart).padStart(2, '0')}.${String(centisecondsPart).padStart(2, '0')}`;
-            } else if (displayMillis < 3600000) { // Less than 1 hour
+            } else if (displayMillis < 3600000) {
                 const minutesPart = Math.floor(displayMillis / 60000);
                 const secondsPart = Math.floor((displayMillis % 60000) / 1000);
                 formattedTime = `${String(minutesPart).padStart(2, '0')}:${String(secondsPart).padStart(2, '0')}`;
-            } else { // 1 hour or more
+            } else {
                 const hoursPart = Math.floor(displayMillis / 3600000);
                 const minutesPart = Math.floor((displayMillis % 3600000) / 60000);
                 const secondsPart = Math.floor((displayMillis % 60000) / 1000);
@@ -792,10 +853,9 @@
             for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (!board[i][j].isMine && !board[i][j].isRevealed) revealSquare(i,j);
              checkWinCondition();
              messageBox.textContent = 'All squares revealed!';
-             // Ensure game over state is consistent after forced reveal
              if (!gameOver) {
-                 endGame(true); // Force win state if somehow not triggered
-                 messageBox.textContent = 'All squares revealed!'; // Re-set message
+                 endGame(true);
+                 messageBox.textContent = 'All squares revealed!';
              }
         }
 
@@ -806,10 +866,9 @@
                  startTime = Date.now();
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
              }
-             revealAllMines(true); // Show everything
-             // Ensure game over state is set correctly
+             revealAllMines(true);
              if (!gameOver) {
-                 endGame(false); // Trigger game over logic (even if already called by revealAllMines hitting a mine)
+                 endGame(false); // Use endGame to ensure proper state setting
              }
              messageBox.textContent = 'All squares revealed!';
         }
