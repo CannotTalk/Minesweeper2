@@ -171,7 +171,7 @@
             <div class="setting-section">
                 <h4>ディレクションマス (矢印+数字)</h4>
                 <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。端のマスは盤面外を指しません。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。</p>
+                   指定された方向の地雷のみをカウントします。**矢印が指す方向に最低1マス存在する場合のみ生成されます** (盤面の壁を直接指すことはありません)。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。</p>
                 <div class="setting-label">
                      有効
                     <label class="switch">
@@ -387,7 +387,7 @@
             }
             potentialNumberSquares.sort(() => Math.random() - 0.5); // Shuffle
 
-            const assignedSpecial = new Set();
+            const assignedSpecial = new Set(); // Track assigned squares
             const totalSquares = gridSize * gridSize; // Total board squares
             const numPotential = potentialNumberSquares.length; // Number of potential number squares
 
@@ -399,7 +399,7 @@
                 { dx: 0, dy: 1, symbol: '→', name: 'right' }
             ];
 
-            // Helper to check for directional chains
+            // Helper function to check for directional chains
             function hasDirectionalChain(startRow, startCol, dx, dy) {
                 let r = startRow + dx; let c = startCol + dy;
                 while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
@@ -414,6 +414,7 @@
                 return baseDirections.filter(dir => {
                     const nextR = r + dir.dx;
                     const nextC = c + dir.dy;
+                    // Check if the next square in this direction is within the board boundaries
                     return nextR >= 0 && nextR < gridSize && nextC >= 0 && nextC < gridSize;
                 });
             }
@@ -421,24 +422,27 @@
 
             if (!enableNumbers) {
                 // --- Numbers OFF: Apply deterministically ---
+                // Order: Directional -> AreaValue -> OddEven -> Hide
                 if (enableDirectional) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`;
                         if (!assignedSpecial.has(k)) {
                             const sq = board[r][c];
                             let assignedDir = false;
-                            const validDirs = getValidDirections(r, c); // Get valid directions first
-                            const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                            const validDirs = getValidDirections(r, c); // Get directions pointing onto the board
 
-                            for (const dir of shuffledValidDirs) {
-                                if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
-                                    const count = countMinesInDirection(r, c, dir.dx, dir.dy);
-                                    sq.isDirectional = sq.isHide = true;
-                                    sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
-                                    sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
-                                    assignedSpecial.add(k);
-                                    assignedDir = true;
-                                    break;
+                            if (validDirs.length > 0) { // Only proceed if there's at least one valid direction
+                                const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                                for (const dir of shuffledValidDirs) {
+                                    if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
+                                        const count = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                        sq.isDirectional = sq.isHide = true;
+                                        sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                        sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
+                                        assignedSpecial.add(k);
+                                        assignedDir = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -446,7 +450,7 @@
                 }
                 // Apply AreaValue if not assigned
                 if (enableAreaValue) {
-                    for (const { r, c } of potentialNumberSquares) { /* ... same as before ... */
+                    for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
@@ -458,7 +462,7 @@
                 }
                 // Apply OddEven if not assigned
                 if (enableOddEven) {
-                    for (const { r, c } of potentialNumberSquares) { /* ... same as before ... */
+                    for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
                              sq.isOddEven = sq.isHide = true;
@@ -474,28 +478,31 @@
 
             } else {
                 // --- Numbers ON: Apply probabilistically ---
+                // Order: Directional -> AreaValue -> OddEven -> Hide
                 if (enableDirectional) {
-                    // ★ Calculate max based on potential number squares ★
+                    // Calculate max based on potential number squares rate
                     const maxDir = Math.floor(numPotential * maxDirectionalRate);
                     let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
                         if (count >= maxDir) break; const k = `${r}-${c}`;
                         if (!assignedSpecial.has(k)) {
                             const sq = board[r][c];
-                            let assignedDir = false;
-                            const validDirs = getValidDirections(r, c); // Get valid directions first
-                            const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                             let assignedDir = false;
+                             const validDirs = getValidDirections(r, c); // Get valid directions
 
-                            for (const dir of shuffledValidDirs) {
-                                 if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) { // Check chain
-                                     const dirCount = countMinesInDirection(r, c, dir.dx, dir.dy);
-                                     sq.isDirectional = sq.isHide = true;
-                                     sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
-                                     sq.directionalCount = dirCount; sq.directionalSymbol = dir.symbol;
-                                     assignedSpecial.add(k);
-                                     assignedDir = true;
-                                     count++; // Increment count only when assigned
-                                     break;
+                             if (validDirs.length > 0) { // Only proceed if there's at least one valid direction
+                                 const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                                 for (const dir of shuffledValidDirs) {
+                                     if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) { // Check chain
+                                         const dirCount = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                         sq.isDirectional = sq.isHide = true;
+                                         sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                         sq.directionalCount = dirCount; sq.directionalSymbol = dir.symbol;
+                                         assignedSpecial.add(k);
+                                         assignedDir = true;
+                                         count++; // Increment count only when assigned
+                                         break;
+                                     }
                                  }
                              }
                         }
@@ -503,9 +510,8 @@
                 }
                 // Apply AreaValue probabilistically if not assigned
                 if (enableAreaValue) {
-                    // Rate based on total board size (as before)
                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
-                     for (const { r, c } of potentialNumberSquares) { /* ... same as before ... */
+                     for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
@@ -517,9 +523,8 @@
                 }
                 // Apply OddEven probabilistically if not assigned
                 if (enableOddEven) {
-                     // Rate based on total board size (as before)
                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
-                     for (const { r, c } of potentialNumberSquares) { /* ... same as before ... */
+                     for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
                              sq.isOddEven = sq.isHide = true;
@@ -530,7 +535,6 @@
                 }
                 // Apply simple Hide probabilistically if enabled and not assigned
                 if (enableHide) {
-                    // Rate based on total board size (as before)
                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
                     const max = Math.floor(totalSquares * rate); let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
@@ -686,6 +690,7 @@
                 }
             }
         }
+
 
         // Updates the game timer every second
         function updateTimer() { seconds++; updateTimerDisplay(); }
