@@ -26,8 +26,8 @@
             flex-direction: column;
             align-items: center;
             margin-bottom: 12px;
-            position: relative; /* ★ Set position context for absolute positioning */
-            padding-top: 40px; /* ★ Add padding to prevent overlap with button */
+            position: relative; /* Set position context for absolute positioning */
+            padding-top: 40px; /* Add padding to prevent overlap with button */
         }
         #board {
             display: grid;
@@ -35,7 +35,7 @@
             border: 2px solid #333;
             background-color: #b4c687;
             padding: 4px;
-            /* ★ Add margin top to ensure space below buttons */
+            /* Add margin top to ensure space below buttons */
             margin-top: 5px;
         }
         .square {
@@ -66,7 +66,7 @@
             margin-top: 8px;
             font-family: 'Press Start 2P', cursive;
         }
-        /* ★★★ Rules & Settings Button Styling ★★★ */
+        /* Rules & Settings Button Styling */
         #rules-button {
             position: absolute;
             top: 10px; /* Adjust as needed */
@@ -84,7 +84,6 @@
         #rules-button:hover {
             background-color: #d0d0d0;
         }
-        /* ★★★ End of Rules Button Styling ★★★ */
 
         #message-box {
             margin-top: 8px;
@@ -146,18 +145,22 @@
 
         /* --- Popup Styles --- */
          #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
-         #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; padding: 15px 20px 20px 20px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; }
-         #rules-popup h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
+         #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; display: flex; flex-direction: column; /* For footer */ }
+         .popup-header { padding: 15px 20px 0 20px; /* Adjust padding */ }
+         .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
+         .rules-content { max-height: 65vh; /* Adjust height considering footer */ overflow-y: auto; padding: 0 20px 10px 20px; /* Adjust padding */ }
          #rules-popup h3 { font-size: 14px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; font-weight: bold; }
          #rules-popup h4 { font-size: 13px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: #555; }
          #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; }
          #close-popup-button { position: absolute; top: 8px; right: 8px; background: none; border: 1px solid transparent; font-size: 26px; font-weight: bold; color: #777; cursor: pointer; font-family: sans-serif; line-height: 1; padding: 0 6px; transition: color 0.2s, border-color 0.2s; }
          #close-popup-button:hover, #close-popup-button:focus { color: #000; border-color: #ccc; outline: none; }
-         .rules-content { max-height: 70vh; overflow-y: auto; padding-right: 10px; }
          #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
          #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
          #rules-popup .switch { margin-left: 8px; }
-         #popup-overlay.visible, #rules-popup.visible { display: block; }
+         #popup-overlay.visible, #rules-popup.visible { display: flex; /* Use flex for popup structure */ }
+         .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; /* Push to bottom */ }
+         #save-settings-button { padding: 6px 12px; font-size: 12px; font-family: 'Press Start 2P', cursive; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px; }
+         #save-settings-button:hover { background-color: #45a049; }
 
          /* Mine Count Slider Styles */
          #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
@@ -165,21 +168,10 @@
          .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
 
          /* PC Operation Mode Setting Styles */
-        .pc-op-mode-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .pc-op-mode-label input[type="radio"] {
-            margin-right: 5px;
-        }
-        #pc-op-mode-section {
-            display: block;
-        }
-        body.touch-device #pc-op-mode-section {
-            display: none;
-        }
+        .pc-op-mode-label { display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer; }
+        .pc-op-mode-label input[type="radio"] { margin-right: 5px; }
+        #pc-op-mode-section { display: block; }
+        body.touch-device #pc-op-mode-section { display: none; }
 
     </style>
 </head>
@@ -191,7 +183,7 @@
             <button id="flag-mode-button" class="mode-button" title="旗モード (クリック/タップで旗を立てる/外す)">🚩</button>
         </div>
 
-        <!-- ★ Rules Button Moved Here (Positioned with CSS) ★ -->
+        <!-- Rules Button Moved Here -->
         <button id="rules-button">Rules & Settings</button>
 
         <div id="board"></div>
@@ -209,7 +201,9 @@
     <div id="popup-overlay"></div>
     <div id="rules-popup">
         <button id="close-popup-button" aria-label="閉じる">×</button>
-        <h2>ルールと設定</h2>
+        <div class="popup-header">
+             <h2>ルールと設定</h2>
+        </div>
         <div class="rules-content">
             <h3>基本ルール</h3>
             <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
@@ -226,7 +220,7 @@
                      <span id="mine-count-display">30</span>
                  </div>
                  <input type="range" id="mine-slider" min="0" max="225" value="30">
-                 <p style="font-size:10px; margin-top: 5px;">変更後、自動でリセットされます。</p>
+                 <p style="font-size:10px; margin-top: 5px;">変更を適用するには「設定を保存」を押してください。</p>
              </div>
 
             <!-- PC Operation Mode Setting -->
@@ -257,7 +251,7 @@
 
             <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
-            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。</p>
+            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
 
             <div class="setting-section">
                 <h4>ハイドマス (・)</h4>
@@ -310,6 +304,10 @@
                  </div>
              </div>
         </div>
+        <!-- Popup Footer -->
+        <div class="popup-footer">
+            <button id="save-settings-button">設定を保存してリセット</button>
+        </div>
     </div>
 
     <script>
@@ -320,7 +318,7 @@
         const minHideRate = 0;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
-        // const maxDirectionalRate = 0.10;
+        // const maxDirectionalRate = 0.10; // Keep for potential future use
 
         // --- Board State ---
         let board = [];
@@ -365,19 +363,32 @@
         // PC Operation Mode Radios
         const pcOpModeRadios = document.querySelectorAll('input[name="pc-op-mode"]');
         const pcOpModeSection = document.getElementById('pc-op-mode-section');
+        // Save Settings Button
+        const saveSettingsButton = document.getElementById('save-settings-button');
 
-        // --- Settings ---
+        // --- Settings (Current Applied) ---
         let enableNumbers = numberSwitch.checked;
         let enableHide = hideSwitch.checked;
         let enableDirectional = directionalSwitch.checked;
         let enableOddEven = oddEvenSwitch.checked;
         let enableAreaValue = areaValueSwitch.checked;
 
+        // Pending Settings Object
+        let pendingSettings = {
+            numMines: numMines,
+            enableNumbers: enableNumbers,
+            enableHide: enableHide,
+            enableDirectional: enableDirectional,
+            enableOddEven: enableOddEven,
+            enableAreaValue: enableAreaValue
+        };
+
         // --- Initial Setup for Mine Slider ---
-        if (numMines < 0) numMines = 0;
-        if (numMines > 225) numMines = 225;
-        mineSlider.value = numMines;
-        mineCountDisplay.textContent = numMines;
+        if (pendingSettings.numMines < 0) pendingSettings.numMines = 0;
+        if (pendingSettings.numMines > 225) pendingSettings.numMines = 225;
+        mineSlider.value = pendingSettings.numMines;
+        mineCountDisplay.textContent = pendingSettings.numMines;
+        numMines = pendingSettings.numMines;
         minesLeft = numMines;
 
         // --- Device Detection and UI Initialization ---
@@ -401,52 +412,90 @@
         }
 
         // --- Event Listeners ---
-        resetButton.addEventListener('click', resetGame);
+        resetButton.addEventListener('click', resetGame); // Resets with current settings
         revealNonMinesButton.addEventListener('click', revealNonMines);
         revealAllButton.addEventListener('click', revealAll);
-        rulesButton.addEventListener('click', openPopup);
+        rulesButton.addEventListener('click', openPopup); // Opens popup and loads current settings into UI/pending
         closePopupButton.addEventListener('click', closePopup);
         popupOverlay.addEventListener('click', closePopup);
-        // Switch Listeners
-        numberSwitch.addEventListener('change', handleSettingChange);
-        hideSwitch.addEventListener('change', handleSettingChange);
-        directionalSwitch.addEventListener('change', handleSettingChange);
-        oddEvenSwitch.addEventListener('change', handleSettingChange);
-        areaValueSwitch.addEventListener('change', handleSettingChange);
-        // Mine Slider Listeners
-        mineSlider.addEventListener('input', () => { mineCountDisplay.textContent = mineSlider.value; });
-        mineSlider.addEventListener('change', () => {
-            numMines = parseInt(mineSlider.value, 10);
-            mineCountDisplay.textContent = numMines;
-            resetGame();
+        // Switch Listeners -> Update pendingSettings ONLY
+        numberSwitch.addEventListener('change', () => { pendingSettings.enableNumbers = numberSwitch.checked; });
+        hideSwitch.addEventListener('change', () => { pendingSettings.enableHide = hideSwitch.checked; });
+        directionalSwitch.addEventListener('change', () => { pendingSettings.enableDirectional = directionalSwitch.checked; });
+        oddEvenSwitch.addEventListener('change', () => { pendingSettings.enableOddEven = oddEvenSwitch.checked; });
+        areaValueSwitch.addEventListener('change', () => { pendingSettings.enableAreaValue = areaValueSwitch.checked; });
+        // Mine Slider Listeners -> Update pendingSettings ONLY
+        mineSlider.addEventListener('input', () => {
+             pendingSettings.numMines = parseInt(mineSlider.value, 10);
+             mineCountDisplay.textContent = pendingSettings.numMines;
         });
         // Mode Button Listeners
         digModeButton.addEventListener('click', () => switchMode('dig'));
         flagModeButton.addEventListener('click', () => switchMode('flag'));
-        // PC Operation Mode Listener
+        // PC Operation Mode Listener (Instant UI update, no pending needed)
         pcOpModeRadios.forEach(radio => {
             radio.addEventListener('change', handlePcOperationModeChange);
         });
+        // Save Settings Button Listener
+        saveSettingsButton.addEventListener('click', saveSettingsAndReset);
 
 
         // --- Popup Functions ---
         function openPopup() {
+            // Load CURRENT game settings into pendingSettings and UI controls
+            pendingSettings = {
+                numMines: numMines,
+                enableNumbers: enableNumbers,
+                enableHide: enableHide,
+                enableDirectional: enableDirectional,
+                enableOddEven: enableOddEven,
+                enableAreaValue: enableAreaValue
+            };
+
+            mineSlider.value = pendingSettings.numMines;
+            mineCountDisplay.textContent = pendingSettings.numMines;
+            numberSwitch.checked = pendingSettings.enableNumbers;
+            hideSwitch.checked = pendingSettings.enableHide;
+            directionalSwitch.checked = pendingSettings.enableDirectional;
+            oddEvenSwitch.checked = pendingSettings.enableOddEven;
+            areaValueSwitch.checked = pendingSettings.enableAreaValue;
+            // Ensure correct PC op mode radio is checked
+            const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
+            if (currentPcOpRadio) currentPcOpRadio.checked = true;
+
+
             rulesPopup.classList.add('visible');
             popupOverlay.classList.add('visible');
         }
+
         function closePopup() {
+            // Changes in pendingSettings are discarded if not saved
             rulesPopup.classList.remove('visible');
             popupOverlay.classList.remove('visible');
         }
+
+        // Removed resetGame() call from handleSettingChange
         function handleSettingChange() {
-            enableNumbers = numberSwitch.checked;
-            enableHide = hideSwitch.checked;
-            enableDirectional = directionalSwitch.checked;
-            enableOddEven = oddEvenSwitch.checked;
-            enableAreaValue = areaValueSwitch.checked;
-            resetGame();
+            // Switch changes now only update pending settings (handled directly in listener)
         }
-        // Handle PC Operation Mode Change
+
+        // New function to save settings and trigger reset
+        function saveSettingsAndReset() {
+            // Apply pending settings to actual game variables
+            numMines = pendingSettings.numMines;
+            enableNumbers = pendingSettings.enableNumbers;
+            enableHide = pendingSettings.enableHide;
+            enableDirectional = pendingSettings.enableDirectional;
+            enableOddEven = pendingSettings.enableOddEven;
+            enableAreaValue = pendingSettings.enableAreaValue;
+
+            // PC Op mode is applied instantly, so no need to apply from pending
+
+            resetGame(); // Reset the game with the newly applied settings
+            closePopup(); // Close the popup after saving
+        }
+
+        // Handle PC Operation Mode Change (Instant UI update)
         function handlePcOperationModeChange(event) {
              pcOperationMode = event.target.value;
              updateModeButtonsVisibility();
@@ -460,7 +509,7 @@
             if (newMode === 'dig') {
                 digModeButton.classList.add('active');
                 flagModeButton.classList.remove('active');
-            } else { // 'flag' mode
+            } else {
                 digModeButton.classList.remove('active');
                 flagModeButton.classList.add('active');
             }
@@ -468,13 +517,14 @@
 
 
         // --- Game Logic Functions ---
+        // resetGame now uses the current global settings (numMines, enable...)
         function resetGame() {
             gameOver = true;
             clearInterval(timerInterval);
             elapsedMilliseconds = 0;
             startTime = 0;
             gameStarted = false;
-            minesLeft = numMines;
+            minesLeft = numMines; // Use current numMines
             switchMode('dig');
             updateTimerDisplay();
             messageBox.textContent = '';
@@ -483,6 +533,7 @@
             setTimeout(createBoard, 50);
         }
 
+        // createBoard uses the current global settings
         function createBoard() {
             board = [];
             minesLeft = numMines;
@@ -504,49 +555,42 @@
                     const squareElement = square.element;
                     squareElement.classList.add('square', 'hidden');
                     squareElement.dataset.row = i; squareElement.dataset.col = j;
-                    // Use unified interaction handler for click/tap
                     squareElement.addEventListener('click', () => handleSquareInteraction(i, j));
-                    // Right-click listener (PC mouse mode only)
                     squareElement.addEventListener('contextmenu', (event) => {
                         event.preventDefault();
-                        if (!isTouch && pcOperationMode === 'mouse') {
-                             handleFlagAction(i, j);
-                        }
+                        if (!isTouch && pcOperationMode === 'mouse') { handleFlagAction(i, j); }
                     });
-                    // Long-press listener (Touch devices, acts like flag mode click)
                     let pressTimer;
                     squareElement.addEventListener('touchstart', (event) => {
                         if (isTouch && (!modeToggleButtonsContainer.classList.contains('visible') || currentInteractionMode === 'flag')) {
                              clearTimeout(pressTimer);
-                             pressTimer = setTimeout(() => {
-                                 event.preventDefault();
-                                 handleFlagAction(i, j);
-                             }, 500);
+                             pressTimer = setTimeout(() => { event.preventDefault(); handleFlagAction(i, j); }, 500);
                          }
                     }, { passive: false });
                     squareElement.addEventListener('touchend', () => clearTimeout(pressTimer));
                     squareElement.addEventListener('touchmove', () => clearTimeout(pressTimer));
-
                     boardElement.appendChild(squareElement);
                 }
             }
-            plantMines();
+            plantMines(); // Uses current numMines
             calculateAdjacentMines();
-            applySpecialSquares();
-            updateMinesLeftDisplay();
-            // Initialize UI based on device/settings after board exists
-            detectTouch();
+            applySpecialSquares(); // Uses current enable... flags
+            updateMinesLeftDisplay(); // Uses minesLeft derived from current numMines
+            detectTouch(); // Detect touch after elements are created
         }
 
+        // plantMines uses the current global numMines
         function plantMines() {
              let minesPlanted = 0;
              const maxPossibleMines = gridSize * gridSize;
               if (numMines >= maxPossibleMines) {
                    numMines = maxPossibleMines - 1;
                    console.warn(`Mine count capped at ${numMines}`);
+                   // Update slider and display ONLY if capped (reflect reality)
                    mineSlider.value = numMines;
                    mineCountDisplay.textContent = numMines;
-                   minesLeft = numMines;
+                   minesLeft = numMines; // Update this too
+                   pendingSettings.numMines = numMines; // Update pending too
               }
              if (numMines < 0) numMines = 0;
 
@@ -557,6 +601,7 @@
              }
         }
 
+        // calculateAdjacentMines, countMinesInDirection, hasNeighborOfType remain unchanged
         function calculateAdjacentMines() {
              for (let i = 0; i < gridSize; i++) {
                  for (let j = 0; j < gridSize; j++) {
@@ -573,7 +618,6 @@
                  }
              }
         }
-
         function countMinesInDirection(startRow, startCol, dx, dy) {
              let count = 0; let r = startRow + dx; let c = startCol + dy;
              while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
@@ -581,7 +625,6 @@
                  r += dx; c += dy;
              } return count;
         }
-
         function hasNeighborOfType(r, c, key) {
              for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
                  if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
@@ -589,20 +632,20 @@
              } return false;
         }
 
+        // applySpecialSquares uses the current global enable... flags
         function applySpecialSquares() {
             const potentialNumberSquares = [];
             for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
-                    const square = board[i][j];
-                    square.isHide = square.isOddEven = square.isAreaValue = square.isDirectional = false;
-                    square.oddEvenValue = square.areaValue = square.direction = square.directionalCount = square.directionalSymbol = null;
-                    if (!square.isMine && square.adjacentMines > 0) {
-                        potentialNumberSquares.push({ r: i, c: j });
-                    }
-                }
+                 for (let j = 0; j < gridSize; j++) {
+                     const square = board[i][j];
+                     square.isHide = square.isOddEven = square.isAreaValue = square.isDirectional = false;
+                     square.oddEvenValue = square.areaValue = square.direction = square.directionalCount = square.directionalSymbol = null;
+                     if (!square.isMine && square.adjacentMines > 0) {
+                         potentialNumberSquares.push({ r: i, c: j });
+                     }
+                 }
             }
             potentialNumberSquares.sort(() => Math.random() - 0.5);
-
             const assignedSpecial = new Set();
             const totalSquares = gridSize * gridSize;
             const numPotential = potentialNumberSquares.length;
@@ -613,11 +656,10 @@
             function hasDirectionalChain(r, c, dx, dy) { /* ... */ }
             function getValidDirections(r, c) { /* ... */ }
 
-            if (!enableNumbers) {
-                // ★★★ Directional generation disabled ★★★
-                /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
-                    for (const { r, c } of potentialNumberSquares) {
+            if (!enableNumbers) { // Uses current global enableNumbers
+                // Directional disabled: /* if (enableDirectional) { ... } */
+                if (enableAreaValue) { /* ... uses current enableAreaValue ... */
+                     for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
@@ -626,8 +668,8 @@
                          }
                     }
                 }
-                if (enableOddEven) {
-                    for (const { r, c } of potentialNumberSquares) {
+                if (enableOddEven) { /* ... uses current enableOddEven ... */
+                     for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
                              sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
@@ -635,14 +677,13 @@
                          }
                     }
                 }
-                for (const { r, c } of potentialNumberSquares) {
-                    if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
-                }
+                for (const { r, c } of potentialNumberSquares) { /* Hide remaining */
+                     if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
+                 }
             } else {
-                // ★★★ Directional generation disabled ★★★
-                 /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
-                    const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
+                // Directional disabled: /* if (enableDirectional) { ... } */
+                if (enableAreaValue) { /* ... uses current enableAreaValue ... */
+                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
@@ -652,8 +693,8 @@
                          }
                      }
                 }
-                if (enableOddEven) {
-                    const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
+                if (enableOddEven) { /* ... uses current enableOddEven ... */
+                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
@@ -662,18 +703,19 @@
                          }
                      }
                 }
-                if (enableHide) {
-                    const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
-                    const max = Math.floor(totalSquares * rate); let count = 0;
-                    for (const { r, c } of potentialNumberSquares) {
-                        if (count >= max) break; const k = `${r}-${c}`;
-                        if (!assignedSpecial.has(k)) { board[r][c].isHide = true; count++; }
-                    }
-                }
+                if (enableHide) { /* ... uses current enableHide ... */
+                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
+                     const max = Math.floor(totalSquares * rate); let count = 0;
+                     for (const { r, c } of potentialNumberSquares) {
+                         if (count >= max) break; const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k)) { board[r][c].isHide = true; count++; }
+                     }
+                 }
             }
         }
 
-        // Unified interaction handler
+
+        // --- Interaction and Rendering Functions ---
         function handleSquareInteraction(r, c) {
              if (gameOver) return;
 
@@ -700,7 +742,6 @@
              }
         }
 
-        // Handles flagging logic
         function handleFlagAction(r, c) {
             if (gameOver || board[r][c].isRevealed) return;
              if (!gameStarted) {
@@ -772,8 +813,7 @@
                         el.textContent = '';
                     }
                 }
-                 // Check if flag-wrong class was added (by revealAllMines)
-                 if (el.classList.contains('flag-wrong')) {
+                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added
                     el.textContent = '❌';
                     el.classList.add('flag-wrong'); // Ensure class stays
                  }
@@ -897,7 +937,7 @@
 
         // --- Initial Setup ---
         updateTimerDisplay(); // Show initial 00.00
-        createBoard(); // Start the game on load
+        createBoard(); // Start the game with initial settings
 
     </script>
 </body>
