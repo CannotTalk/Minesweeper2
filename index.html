@@ -14,19 +14,13 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px 0;
-            background-color: #f0f0f0; /* Default background */
+            background-color: #f0f0f0;
             font-family: 'Press Start 2P', cursive;
             transition: background-color 0.5s ease;
         }
         body.game-over {
-            background-color: #ff4444; /* Game Over background */
+            background-color: #ff4444;
         }
-        /* Consider adding a game-clear class if you prefer class-based styling for win state */
-        /*
-        body.game-clear {
-             background-color: #aaffaa;
-        }
-        */
         #game-container {
             display: flex;
             flex-direction: column;
@@ -36,6 +30,7 @@
             width: 90%;
             max-width: 350px;
         }
+        /* Game Header Styling */
         #game-header {
             display: flex;
             justify-content: space-between;
@@ -99,6 +94,7 @@
         }
         #rules-button:hover { background-color: #d0d0d0; }
 
+        /* Info Controls Container Styling */
         #info-controls {
             display: flex;
             flex-direction: column;
