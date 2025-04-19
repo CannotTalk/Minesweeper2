@@ -175,7 +175,7 @@ input:checked + .slider:before {
 }
 
 #debug-buttons {
-    display: none;
+    display: flex;
     margin-top: 10px;
 }
 
