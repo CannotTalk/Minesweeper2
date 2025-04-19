@@ -158,11 +158,45 @@
         }
 
         /* --- Popup Styles --- */
-         #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
-         #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; display: flex; flex-direction: column; /* For footer */ }
-         .popup-header { padding: 15px 20px 0 20px; /* Adjust padding */ }
+         #popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 99;
+            display: none; /* Hidden by default */
+        }
+         #rules-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background-color: #fdfdfd;
+            border: 2px solid #333;
+            border-radius: 8px;
+            z-index: 100;
+            display: none; /* Hidden by default */
+            font-size: 11px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            font-family: sans-serif;
+            color: #333;
+            flex-direction: column;
+        }
+        /* Visibility classes using display */
+        #popup-overlay.visible {
+            display: block !important; /* Use !important for override assurance */
+        }
+        #rules-popup.visible {
+            display: flex !important; /* Use !important for override assurance */
+        }
+
+         .popup-header { padding: 15px 20px 0 20px; }
          .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
-         .rules-content { max-height: 65vh; /* Adjust height considering footer */ overflow-y: auto; padding: 0 20px 10px 20px; /* Adjust padding */ }
+         .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
          #rules-popup h3 { font-size: 14px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; font-weight: bold; }
          #rules-popup h4 { font-size: 13px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: #555; }
          #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; }
@@ -171,8 +205,7 @@
          #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
          #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
          #rules-popup .switch { margin-left: 8px; }
-         #popup-overlay.visible, #rules-popup.visible { display: flex; /* Use flex for popup structure */ }
-         .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; /* Push to bottom */ }
+         .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; }
          #save-settings-button { padding: 6px 12px; font-size: 12px; font-family: 'Press Start 2P', cursive; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px; }
          #save-settings-button:hover { background-color: #45a049; }
 
@@ -376,7 +409,7 @@
         const pcOpModeRadios = document.querySelectorAll('input[name="pc-op-mode"]');
         const pcOpModeSection = document.getElementById('pc-op-mode-section');
         const saveSettingsButton = document.getElementById('save-settings-button');
-        const activeRulesDisplay = document.getElementById('active-rules-display'); // Get the new element
+        const activeRulesDisplay = document.getElementById('active-rules-display');
 
         // --- Settings (Current Applied) ---
         let enableNumbers = numberSwitch.checked;
@@ -410,7 +443,6 @@
                 document.body.classList.add('touch-device');
             } else {
                  document.body.classList.remove('touch-device');
-                 // Read initial PC operation mode setting only if NOT touch
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
             }
              updateModeButtonsVisibility();
@@ -456,8 +488,14 @@
             if (currentPcOpRadio) currentPcOpRadio.checked = true;
             rulesPopup.classList.add('visible'); popupOverlay.classList.add('visible');
         }
-        function closePopup() { rulesPopup.classList.remove('visible'); popupOverlay.classList.remove('visible'); }
-        function handleSettingChange() { /* No longer directly calls reset */ }
+
+        function closePopup() {
+            rulesPopup.classList.remove('visible');
+            popupOverlay.classList.remove('visible');
+        }
+
+        function handleSettingChange() { /* No longer resets game directly */ }
+
         function saveSettingsAndReset() {
             numMines = pendingSettings.numMines; enableNumbers = pendingSettings.enableNumbers;
             enableHide = pendingSettings.enableHide; enableDirectional = pendingSettings.enableDirectional;
@@ -480,10 +518,9 @@
                 rulesHtml += `<div>No Numbers</div>`;
             }
             if (enableHide) {
-                 rulesHtml += `<div>Concealment Squares</div>`; // Use updated English name
+                 rulesHtml += `<div>Concealment Squares</div>`;
             }
-            // Directional is disabled for now
-            // if (enableDirectional) {
+            // if (enableDirectional) { // Currently disabled
             //     rulesHtml += `<div>Directional Squares</div>`;
             // }
             if (enableOddEven) {
@@ -492,11 +529,10 @@
             if (enableAreaValue) {
                  rulesHtml += `<div>Range Value Squares</div>`;
             }
-            // If no special rules are active (and numbers are enabled), display nothing or a default message
             if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
-                 rulesHtml = '<div>Standard Rules</div>'; // Example default
-            } else if (!enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
-                 rulesHtml = '<div>No Numbers</div>'; // Only show this if numbers are off but others are also off
+                 rulesHtml = '<div>Standard Rules</div>';
+            } else if (!rulesHtml) {
+                rulesHtml = '<div>Standard Rules</div>'; // Default if numbers on but no other rules
             }
 
             activeRulesDisplay.innerHTML = rulesHtml;
@@ -633,9 +669,9 @@
             function hasDirectionalChain(r, c, dx, dy) { /* ... */ }
             function getValidDirections(r, c) { /* ... */ }
 
-            if (!enableNumbers) {
+            if (!enableNumbers) { // Uses current global enableNumbers
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
+                if (enableAreaValue) { /* ... uses current enableAreaValue ... */
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
@@ -645,7 +681,7 @@
                          }
                     }
                 }
-                if (enableOddEven) {
+                if (enableOddEven) { /* ... uses current enableOddEven ... */
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
@@ -654,12 +690,12 @@
                          }
                     }
                 }
-                for (const { r, c } of potentialNumberSquares) {
+                for (const { r, c } of potentialNumberSquares) { /* Hide remaining */
                      if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
                  }
             } else {
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
+                if (enableAreaValue) { /* ... uses current enableAreaValue ... */
                      const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`;
@@ -670,7 +706,7 @@
                          }
                      }
                 }
-                if (enableOddEven) {
+                if (enableOddEven) { /* ... uses current enableOddEven ... */
                      const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
@@ -680,7 +716,7 @@
                          }
                      }
                 }
-                if (enableHide) {
+                if (enableHide) { /* ... uses current enableHide ... */
                      const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
                      const max = Math.floor(totalSquares * rate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -690,6 +726,7 @@
                  }
             }
         }
+
 
         // --- Interaction and Rendering Functions ---
         function handleSquareInteraction(r, c) {
