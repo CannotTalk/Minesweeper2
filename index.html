@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マインスイーパー</title>
+    <!-- ★ Title Updated ★ -->
+    <title>Minesweeper 2</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
@@ -181,38 +182,17 @@
 
         /* --- Popup Styles --- */
          #popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 99;
-            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none;
         }
          #rules-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 500px;
-            background-color: #fdfdfd;
-            border: 2px solid #333;
-            border-radius: 8px;
-            z-index: 100;
-            display: none;
-            font-size: 11px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-            font-family: sans-serif;
-            color: #333;
-            flex-direction: column;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 500px; background-color: #fdfdfd;
+            border: 2px solid #333; border-radius: 8px; z-index: 100;
+            display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            font-family: sans-serif; color: #333; flex-direction: column;
         }
-        #popup-overlay.visible,
-        #rules-popup.visible {
-            display: flex !important;
-        }
-
+        #popup-overlay.visible, #rules-popup.visible { display: flex !important; }
          .popup-header { padding: 15px 20px 0 20px; }
          .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
          .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
@@ -260,17 +240,13 @@
     <div id="game-container">
          <!-- Header for Timer and Rules Button -->
         <div id="game-header">
-             <!-- Mode Toggle Buttons (Order 1) -->
              <div id="mode-toggle-buttons">
                  <button id="dig-mode-button" class="mode-button active" title="掘るモード">⛏️</button>
                  <button id="flag-mode-button" class="mode-button" title="旗モード">🚩</button>
              </div>
-             <!-- Timer (Order 2) -->
             <div class="timer">Time: <span id="timer">00.00</span></div>
-             <!-- Rules Button (Order 3) -->
             <button id="rules-button">Rules & Settings</button>
         </div>
-        <!-- End Header -->
 
         <div id="board"></div>
 
@@ -548,9 +524,11 @@
         // --- Initial Setup for Sliders ---
         if (pendingSettings.numMines < 0) {
             pendingSettings.numMines = 0;
+
         }
         if (pendingSettings.numMines > 225) {
             pendingSettings.numMines = 225;
+
         }
         mineSlider.value = pendingSettings.numMines;
 
@@ -894,7 +872,8 @@
             activeRulesDisplay.innerHTML = ''; // Clear rules display
             body.classList.remove('game-over');
 
-            body.style.backgroundColor = '#f0f0f0';
+            // ★ Removed direct style manipulation ★
+            // body.style.backgroundColor = '#f0f0f0';
 
             setTimeout(createBoard, 50);
 
@@ -1068,6 +1047,7 @@
                  c += dy;
              }
              return count;
+
         }
 
         function hasNeighborOfType(r, c, key) {
@@ -1084,6 +1064,7 @@
                  }
              }
              return false;
+
         }
 
         function applySpecialSquares() {
@@ -1381,8 +1362,8 @@
                 updateMinesLeftDisplay();
             } else {
                 messageBox.textContent = 'Game Over!';
-                body.classList.add('game-over');
-                revealAllMines(true);
+                body.classList.add('game-over'); // Apply red background style
+                revealAllMines(true); // Show results
             }
         }
         function revealAllMines(showContent) {
@@ -1401,7 +1382,7 @@
                         renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true;
+                            sq.isRevealed = true; // Mark revealed
                             el.className = 'square revealed flag-wrong'; // Set classes directly
                             el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
