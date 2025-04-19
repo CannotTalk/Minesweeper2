@@ -1,49 +1,46 @@
-        // Modified revealAllMines to keep correct flags and show wrong flags/unflagged mines
-        function revealAllMines(showContent) {
-             for (let i = 0; i < gridSize; i++) {
-                 for (let j = 0; j < gridSize; j++) {
-                     const square = board[i][j];
-                     const element = square.element;
-
-                     // --- Handle Mine Squares ---
-                     if (square.isMine) {
-                         if (square.isFlagged) {
-                             // Correctly flagged mine: Do nothing, keep the flag 🚩
-                             // Ensure it doesn't get overwritten later
-                             continue; // Move to the next square
-                         } else if (element.classList.contains('mine-clicked')) {
-                             // The mine that was clicked: Already handled by revealMine, do nothing extra
-                             continue;
-                         } else {
-                             // Unflagged mine: Reveal it as a bomb
-                             square.isRevealed = true; // Mark as revealed internally
-                             element.classList.remove('hidden', 'flagged');
-                             element.classList.add('revealed', 'mine');
-                             if (showContent) {
-                                 element.textContent = '💣';
-                             } else {
-                                 element.textContent = '';
-                             }
-                         }
-                     }
-                     // --- Handle Non-Mine Squares ---
-                     else {
-                         if (square.isFlagged) {
-                             // Incorrectly flagged non-mine: Show 'X'
-                             square.isRevealed = true; // Mark revealed to override flag visually
-                             element.classList.remove('hidden', 'flagged');
-                             element.classList.add('revealed', 'flag-wrong');
-                             element.textContent = '❌';
-                         } else if (showContent && !square.isRevealed) {
-                            // If revealAll debug button called, reveal non-mines too
-                            // Use revealSquare for consistency (handles adjacent numbers etc.)
-                            // Need to be careful not to cause infinite loops if revealSquare calls revealAllMines
-                            // Directly rendering might be safer here in the context of revealAll debug
-                            square.isRevealed = true;
-                            renderSquareContent(square); // Render its actual content (number or blank)
-                         }
-                         // Otherwise (unflagged, unrevealed non-mine in normal game over): Do nothing
-                     }
-                 }
+        // --- Debug Functions ---
+        function revealNonMines() {
+            if (gameOver) return;
+             if (!gameStarted) { // Start timer if debug is first action
+                 gameStarted = true;
+                 timerInterval = setInterval(updateTimer, 1000);
              }
+
+            // Reveal all non-mine squares
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (!board[i][j].isMine && !board[i][j].isRevealed) {
+                         revealSquare(i,j); // This will increment revealedNonMineCount
+                    }
+                }
+            }
+
+             // After revealing, check if the win condition is met
+             checkWinCondition(); // This should now trigger endGame(true)
+
+             // --- ここでメッセージを上書き ---
+             // Since revealNonMines forces a win state (if not already game over),
+             // explicitly set the desired message after the win state is processed.
+             // We check gameOver again to ensure endGame(true) was called by checkWinCondition.
+             if (gameOver) {
+                 messageBox.textContent = 'All squares revealed!';
+             }
+
+             // Fallback: If somehow checkWinCondition didn't trigger endGame (highly unlikely)
+             // Force the end game state and set the message.
+             if (!gameOver) {
+                 endGame(true); // Force win state
+                 messageBox.textContent = 'All squares revealed!'; // Set the message
+             }
+        }
+
+        function revealAll() {
+             if (gameOver) return;
+             if (!gameStarted) { // Start timer if debug is first action
+                 gameStarted = true;
+                 timerInterval = setInterval(updateTimer, 1000);
+             }
+             revealAllMines(true); // Show all mines and content
+             endGame(false); // Consider reveal all as a loss or neutral state for scoring
+             messageBox.textContent = 'All squares revealed!'; // Specific message for revealAll
         }
