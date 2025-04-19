@@ -53,8 +53,7 @@
         .revealed { background-color: #b4c687; }
         .mine { background-color: #ff4444; color: #000; font-size: 12px; }
         .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
-        /* Style for incorrectly flagged squares */
-        .flag-wrong { background-color: #fdd !important; /* Use !important to override .revealed */ }
+        .flag-wrong { background-color: #fdd !important; }
 
         #reset-button, #rules-button {
             padding: 6px 12px;
@@ -121,7 +120,7 @@
 <body>
     <div id="game-container">
         <div id="board"></div>
-        <div class="timer">Time: <span id="timer">0:00:00</span></div>
+        <div class="timer">Time: <span id="timer">00.00</span></div> <!-- Initial display updated -->
         <div id="message-box"></div>
         <button id="reset-button">Reset</button>
         <button id="rules-button">ルール説明</button>
@@ -148,9 +147,9 @@
              <div class="setting-section">
                  <div class="slider-label">
                      <span>地雷の数:</span>
-                     <span id="mine-count-display">30</span> <!-- Initial value display -->
+                     <span id="mine-count-display">30</span>
                  </div>
-                 <input type="range" id="mine-slider" min="0" max="225" value="30"> <!-- Updated min/max -->
+                 <input type="range" id="mine-slider" min="0" max="225" value="30">
                  <p style="font-size:10px; margin-top: 5px;">変更後、自動でリセットされます。</p>
              </div>
             <!-- End of Mine Count Section -->
@@ -243,9 +242,11 @@
         let minesLeft = numMines;
         let gameOver = false;
         let timerInterval;
-        let seconds = 0;
-        let revealedNonMineCount = 0;
+        // Use milliseconds for timer
+        let elapsedMilliseconds = 0;
+        const timerUpdateInterval = 50; // Update timer logic every 50ms
         let gameStarted = false;
+        let startTime = 0; // To calculate elapsed time accurately
 
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
@@ -306,6 +307,7 @@
             resetGame();
         });
 
+
         // --- Popup Functions ---
         function openPopup() {
             rulesPopup.classList.add('visible');
@@ -327,10 +329,12 @@
         // --- Game Logic Functions ---
         function resetGame() {
             gameOver = true;
-            clearInterval(timerInterval);
-            seconds = 0;
-            updateTimerDisplay();
+            clearInterval(timerInterval); // Stop existing timer
+            // Reset timer variables
+            elapsedMilliseconds = 0;
+            startTime = 0;
             gameStarted = false;
+            updateTimerDisplay(); // Display 00.00
             minesLeft = numMines;
             messageBox.textContent = '';
             body.classList.remove('game-over');
@@ -386,8 +390,7 @@
                   mineCountDisplay.textContent = numMines;
                   minesLeft = numMines;
              }
-            // Ensure numMines is not negative after adjustment
-            if (numMines < 0) numMines = 0;
+            if (numMines < 0) numMines = 0; // Ensure not negative
 
             while (minesPlanted < numMines) {
                 const r = Math.floor(Math.random() * gridSize);
@@ -599,12 +602,15 @@
             }
         }
 
-
         // --- Other Game Logic Functions ---
 
         function handleSquareClick(r, c) {
             if (gameOver || board[r][c].isRevealed || board[r][c].isFlagged) return;
-            if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+            if (!gameStarted) {
+                gameStarted = true;
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, timerUpdateInterval);
+            }
             const square = board[r][c];
             if (square.isMine) { revealMine(r, c); endGame(false); }
             else { revealSquare(r, c); checkWinCondition(); }
@@ -670,14 +676,18 @@
                  // Handle display of incorrectly flagged squares ('X')
                  if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
-                    el.classList.add('flag-wrong');
+                    el.classList.add('flag-wrong'); // Ensure class stays
                  }
             }
         }
 
         function handleRightClick(r, c) {
             if (gameOver || board[r][c].isRevealed) return;
-            if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+            if (!gameStarted) {
+                gameStarted = true;
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, timerUpdateInterval);
+            }
             const sq = board[r][c]; sq.isFlagged = !sq.isFlagged;
             if (sq.isFlagged) minesLeft--; else minesLeft++;
             renderSquareContent(sq); updateMinesLeftDisplay();
@@ -689,19 +699,30 @@
             const totalNonMine = gridSize * gridSize - numMines; // Use current numMines
             if (revealedNonMineCount >= totalNonMine) { // Use >= for safety
                 let allRevealed = true;
-                for(let i=0; i<gridSize; i++) for(let j=0; j<gridSize; j++) if(!board[i][j].isMine && !board[i][j].isRevealed) allRevealed = false;
-                if(allRevealed) endGame(true);
+                for(let i=0; i<gridSize; i++) for(let j=0; j<gridSize; j++) if(!board[i][j].isMine && !board[i][j].isRevealed) {allRevealed = false; break;}
+                if(!allRevealed) return; // Exit if not all non-mines are revealed
+                endGame(true);
             }
         }
 
+
         function endGame(isWin) {
-            if (gameOver && !isWin) return;
-            gameOver = true; clearInterval(timerInterval);
+             // Prevent stopping timer multiple times or processing loss after win
+             if(gameOver) return;
+
+             gameOver = true;
+             clearInterval(timerInterval);
+             if(gameStarted) { // Calculate final elapsed time if game actually started
+                 elapsedMilliseconds = Date.now() - startTime;
+                 updateTimerDisplay(); // Update display one last time with final millis
+             }
+
             if (isWin) {
                 messageBox.textContent = 'Game Clear!'; body.style.backgroundColor = '#aaffaa';
                 for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (board[i][j].isMine && !board[i][j].isFlagged) { board[i][j].isFlagged = true; renderSquareContent(board[i][j]); }
                 minesLeft = 0; updateMinesLeftDisplay();
             } else {
+                // Only show game over message if not already cleared
                 if(messageBox.textContent !== 'Game Clear!') {
                    messageBox.textContent = 'Game Over!'; body.classList.add('game-over');
                 }
@@ -709,7 +730,6 @@
             }
         }
 
-        // Reveals all mines and incorrect flags at game end
         function revealAllMines(showContent) {
             for (let i=0; i<gridSize; i++) {
                 for (let j=0; j<gridSize; j++) {
@@ -733,37 +753,69 @@
         }
 
 
-        function updateTimer() { seconds++; updateTimerDisplay(); }
+        function updateTimer() {
+            if (!gameStarted || gameOver) return;
+            elapsedMilliseconds = Date.now() - startTime;
+            updateTimerDisplay();
+        }
 
         function updateTimerDisplay() {
-            const h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60), s = seconds % 60;
-            timerDisplay.textContent = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            let formattedTime;
+             // Use Math.max to prevent negative display briefly on reset
+             const displayMillis = Math.max(0, elapsedMilliseconds);
+
+            if (displayMillis < 60000) { // Less than 1 minute
+                const secondsPart = Math.floor(displayMillis / 1000);
+                const centisecondsPart = Math.floor((displayMillis % 1000) / 10);
+                formattedTime = `${String(secondsPart).padStart(2, '0')}.${String(centisecondsPart).padStart(2, '0')}`;
+            } else if (displayMillis < 3600000) { // Less than 1 hour
+                const minutesPart = Math.floor(displayMillis / 60000);
+                const secondsPart = Math.floor((displayMillis % 60000) / 1000);
+                formattedTime = `${String(minutesPart).padStart(2, '0')}:${String(secondsPart).padStart(2, '0')}`;
+            } else { // 1 hour or more
+                const hoursPart = Math.floor(displayMillis / 3600000);
+                const minutesPart = Math.floor((displayMillis % 3600000) / 60000);
+                const secondsPart = Math.floor((displayMillis % 60000) / 1000);
+                formattedTime = `${hoursPart}:${String(minutesPart).padStart(2, '0')}:${String(secondsPart).padStart(2, '0')}`;
+            }
+            timerDisplay.textContent = formattedTime;
         }
 
         // --- Debug Functions ---
         function revealNonMines() {
             if (gameOver) return;
-             if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
             for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (!board[i][j].isMine && !board[i][j].isRevealed) revealSquare(i,j);
              checkWinCondition();
              messageBox.textContent = 'All squares revealed!';
+             // Ensure game over state is consistent after forced reveal
              if (!gameOver) {
-                 endGame(true);
-                 messageBox.textContent = 'All squares revealed!';
+                 endGame(true); // Force win state if somehow not triggered
+                 messageBox.textContent = 'All squares revealed!'; // Re-set message
              }
         }
 
         function revealAll() {
              if (gameOver) return;
-             if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
-             revealAllMines(true);
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
+             revealAllMines(true); // Show everything
+             // Ensure game over state is set correctly
              if (!gameOver) {
-                 gameOver = true; clearInterval(timerInterval);
+                 endGame(false); // Trigger game over logic (even if already called by revealAllMines hitting a mine)
              }
              messageBox.textContent = 'All squares revealed!';
         }
 
         // --- Initial Setup ---
+        updateTimerDisplay(); // Show initial 00.00
         createBoard(); // Start the game on load
 
     </script>
