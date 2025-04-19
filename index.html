@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- ★ Title Updated ★ -->
     <title>Minesweeper 2</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
@@ -15,13 +14,19 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px 0;
-            background-color: #f0f0f0;
+            background-color: #f0f0f0; /* Default background */
             font-family: 'Press Start 2P', cursive;
             transition: background-color 0.5s ease;
         }
         body.game-over {
-            background-color: #ff4444;
+            background-color: #ff4444; /* Game Over background */
         }
+        /* Consider adding a game-clear class if you prefer class-based styling for win state */
+        /*
+        body.game-clear {
+             background-color: #aaffaa;
+        }
+        */
         #game-container {
             display: flex;
             flex-direction: column;
@@ -31,7 +36,6 @@
             width: 90%;
             max-width: 350px;
         }
-        /* Game Header Styling */
         #game-header {
             display: flex;
             justify-content: space-between;
@@ -95,7 +99,6 @@
         }
         #rules-button:hover { background-color: #d0d0d0; }
 
-        /* Info Controls Container Styling */
         #info-controls {
             display: flex;
             flex-direction: column;
@@ -143,7 +146,7 @@
         .slider.round:before { border-radius: 50%; }
 
         .special-square { font-size: 9px; }
-        .odd-even-square { color: #0000CD; font-weight: bold; } /* Updated color */
+        .odd-even-square { color: #0000CD; font-weight: bold; }
         .area-value-square{ color: #902094; font-weight: bold; }
         .directional-square {
             color: #1a759f;
@@ -782,6 +785,7 @@
             closePopup();
 
         }
+
         function handlePcOperationModeChange(event) {
              pcOperationMode = event.target.value;
 
@@ -792,6 +796,7 @@
              switchMode('dig');
 
         }
+
         function switchMode(newMode) {
             if (newMode === currentInteractionMode) {
                 return;
@@ -872,8 +877,7 @@
             activeRulesDisplay.innerHTML = ''; // Clear rules display
             body.classList.remove('game-over');
 
-            // ★ Removed direct style manipulation ★
-            // body.style.backgroundColor = '#f0f0f0';
+            body.style.backgroundColor = ''; // ★ Reset inline background style ★
 
             setTimeout(createBoard, 50);
 
@@ -1349,7 +1353,7 @@
              }
             if (isWin) {
                 messageBox.textContent = 'Game Clear!';
-                body.style.backgroundColor = '#aaffaa';
+                body.style.backgroundColor = '#aaffaa'; // Keep inline style for win
                 for (let i=0; i<gridSize; i++) {
                     for (let j=0; j<gridSize; j++) {
                         if (board[i][j].isMine && !board[i][j].isFlagged) {
@@ -1362,8 +1366,8 @@
                 updateMinesLeftDisplay();
             } else {
                 messageBox.textContent = 'Game Over!';
-                body.classList.add('game-over'); // Apply red background style
-                revealAllMines(true); // Show results
+                body.classList.add('game-over'); // Use class for game over red
+                revealAllMines(true);
             }
         }
         function revealAllMines(showContent) {
@@ -1382,7 +1386,7 @@
                         renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true; // Mark revealed
+                            sq.isRevealed = true;
                             el.className = 'square revealed flag-wrong'; // Set classes directly
                             el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
