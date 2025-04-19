@@ -1,0 +1,188 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: 'Press Start 2P', cursive;
+    transition: background-color 0.5s ease;
+}
+
+body.game-over {
+    background-color: #ff4444;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(15, 30px);
+    border: 2px solid #333;
+    background-color: #b4c687;
+    padding: 5px;
+}
+
+.square {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+    background-color: #eee;
+}
+
+.hidden {
+    background-color: #ddd;
+}
+
+.revealed {
+    background-color: #b4c687;
+}
+
+.mine {
+    background-color: #ff4444;
+    color: #fff;
+}
+
+#reset-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+#message-box {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.timer {
+    font-size: 20px;
+    margin-top: 10px;
+    color: #333;
+}
+
+.direction {
+    color: #fff;
+    font-size: 12px;
+}
+
+.game-over-message {
+    color: #fff;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 20px;
+    padding: 10px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin-left: 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.special-square {
+    font-size: 12px;
+    color: #ffdb58;
+}
+
+#debug-buttons {
+    display: flex;
+    margin-top: 10px;
+}
+
+#debug-buttons button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+}
