@@ -35,7 +35,7 @@
             border: 2px solid #333;
             background-color: #b4c687;
             padding: 4px;
-            /* Add margin top to ensure space below buttons */
+            /* Add margin top to ensure space below buttons if visible */
             margin-top: 5px;
         }
         .square {
@@ -186,12 +186,11 @@
             color: #333;
             flex-direction: column;
         }
-        /* Visibility classes using display */
         #popup-overlay.visible {
-            display: block !important; /* Use !important for override assurance */
+            display: block !important;
         }
         #rules-popup.visible {
-            display: flex !important; /* Use !important for override assurance */
+            display: flex !important;
         }
 
          .popup-header { padding: 15px 20px 0 20px; }
@@ -234,15 +233,19 @@
         <button id="rules-button">Rules & Settings</button>
 
         <div id="board"></div>
-        <div class="timer">Time: <span id="timer">00.00</span></div>
-        <div id="message-box"></div>
-        <!-- Active Rules Display Area -->
-        <div id="active-rules-display"></div>
-        <button id="reset-button">Reset</button>
-        <div id="debug-buttons">
-            <button id="reveal-non-mines">Open Non-Mines</button>
-            <button id="reveal-all">Open All</button>
+
+        <!-- Info and Controls Container -->
+        <div id="info-controls">
+            <div class="timer">Time: <span id="timer">00.00</span></div>
+            <div id="message-box"></div>
+            <div id="active-rules-display"></div>
+            <button id="reset-button">Reset</button>
+            <div id="debug-buttons">
+                <button id="reveal-non-mines">Open Non-Mines</button>
+                <button id="reveal-all">Open All</button>
+            </div>
         </div>
+
     </div>
 
      <!-- Popup Structure -->
@@ -300,7 +303,8 @@
 
             <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
-            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
+            <!-- ★ Removed probability text ★ -->
+            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
 
             <div class="setting-section">
                 <h4>ハイドマス (Concealment Squares)</h4>
@@ -317,8 +321,9 @@
             <!-- Directional Square Section -->
             <div class="setting-section">
                 <h4>ディレクションマス (Directional Squares)</h4>
+                 <!-- ★ Removed probability text ★ -->
                  <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
                    <b>（現在この機能は調整中のため生成されません）</b></p>
                 <div class="setting-label">
                      有効
@@ -331,7 +336,8 @@
 
              <div class="setting-section">
                 <h4>オッドイーブンマス (OddEven Squares)</h4>
-                 <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。(これもハイドマスの一種です)</p>
+                 <!-- ★ Removed redundant text ★ -->
+                 <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。</p>
                 <div class="setting-label">
                      有効
                      <label class="switch">
@@ -343,7 +349,8 @@
 
              <div class="setting-section">
                 <h4>エリアバリューマス (Range Value Squares)</h4>
-                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。(これもハイドマスの一種です)</p>
+                 <!-- ★ Removed redundant text ★ -->
+                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。</p>
                  <div class="setting-label">
                       有効
                      <label class="switch">
@@ -494,7 +501,7 @@
             popupOverlay.classList.remove('visible');
         }
 
-        function handleSettingChange() { /* No longer resets game directly */ }
+        function handleSettingChange() { /* Switches update pendingSettings directly now */ }
 
         function saveSettingsAndReset() {
             numMines = pendingSettings.numMines; enableNumbers = pendingSettings.enableNumbers;
@@ -532,7 +539,7 @@
             if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
                  rulesHtml = '<div>Standard Rules</div>';
             } else if (!rulesHtml) {
-                rulesHtml = '<div>Standard Rules</div>'; // Default if numbers on but no other rules
+                rulesHtml = '<div>Standard Rules</div>';
             }
 
             activeRulesDisplay.innerHTML = rulesHtml;
@@ -671,7 +678,7 @@
 
             if (!enableNumbers) { // Uses current global enableNumbers
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) { /* ... uses current enableAreaValue ... */
+                if (enableAreaValue) {
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
@@ -681,7 +688,7 @@
                          }
                     }
                 }
-                if (enableOddEven) { /* ... uses current enableOddEven ... */
+                if (enableOddEven) {
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
@@ -690,12 +697,12 @@
                          }
                     }
                 }
-                for (const { r, c } of potentialNumberSquares) { /* Hide remaining */
+                for (const { r, c } of potentialNumberSquares) {
                      if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
                  }
             } else {
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) { /* ... uses current enableAreaValue ... */
+                if (enableAreaValue) {
                      const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`;
@@ -706,7 +713,7 @@
                          }
                      }
                 }
-                if (enableOddEven) { /* ... uses current enableOddEven ... */
+                if (enableOddEven) {
                      const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
@@ -716,7 +723,7 @@
                          }
                      }
                 }
-                if (enableHide) { /* ... uses current enableHide ... */
+                if (enableHide) {
                      const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
                      const max = Math.floor(totalSquares * rate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
