@@ -147,7 +147,7 @@
         .directional-square {
             color: #1a759f;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 9px; /* Adjust as needed for T/B/L/R */
         }
         .natural-number-square {
             color: #2E8B57; /* SeaGreen */
@@ -369,9 +369,8 @@
             <!-- Directional Square Section -->
             <div class="setting-section" data-rule-id="directional">
                 <h4>ディレクションマス (Directional Squares)</h4>
-                 <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
-                   <b>（現在この機能は調整中のため生成されません）</b></p>
+                 <p>方向(T,B,L,R)とその方向にある地雷の数を表示します (例:「R4」はそのマスより右にある地雷が4個)。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。</p> <!-- Text updated -->
                 <div class="setting-label">
                      <span>有効</span>
                       <div>
@@ -401,7 +400,7 @@
 
              <div class="setting-section" data-rule-id="areaValue">
                 <h4>エリアバリューマス (Range Value Squares)</h4>
-                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。</p>
+                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「~3」、「4~6」、「7~」で表示されます。</p> <!-- Text updated -->
                  <div class="setting-label">
                       <span>有効</span>
                       <div>
@@ -414,10 +413,9 @@
                  </div>
              </div>
 
-             <!-- Natural Number Square Section -->
              <div class="setting-section" data-rule-id="naturalNumber">
                 <h4>ナチュラルナンバーマス (Natural Number Squares)</h4>
-                <p>周囲8マスの地雷数が素数(2,3,5,7)の場合はその数字を、素数でない場合(1,4,6,8)は最も近い素数との差を表示します。(例: 1→「-1」、4→「±1」、6→「±1」、8→「+1」)</p>
+                <p>周囲8マスの地雷数が素数(2,3,5,7)の場合はその数字を、素数でない場合(1,4,6,8)は最も近い素数との差を表示します。例えば、「-1」(1)、「±1」(4)、「+1」(8)のように表示されます。</p> <!-- Text updated -->
                 <div class="setting-label">
                      <span>有効</span>
                       <div>
@@ -447,7 +445,7 @@
              enableNumbers: true,
              enableHide: true,
              hideRateMax: 0.10, // 10%
-             enableDirectional: false,
+             enableDirectional: false, // Default OFF
              enableOddEven: true,
              enableAreaValue: true,
              enableNaturalNumber: true
@@ -459,6 +457,7 @@
         const minHideRate = 0.05;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
+        const maxDirectionalRate = 0.05; // ★ Set directional rate to 5% ★
         const maxNaturalNumberRate = 0.10; // Example rate
 
         // --- Board State ---
@@ -606,9 +605,12 @@
             } else {
                  document.body.classList.remove('touch-device');
 
+                 // Read initial PC operation mode setting only if NOT touch
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
 
-                 document.body.dataset.pcOpMode = pcOperationMode; // Set data attribute for CSS
+                 // Add data attribute to body for CSS targeting
+                 document.body.dataset.pcOpMode = pcOperationMode;
+
             }
              updateModeButtonsVisibility();
 
@@ -726,7 +728,7 @@
                 enableDirectional: enableDirectional,
                 enableOddEven: enableOddEven,
                 enableAreaValue: enableAreaValue,
-                enableNaturalNumber: enableNaturalNumber // Include natural number
+                enableNaturalNumber: enableNaturalNumber
             };
 
             mineSlider.value = pendingSettings.numMines;
@@ -842,7 +844,7 @@
 
                     break;
 
-                 case 'naturalNumber': // Added case
+                 case 'naturalNumber':
                     pendingSettings.enableNaturalNumber = defaultSettings.enableNaturalNumber;
 
                     naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber;
@@ -863,7 +865,7 @@
 
             enableHide = pendingSettings.enableHide;
 
-            hideRateMax = pendingSettings.hideRateMax; // Apply hide rate
+            hideRateMax = pendingSettings.hideRateMax;
 
             enableDirectional = pendingSettings.enableDirectional;
 
@@ -871,7 +873,7 @@
 
             enableAreaValue = pendingSettings.enableAreaValue;
 
-            enableNaturalNumber = pendingSettings.enableNaturalNumber; // Apply natural number
+            enableNaturalNumber = pendingSettings.enableNaturalNumber;
 
             updateNoFlagsUI(); // Update UI based on new setting
             resetGame(); // Reset the game with the newly applied settings
@@ -931,7 +933,9 @@
                  rulesHtml += `<div>Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
 
             }
-            // if (enableDirectional) { ... }
+            if (enableDirectional) { // Now potentially active
+                rulesHtml += `<div>Directional Squares</div>`;
+            }
             if (enableOddEven) {
                  rulesHtml += `<div>OddEven Squares</div>`;
 
@@ -940,7 +944,7 @@
                  rulesHtml += `<div>Range Value Squares</div>`;
 
             }
-             if (enableNaturalNumber) { // Add display
+            if (enableNaturalNumber) {
                  rulesHtml += `<div>Natural Number Squares</div>`;
 
             }
@@ -1021,21 +1025,11 @@
 
                 for (let j = 0; j < gridSize; j++) {
                     board[i][j] = {
-                        isMine: false,
-                        isRevealed: false,
-                        isFlagged: false,
-                        adjacentMines: 0,
-                        isHide: false,
-                        isOddEven: false,
-                        isAreaValue: false,
-                        isDirectional: false,
-                        isNaturalNumber: false, // Added property
-                        oddEvenValue: null,
-                        areaValue: null,
-                        direction: null,
-                        directionalCount: null,
-                        directionalSymbol: null,
-                        naturalNumberValue: null, // Added property
+                        isMine: false, isRevealed: false, isFlagged: false,
+                        adjacentMines: 0, isHide: false, isOddEven: false, isAreaValue: false, isDirectional: false,
+                        isNaturalNumber: false,
+                        oddEvenValue: null, areaValue: null, direction: null, directionalCount: null, directionalSymbol: null,
+                        naturalNumberValue: null,
                         element: document.createElement('div')
                     };
 
@@ -1054,7 +1048,6 @@
                     squareElement.addEventListener('contextmenu', (event) => {
                         event.preventDefault();
 
-                        // Disable right-click flagging if no flags mode
                         if (!isTouch && pcOperationMode === 'mouse' && !enableNoFlags) {
                             handleFlagAction(i, j);
                         }
@@ -1063,7 +1056,6 @@
                     let pressTimer;
 
                     squareElement.addEventListener('touchstart', (event) => {
-                        // Disable long-press flagging if no flags mode
                         if (isTouch && !enableNoFlags) {
                              clearTimeout(pressTimer);
 
@@ -1093,9 +1085,9 @@
 
             updateMinesLeftDisplay();
 
-            updateActiveRulesDisplay(); // Update rules display
-            updateNoFlagsUI(); // Update no-flags UI elements
-            detectTouch(); // Detect touch after elements are created
+            updateActiveRulesDisplay();
+            updateNoFlagsUI();
+            detectTouch();
 
         }
 
@@ -1197,26 +1189,24 @@
 
         }
 
-        // ★★★ New Helper: Calculate Natural Number Value ★★★
+        // Helper: Calculate Natural Number Value
         function calculateNaturalNumberValue(num) {
-            // Primes in the 1-8 range
             const primes = [2, 3, 5, 7];
 
             if (primes.includes(num)) {
                 return num.toString(); // Return the prime number itself
 
             }
-            // Non-primes in the 1-8 range
             switch (num) {
-                case 1: return "-1"; // Closest prime is 2 (2-1=1)
-                case 4: return "±1"; // Closest primes are 3 and 5
-                case 6: return "±1"; // Closest primes are 5 and 7
-                case 8: return "+1"; // Closest prime is 7 (7+1=8)
-                default: return "?"; // For 0 or > 8 (or if error)
+                case 1: return "-1";
+                case 4: return "±1";
+                case 6: return "±1";
+                case 8: return "+1";
+                default: return "?"; // Should not happen for adjacentMines > 0
             }
         }
 
-
+        // Applies special square types based on settings
         function applySpecialSquares() {
             const potentialNumberSquares = [];
 
@@ -1250,125 +1240,113 @@
 
             const numPotential = potentialNumberSquares.length;
 
-            // const baseDirections = [ /* ... */ ]; // Kept for future use
-            // function hasDirectionalChain(r, c, dx, dy) { /* ... */ } // Kept for future use
-            // function getValidDirections(r, c) { /* ... */ } // Kept for future use
+            // ★ Updated directions with T/B/L/R symbols ★
+            const baseDirections = [
+                 { dx: -1, dy: 0, symbol: 'T', name: 'up' },
+                 { dx: 1, dy: 0, symbol: 'B', name: 'down' },
+                 { dx: 0, dy: -1, symbol: 'L', name: 'left' },
+                 { dx: 0, dy: 1, symbol: 'R', name: 'right' }
+             ];
 
+            // Helper function to check for directional chains
+            function hasDirectionalChain(startRow, startCol, dx, dy) {
+                 let r = startRow + dx;
+                 let c = startCol + dy;
+                 while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                     const nextSquare = board[r][c];
+                     if (nextSquare?.isDirectional && nextSquare.direction?.dx === dx && nextSquare.direction?.dy === dy) {
+                         return true;
+                     }
+                     r += dx;
+                     c += dy;
+                 }
+                 return false;
+
+            }
+
+            // Helper to get valid directions for a given cell
+            function getValidDirections(r, c) {
+                 return baseDirections.filter(dir => {
+                     const nextR = r + dir.dx;
+                     const nextC = c + dir.dy;
+                     return nextR >= 0 && nextR < gridSize && nextC >= 0 && nextC < gridSize;
+                 });
+            }
+
+            // --- Apply Special Square Logic ---
             if (!enableNumbers) { // Uses current global enableNumbers
                 // --- Numbers OFF: Apply deterministically ---
                 // ★ Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide ★
-                // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
-                     for (const { r, c } of potentialNumberSquares) {
-                         const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const sq = board[r][c];
-                             sq.isAreaValue = true;
-                             sq.isHide = true; // All non-number squares are hidden
-                             if (sq.adjacentMines <= 3) { sq.areaValue = '-3'; }
-                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4-6'; }
-                             else { sq.areaValue = '7+'; }
-                             assignedSpecial.add(k);
-                         }
-                    }
-                }
-                if (enableOddEven) {
-                     for (const { r, c } of potentialNumberSquares) {
-                         const k = `${r}-${c}`;
-                         const sq = board[r][c];
-                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = true;
-                             sq.isHide = true;
-                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
-                             assignedSpecial.add(k);
-                         }
-                    }
-                }
-                // Apply Natural Number if enabled and not assigned
-                if (enableNaturalNumber) {
+                if (enableDirectional) { // ★ Directional Generation (Deterministic) ★
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`;
-                        const sq = board[r][c];
-                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isNaturalNumber')) {
-                            sq.isNaturalNumber = true;
-                            sq.isHide = true;
-                            sq.naturalNumberValue = calculateNaturalNumberValue(sq.adjacentMines);
-                            assignedSpecial.add(k);
+                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
+                            const sq = board[r][c];
+                            let assignedDir = false;
+                            const validDirs = getValidDirections(r, c);
+                            if (validDirs.length > 0) {
+                                const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                                for (const dir of shuffledValidDirs) {
+                                    if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
+                                        const count = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                        sq.isDirectional = true; sq.isHide = true;
+                                        sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                        sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
+                                        assignedSpecial.add(k);
+                                        assignedDir = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+                if (enableAreaValue) { /* ... */ }
+                if (enableOddEven) { /* ... */ }
+                if (enableNaturalNumber) { /* ... */ }
                 // Apply hide to remaining if enabled (or if numbers off and hide off)
                 if (enableHide || !enableNumbers) {
                     for (const { r, c } of potentialNumberSquares) {
                          if (!assignedSpecial.has(`${r}-${c}`)) {
-                             board[r][c].isHide = true; // Ensure it's marked as hidden
+                             board[r][c].isHide = true;
                          }
                      }
                 }
             } else {
                 // --- Numbers ON: Apply probabilistically ---
                  // ★ Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide ★
-                // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
-                     const max = Math.floor(totalSquares * maxAreaValueRate);
-                     let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) { break; }
-                         const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const sq = board[r][c];
-                             sq.isAreaValue = true; sq.isHide = true;
-                             if (sq.adjacentMines <= 3) { sq.areaValue = '-3'; }
-                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4-6'; }
-                             else { sq.areaValue = '7+'; }
-                             assignedSpecial.add(k); count++;
-                         }
-                     }
-                }
-                if (enableOddEven) {
-                     const max = Math.floor(totalSquares * maxOddEvenRate);
-                     let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) { break; }
-                         const k = `${r}-${c}`;
-                         const sq = board[r][c];
-                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = true; sq.isHide = true;
-                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
-                             assignedSpecial.add(k); count++;
-                         }
-                     }
-                }
-                // Apply Natural Number probabilistically
-                if (enableNaturalNumber) {
-                     const maxNat = Math.floor(numPotential * maxNaturalNumberRate);
-                     let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                          if (count >= maxNat) { break; }
-                          const k = `${r}-${c}`;
-                          const sq = board[r][c];
-                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isNaturalNumber')) {
-                               sq.isNaturalNumber = true;
-                               sq.isHide = true; // Natural Number also implies hidden number initially
-                               sq.naturalNumberValue = calculateNaturalNumberValue(sq.adjacentMines);
-                               assignedSpecial.add(k);
-                               count++;
-                           }
-                      }
-                 }
-                // Hide logic using hideRateMax
-                if (enableHide) {
-                     const maxHide = Math.floor(numPotential * hideRateMax);
-                     let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                         if (count >= maxHide) { break; }
-                         const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k)) { // Only hide if not already special
-                            board[r][c].isHide = true;
-                            count++;
+                 if (enableDirectional) { // ★ Directional Generation (Probabilistic) ★
+                    const maxDir = Math.floor(numPotential * maxDirectionalRate); // Use 5% rate
+                    let count = 0;
+                    for (const { r, c } of potentialNumberSquares) {
+                        if (count >= maxDir) { break; }
+                        const k = `${r}-${c}`;
+                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
+                            const sq = board[r][c];
+                             let assignedDir = false;
+                             const validDirs = getValidDirections(r, c);
+                             if (validDirs.length > 0) {
+                                 const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                                 for (const dir of shuffledValidDirs) {
+                                     if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
+                                         const dirCount = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                         sq.isDirectional = true; sq.isHide = true;
+                                         sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                         sq.directionalCount = dirCount; sq.directionalSymbol = dir.symbol;
+                                         assignedSpecial.add(k);
+                                         assignedDir = true;
+                                         count++;
+                                         break;
+                                     }
+                                 }
+                             }
                         }
-                     }
+                    }
                  }
+                if (enableAreaValue) { /* ... */ }
+                if (enableOddEven) { /* ... */ }
+                if (enableNaturalNumber) { /* ... */ }
+                if (enableHide) { /* ... */ }
                  // Remaining squares will show numbers
             }
         }
@@ -1376,7 +1354,6 @@
 
         // --- Interaction and Rendering Functions ---
         function handleSquareInteraction(r, c) {
-             // Skip interaction immediately after flagging via touch/button
              if (justFlagged) {
                  return;
 
@@ -1540,18 +1517,17 @@
                     } else if (sq.isAreaValue) {
                         el.classList.add('special-square', 'area-value-square');
 
-                        el.textContent = sq.areaValue;
+                        // ★ Update Area Value text ★
+                        el.textContent = sq.areaValue === '-3' ? '~3' : sq.areaValue === '7+' ? '7~' : sq.areaValue; // Handles 4-6 too
 
                     } else if (sq.isOddEven) {
                         el.classList.add('special-square', 'odd-even-square');
 
                         el.textContent = sq.oddEvenValue;
 
-                    } else if (sq.isNaturalNumber) { // ★ Natural Number Display Logic ★
-                         el.classList.add('natural-number-square'); // ★ Add specific class ★
-                         if (sq.naturalNumberValue === '±1') {
-                             el.style.fontSize = '10px'; // Slightly smaller for ±
-                         }
+                    } else if (sq.isNaturalNumber) {
+                         el.classList.add('natural-number-square');
+                         if (sq.naturalNumberValue === '±1') { el.style.fontSize = '10px'; }
                          el.textContent = sq.naturalNumberValue;
 
                     } else if (sq.isHide) {
