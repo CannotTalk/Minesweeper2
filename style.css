@@ -177,6 +177,7 @@ input:checked + .slider:before {
 #debug-buttons {
     display: flex;
     margin-top: 10px;
+    visibility: hidden;
 }
 
 #debug-buttons button {
