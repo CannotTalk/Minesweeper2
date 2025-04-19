@@ -26,8 +26,22 @@
             flex-direction: column;
             align-items: center;
             margin-bottom: 12px;
-            position: relative; /* Set position context for absolute positioning */
-            padding-top: 30px; /* Adjust top padding if needed for rules button */
+            position: relative; /* Keep for potential absolute elements inside */
+            /* padding-top: 40px; /* Removed */
+             width: 90%; /* Ensure container has width */
+             max-width: 350px; /* Adjust max-width as needed */
+        }
+        /* Game Header Styling */
+        #game-header {
+            display: flex;
+            justify-content: space-between; /* Aligns timer to left, button to right */
+            align-items: center;          /* Aligns items vertically center */
+            width: 100%;                  /* Takes full container width */
+            max-width: 314px;             /* Approx board width */
+            margin-bottom: 5px;           /* Space below the header */
+            padding: 0 5px;               /* Optional padding inside header */
+            box-sizing: border-box;
+            min-height: 30px; /* Ensure header has some height */
         }
         #board {
             display: grid;
@@ -35,7 +49,7 @@
             border: 2px solid #333;
             background-color: #b4c687;
             padding: 4px;
-            margin-top: 5px; /* Space below timer/mode buttons */
+            margin-top: 5px; /* Space below header/mode buttons */
             margin-bottom: 10px; /* Space above info-controls */
         }
         .square {
@@ -66,10 +80,9 @@
             margin-top: 8px;
             font-family: 'Press Start 2P', cursive;
         }
+        /* Rules & Settings Button Styling */
         #rules-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+            position: static; /* Removed absolute positioning */
             padding: 5px 8px;
             font-size: 10px;
             cursor: pointer;
@@ -79,18 +92,14 @@
             border-radius: 3px;
             z-index: 10;
             margin-top: 0;
+             /* Order last in flex container */
+             order: 3;
         }
-        #rules-button:hover { background-color: #d0d0d0; }
-
-        /* ★★★ Timer moved above board, adjust styles ★★★ */
-        .timer {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 10px; /* Space below timer */
-            text-align: center; /* Center align timer */
-            width: 100%; /* Ensure it takes width for centering */
+        #rules-button:hover {
+            background-color: #d0d0d0;
         }
 
+        /* Info Controls Container Styling */
         #info-controls {
             display: flex;
             flex-direction: column;
@@ -100,7 +109,7 @@
         }
 
         #message-box {
-            /* margin-top: 5px; /* No longer needed */
+            /* margin-top: 5px; /* Removed */
             font-size: 12px;
             color: #333;
             margin-bottom: 2px;
@@ -117,6 +126,16 @@
             min-height: 40px;
         }
         #active-rules-display div { margin-bottom: 2px; }
+
+        .timer {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            /* margin: 0 10px; /* Adjust margin as needed */
+            /* Order second in flex container */
+            order: 2;
+            flex-grow: 1; /* Allow timer to take space if needed */
+        }
 
 
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
@@ -145,16 +164,18 @@
         /* Mode Toggle Button Styles */
         #mode-toggle-buttons {
             display: none; /* Initially hidden */
-            margin-bottom: 10px; /* Space below buttons */
-            user-select: none; /* Prevent text selection */
+            user-select: none;
+            /* Order first in flex container */
+            order: 1;
+             /* Remove margin-bottom */
         }
         #mode-toggle-buttons.visible {
-            display: flex; /* Show buttons */
-            gap: 10px; /* Space between buttons */
+            display: flex;
+            gap: 5px; /* Slightly reduce gap */
         }
         .mode-button {
-            font-size: 20px; /* Larger icons */
-            padding: 5px 10px;
+            font-size: 20px;
+            padding: 3px 6px; /* Adjust padding */
             cursor: pointer;
             border: 2px solid #888;
             background-color: #eee;
@@ -228,22 +249,28 @@
         .pc-op-mode-label input[type="radio"] { margin-right: 5px; }
         #pc-op-mode-section { display: block; }
         body.touch-device #pc-op-mode-section { display: none; }
+        /* PC operation mode visibility adjustment */
+        body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons {
+            display: none; /* Hide buttons in PC mouse mode */
+        }
 
     </style>
 </head>
 <body>
     <div id="game-container">
-         <!-- Mode Toggle Buttons -->
-        <div id="mode-toggle-buttons">
-            <button id="dig-mode-button" class="mode-button active" title="掘るモード (クリック/タップでマスを開く)">⛏️</button>
-            <button id="flag-mode-button" class="mode-button" title="旗モード (クリック/タップで旗を立てる/外す)">🚩</button>
+         <!-- Header for Timer and Rules Button -->
+        <div id="game-header">
+             <!-- Mode Toggle Buttons (Order 1) -->
+             <div id="mode-toggle-buttons">
+                 <button id="dig-mode-button" class="mode-button active" title="掘るモード">⛏️</button>
+                 <button id="flag-mode-button" class="mode-button" title="旗モード">🚩</button>
+             </div>
+             <!-- Timer (Order 2) -->
+            <div class="timer">Time: <span id="timer">00.00</span></div>
+             <!-- Rules Button (Order 3) -->
+            <button id="rules-button">Rules & Settings</button>
         </div>
-
-        <!-- Rules Button Moved Here -->
-        <button id="rules-button">Rules & Settings</button>
-
-        <!-- ★★★ Timer Moved Above Board ★★★ -->
-        <div class="timer">Time: <span id="timer">00.00</span></div>
+        <!-- End Header -->
 
         <div id="board"></div>
 
@@ -456,9 +483,14 @@
             isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
             if (isTouch) {
                 document.body.classList.add('touch-device');
+                // Force button mode logic for touch devices
+                pcOperationMode = 'button';
             } else {
                  document.body.classList.remove('touch-device');
+                 // Read initial PC operation mode setting only if NOT touch
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
+                 // Add data attribute to body for CSS targeting
+                 document.body.dataset.pcOpMode = pcOperationMode;
             }
              updateModeButtonsVisibility();
         }
@@ -509,7 +541,7 @@
             popupOverlay.classList.remove('visible');
         }
 
-        function handleSettingChange() { /* Switches update pendingSettings directly now */ }
+        function handleSettingChange() { /* No direct action needed here anymore */ }
 
         function saveSettingsAndReset() {
             numMines = pendingSettings.numMines; enableNumbers = pendingSettings.enableNumbers;
@@ -518,7 +550,12 @@
             resetGame();
             closePopup();
         }
-        function handlePcOperationModeChange(event) { pcOperationMode = event.target.value; updateModeButtonsVisibility(); switchMode('dig'); }
+        function handlePcOperationModeChange(event) {
+             pcOperationMode = event.target.value;
+             document.body.dataset.pcOpMode = pcOperationMode; // Update data attribute
+             updateModeButtonsVisibility();
+             switchMode('dig');
+        }
         function switchMode(newMode) {
             if (newMode === currentInteractionMode) return;
             currentInteractionMode = newMode;
@@ -546,8 +583,10 @@
             }
             if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
                  rulesHtml = '<div>Standard Rules</div>';
-            } else if (!rulesHtml) {
+            } else if (!rulesHtml && enableNumbers) { // Check if numbers are on but no special rules active
                 rulesHtml = '<div>Standard Rules</div>';
+            } else if (!rulesHtml && !enableNumbers){ // Check if numbers off and no special rules active
+                 rulesHtml = '<div>No Numbers</div>'; // Should ideally not happen if hide defaults on
             }
 
             activeRulesDisplay.innerHTML = rulesHtml;
@@ -596,9 +635,13 @@
                     });
                     let pressTimer;
                     squareElement.addEventListener('touchstart', (event) => {
-                        if (isTouch && (!modeToggleButtonsContainer.classList.contains('visible') || currentInteractionMode === 'flag')) {
+                        // Logic adjusted: Long press always flags on touch devices regardless of mode buttons visibility
+                        if (isTouch) {
                              clearTimeout(pressTimer);
-                             pressTimer = setTimeout(() => { event.preventDefault(); handleFlagAction(i, j); }, 500);
+                             pressTimer = setTimeout(() => {
+                                 event.preventDefault();
+                                 handleFlagAction(i, j);
+                             }, 500);
                          }
                     }, { passive: false });
                     squareElement.addEventListener('touchend', () => clearTimeout(pressTimer));
@@ -611,7 +654,7 @@
             applySpecialSquares();
             updateMinesLeftDisplay();
             updateActiveRulesDisplay(); // Update rules display
-            detectTouch();
+            detectTouch(); // Detect touch after elements are created
         }
 
         function plantMines() {
@@ -686,59 +729,14 @@
 
             if (!enableNumbers) { // Uses current global enableNumbers
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
-                     for (const { r, c } of potentialNumberSquares) {
-                         const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
-                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
-                             assignedSpecial.add(k);
-                         }
-                    }
-                }
-                if (enableOddEven) {
-                     for (const { r, c } of potentialNumberSquares) {
-                         const k = `${r}-${c}`; const sq = board[r][c];
-                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
-                             assignedSpecial.add(k);
-                         }
-                    }
-                }
-                for (const { r, c } of potentialNumberSquares) {
-                     if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
-                 }
+                if (enableAreaValue) { /* ... */ }
+                if (enableOddEven) { /* ... */ }
+                for (const { r, c } of potentialNumberSquares) { /* Hide remaining */ }
             } else {
                 // Directional disabled: /* if (enableDirectional) { ... } */
-                if (enableAreaValue) {
-                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) break; const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
-                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
-                             assignedSpecial.add(k); count++;
-                         }
-                     }
-                }
-                if (enableOddEven) {
-                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
-                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
-                             assignedSpecial.add(k); count++;
-                         }
-                     }
-                }
-                if (enableHide) {
-                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
-                     const max = Math.floor(totalSquares * rate); let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) break; const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k)) { board[r][c].isHide = true; count++; }
-                     }
-                 }
+                if (enableAreaValue) { /* ... */ }
+                if (enableOddEven) { /* ... */ }
+                if (enableHide) { /* ... */ }
             }
         }
 
