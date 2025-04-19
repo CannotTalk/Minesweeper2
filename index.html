@@ -27,20 +27,20 @@
             align-items: center;
             margin-bottom: 12px;
             position: relative;
-             width: 90%; /* Ensure container has width */
-             max-width: 350px; /* Adjust max-width as needed */
+            width: 90%;
+            max-width: 350px;
         }
         /* Game Header Styling */
         #game-header {
             display: flex;
-            justify-content: space-between; /* Aligns timer to left, button to right */
-            align-items: center;          /* Aligns items vertically center */
-            width: 100%;                  /* Takes full container width */
-            max-width: 314px;             /* Approx board width */
-            margin-bottom: 5px;           /* Space below the header */
-            padding: 0 5px;               /* Optional padding inside header */
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 314px;
+            margin-bottom: 5px;
+            padding: 0 5px;
             box-sizing: border-box;
-            min-height: 30px; /* Ensure header has some height */
+            min-height: 30px;
         }
         #board {
             display: grid;
@@ -48,8 +48,8 @@
             border: 2px solid #333;
             background-color: #b4c687;
             padding: 4px;
-            margin-top: 5px; /* Space below header/mode buttons */
-            margin-bottom: 10px; /* Space above info-controls */
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
         .square {
             width: 20px;
@@ -80,7 +80,7 @@
             font-family: 'Press Start 2P', cursive;
         }
         #rules-button {
-            position: static; /* Removed absolute positioning */
+            position: static;
             padding: 5px 8px;
             font-size: 10px;
             cursor: pointer;
@@ -90,7 +90,7 @@
             border-radius: 3px;
             z-index: 10;
             margin-top: 0;
-             order: 3; /* Order last in flex container */
+            order: 3;
         }
         #rules-button:hover { background-color: #d0d0d0; }
 
@@ -125,9 +125,9 @@
             font-size: 14px;
             color: #333;
             text-align: center;
-            order: 2; /* Order second in flex container */
-            flex-grow: 1; /* Allow timer to take space if needed */
-            margin: 0; /* Reset margin */
+            order: 2;
+            flex-grow: 1;
+            margin: 0;
         }
 
 
@@ -156,17 +156,17 @@
 
         /* Mode Toggle Button Styles */
         #mode-toggle-buttons {
-            display: none; /* Initially hidden */
+            display: none;
             user-select: none;
-            order: 1; /* Order first in flex container */
+            order: 1;
         }
         #mode-toggle-buttons.visible {
             display: flex;
-            gap: 5px; /* Slightly reduce gap */
+            gap: 5px;
         }
         .mode-button {
             font-size: 20px;
-            padding: 3px 6px; /* Adjust padding */
+            padding: 3px 6px;
             cursor: pointer;
             border: 2px solid #888;
             background-color: #eee;
@@ -188,7 +188,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
             z-index: 99;
-            display: none; /* Hidden by default */
+            display: none;
         }
          #rules-popup {
             position: fixed;
@@ -201,16 +201,14 @@
             border: 2px solid #333;
             border-radius: 8px;
             z-index: 100;
-            display: none; /* Hidden by default */
+            display: none;
             font-size: 11px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.25);
             font-family: sans-serif;
             color: #333;
             flex-direction: column;
         }
-        #popup-overlay.visible {
-            display: block !important;
-        }
+        #popup-overlay.visible,
         #rules-popup.visible {
             display: flex !important;
         }
@@ -234,6 +232,31 @@
          #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
          #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px;}
          .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
+
+         /* Rule Reset Button Style */
+        .reset-rule-button {
+            font-size: 9px;
+            padding: 2px 6px;
+            margin-left: 10px;
+            cursor: pointer;
+            background-color: #ddd;
+            border: 1px solid #bbb;
+            border-radius: 3px;
+            font-family: sans-serif;
+        }
+        .reset-rule-button:hover {
+            background-color: #ccc;
+        }
+
+        /* Hide Rate Slider Styles */
+        #hide-rate-control { margin-top: 10px; }
+        #hide-rate-slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 3px; font-weight: normal; }
+        #hide-rate-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 12px;}
+        #hide-rate-slider { width: 100%; cursor: pointer; }
+        .setting-section[data-rule-id="hide"] > #hide-rate-control:not(.enabled) {
+             opacity: 0.5;
+             pointer-events: none;
+        }
 
          /* PC Operation Mode Setting Styles */
         .pc-op-mode-label { display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer; }
@@ -295,10 +318,11 @@
 
             <!-- Mine Count Setting Section -->
             <h3>ゲーム設定</h3>
-             <div class="setting-section">
+             <div class="setting-section" data-rule-id="mines">
                  <div class="slider-label">
                      <span>地雷の数:</span>
                      <span id="mine-count-display">30</span>
+                     <button class="reset-rule-button" data-rule="mines">デフォルトに戻す</button>
                  </div>
                  <input type="range" id="mine-slider" min="0" max="225" value="30">
                  <p style="font-size:10px; margin-top: 5px;">変更を適用するには「設定を保存」を押してください。</p>
@@ -318,71 +342,93 @@
 
             <!-- Number Setting Section -->
             <h3>表示設定</h3>
-             <div class="setting-section">
+             <div class="setting-section" data-rule-id="numbers">
                  <h4>数字マス生成 (Numbers Squares)</h4>
                  <p>オンの場合、地雷に隣接するマスに数字が表示されます。<br>
                     オフの場合、数字が表示されるべきマスは、可能な限り他の特殊マス (Directional, AreaValue, OddEven) に置き換えられ、残りはハイドマス (・) になります。</p>
                  <div class="setting-label">
-                      有効
-                     <label class="switch">
-                         <input type="checkbox" id="number-switch" checked>
-                         <span class="slider round"></span>
-                     </label>
+                      <span>有効</span>
+                       <div>
+                         <button class="reset-rule-button" data-rule="numbers">デフォルト</button>
+                         <label class="switch">
+                             <input type="checkbox" id="number-switch" checked>
+                             <span class="slider round"></span>
+                         </label>
+                      </div>
                  </div>
              </div>
 
             <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
-            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
+            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
 
-            <div class="setting-section">
+            <div class="setting-section" data-rule-id="hide">
                 <h4>ハイドマス (Concealment Squares)</h4>
                 <p>数字が表示される代わりに「・」が表示されます。周囲の状況から数字を推測する必要があります。</p>
                 <div class="setting-label">
-                     有効
-                    <label class="switch">
-                        <input type="checkbox" id="hide-switch" checked>
-                        <span class="slider round"></span>
-                    </label>
+                     <span>有効</span>
+                      <div>
+                          <button class="reset-rule-button" data-rule="hide">デフォルト</button>
+                          <label class="switch">
+                              <input type="checkbox" id="hide-switch" checked>
+                              <span class="slider round"></span>
+                          </label>
+                      </div>
+                </div>
+                <div id="hide-rate-control" class="enabled">
+                    <div id="hide-rate-slider-label">
+                        <span>最大割合:</span>
+                        <span id="hide-rate-display">10%</span>
+                    </div>
+                    <input type="range" id="hide-rate-slider" min="5" max="50" step="5" value="10">
                 </div>
             </div>
 
             <!-- Directional Square Section -->
-            <div class="setting-section">
+            <div class="setting-section" data-rule-id="directional">
                 <h4>ディレクションマス (Directional Squares)</h4>
                  <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
                    指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
                    <b>（現在この機能は調整中のため生成されません）</b></p>
                 <div class="setting-label">
-                     有効
-                    <label class="switch">
-                        <input type="checkbox" id="directional-switch"> <!-- Default OFF -->
-                        <span class="slider round"></span>
-                    </label>
+                     <span>有効</span>
+                      <div>
+                          <button class="reset-rule-button" data-rule="directional">デフォルト</button>
+                          <label class="switch">
+                              <input type="checkbox" id="directional-switch"> <!-- Default OFF -->
+                              <span class="slider round"></span>
+                          </label>
+                      </div>
                 </div>
             </div>
 
-             <div class="setting-section">
+             <div class="setting-section" data-rule-id="oddEven">
                 <h4>オッドイーブンマス (OddEven Squares)</h4>
                  <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。</p>
                 <div class="setting-label">
-                     有効
-                     <label class="switch">
-                         <input type="checkbox" id="odd-even-switch" checked>
-                         <span class="slider round"></span>
-                     </label>
+                     <span>有効</span>
+                      <div>
+                          <button class="reset-rule-button" data-rule="oddEven">デフォルト</button>
+                          <label class="switch">
+                              <input type="checkbox" id="odd-even-switch" checked>
+                              <span class="slider round"></span>
+                          </label>
+                      </div>
                  </div>
              </div>
 
-             <div class="setting-section">
+             <div class="setting-section" data-rule-id="areaValue">
                 <h4>エリアバリューマス (Range Value Squares)</h4>
                  <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。</p>
                  <div class="setting-label">
-                      有効
-                     <label class="switch">
-                         <input type="checkbox" id="area-value-switch" checked>
-                         <span class="slider round"></span>
-                     </label>
+                      <span>有効</span>
+                      <div>
+                         <button class="reset-rule-button" data-rule="areaValue">デフォルト</button>
+                         <label class="switch">
+                             <input type="checkbox" id="area-value-switch" checked>
+                             <span class="slider round"></span>
+                         </label>
+                     </div>
                  </div>
              </div>
         </div>
@@ -395,328 +441,693 @@
     <script>
         // --- Constants ---
         const gridSize = 15;
-        let numMines = 30;
-        const maxHideRate = 0.15;
-        const minHideRate = 0;
+
+        const defaultSettings = {
+             numMines: 30,
+             enableNumbers: true,
+             enableHide: true,
+             hideRateMax: 0.10, // 10%
+             enableDirectional: false,
+             enableOddEven: true,
+             enableAreaValue: true
+        };
+
+        let numMines = defaultSettings.numMines;
+
+        const maxHideRate = 0.50; // Corresponds to slider max 50%
+        const minHideRate = 0.05; // Corresponds to slider min 5%
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
         // const maxDirectionalRate = 0.10;
 
         // --- Board State ---
         let board = [];
+
         let minesLeft = numMines;
+
         let gameOver = false;
+
         let timerInterval;
+
         let elapsedMilliseconds = 0;
+
         const timerUpdateInterval = 50;
+
         let gameStarted = false;
+
         let startTime = 0;
 
         // Interaction Mode State
         let currentInteractionMode = 'dig';
+
         let pcOperationMode = 'mouse';
+
         let isTouch = false;
 
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
+
         const resetButton = document.getElementById('reset-button');
+
         const messageBox = document.getElementById('message-box');
+
         const timerDisplay = document.getElementById('timer');
+
         const body = document.body;
+
         const revealNonMinesButton = document.getElementById('reveal-non-mines');
+
         const revealAllButton = document.getElementById('reveal-all');
+
         const rulesButton = document.getElementById('rules-button');
+
         const rulesPopup = document.getElementById('rules-popup');
+
         const closePopupButton = document.getElementById('close-popup-button');
+
         const popupOverlay = document.getElementById('popup-overlay');
+
         const numberSwitch = document.getElementById('number-switch');
+
         const hideSwitch = document.getElementById('hide-switch');
+
         const directionalSwitch = document.getElementById('directional-switch');
+
         const oddEvenSwitch = document.getElementById('odd-even-switch');
+
         const areaValueSwitch = document.getElementById('area-value-switch');
+
         const mineSlider = document.getElementById('mine-slider');
+
         const mineCountDisplay = document.getElementById('mine-count-display');
+
         const modeToggleButtonsContainer = document.getElementById('mode-toggle-buttons');
+
         const digModeButton = document.getElementById('dig-mode-button');
+
         const flagModeButton = document.getElementById('flag-mode-button');
+
         const pcOpModeRadios = document.querySelectorAll('input[name="pc-op-mode"]');
+
         const pcOpModeSection = document.getElementById('pc-op-mode-section');
+
         const saveSettingsButton = document.getElementById('save-settings-button');
+
         const activeRulesDisplay = document.getElementById('active-rules-display');
 
+        const hideRateSlider = document.getElementById('hide-rate-slider');
+
+        const hideRateDisplay = document.getElementById('hide-rate-display');
+
+        const hideRateControl = document.getElementById('hide-rate-control');
+
+        const resetRuleButtons = document.querySelectorAll('.reset-rule-button');
+
         // --- Settings (Current Applied) ---
-        let enableNumbers = numberSwitch.checked;
-        let enableHide = hideSwitch.checked;
-        let enableDirectional = directionalSwitch.checked;
-        let enableOddEven = oddEvenSwitch.checked;
-        let enableAreaValue = areaValueSwitch.checked;
+        let enableNumbers = defaultSettings.enableNumbers;
 
-        // Pending Settings Object
-        let pendingSettings = {
-            numMines: numMines,
-            enableNumbers: enableNumbers,
-            enableHide: enableHide,
-            enableDirectional: enableDirectional,
-            enableOddEven: enableOddEven,
-            enableAreaValue: enableAreaValue
-        };
+        let enableHide = defaultSettings.enableHide;
 
-        // --- Initial Setup for Mine Slider ---
-        if (pendingSettings.numMines < 0) pendingSettings.numMines = 0;
-        if (pendingSettings.numMines > 225) pendingSettings.numMines = 225;
+        let hideRateMax = defaultSettings.hideRateMax;
+
+        let enableDirectional = defaultSettings.enableDirectional;
+
+        let enableOddEven = defaultSettings.enableOddEven;
+
+        let enableAreaValue = defaultSettings.enableAreaValue;
+
+        // Pending Settings Object - Initialized with defaults
+        let pendingSettings = { ...defaultSettings };
+
+        // --- Initial Setup for Sliders ---
+        if (pendingSettings.numMines < 0) {
+            pendingSettings.numMines = 0;
+        }
+        if (pendingSettings.numMines > 225) {
+            pendingSettings.numMines = 225;
+        }
         mineSlider.value = pendingSettings.numMines;
+
         mineCountDisplay.textContent = pendingSettings.numMines;
+
         numMines = pendingSettings.numMines;
+
         minesLeft = numMines;
+
+        hideRateSlider.value = pendingSettings.hideRateMax * 100;
+
+        hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+        hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
 
         // --- Device Detection and UI Initialization ---
         function detectTouch() {
             isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
             if (isTouch) {
                 document.body.classList.add('touch-device');
-                // Force button mode logic for touch devices
-                pcOperationMode = 'button';
+
+                pcOperationMode = 'button'; // Force button mode logic for touch
             } else {
                  document.body.classList.remove('touch-device');
-                 // Read initial PC operation mode setting only if NOT touch
+
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
-                 // Add data attribute to body for CSS targeting
-                 document.body.dataset.pcOpMode = pcOperationMode;
+
+                 document.body.dataset.pcOpMode = pcOperationMode; // Set data attribute for CSS
             }
              updateModeButtonsVisibility();
+
         }
 
         function updateModeButtonsVisibility() {
             if (isTouch || pcOperationMode === 'button') {
                 modeToggleButtonsContainer.classList.add('visible');
+
             } else {
                 modeToggleButtonsContainer.classList.remove('visible');
+
             }
         }
 
         // --- Event Listeners ---
         resetButton.addEventListener('click', resetGame);
+
         revealNonMinesButton.addEventListener('click', revealNonMines);
+
         revealAllButton.addEventListener('click', revealAll);
+
         rulesButton.addEventListener('click', openPopup);
+
         closePopupButton.addEventListener('click', closePopup);
+
         popupOverlay.addEventListener('click', closePopup);
-        numberSwitch.addEventListener('change', () => { pendingSettings.enableNumbers = numberSwitch.checked; });
-        hideSwitch.addEventListener('change', () => { pendingSettings.enableHide = hideSwitch.checked; });
-        directionalSwitch.addEventListener('change', () => { pendingSettings.enableDirectional = directionalSwitch.checked; });
-        oddEvenSwitch.addEventListener('change', () => { pendingSettings.enableOddEven = oddEvenSwitch.checked; });
-        areaValueSwitch.addEventListener('change', () => { pendingSettings.enableAreaValue = areaValueSwitch.checked; });
+
+        numberSwitch.addEventListener('change', () => {
+             pendingSettings.enableNumbers = numberSwitch.checked;
+        });
+
+        hideSwitch.addEventListener('change', () => {
+            pendingSettings.enableHide = hideSwitch.checked;
+
+            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+        });
+
+        directionalSwitch.addEventListener('change', () => {
+             pendingSettings.enableDirectional = directionalSwitch.checked;
+        });
+
+        oddEvenSwitch.addEventListener('change', () => {
+             pendingSettings.enableOddEven = oddEvenSwitch.checked;
+        });
+
+        areaValueSwitch.addEventListener('change', () => {
+             pendingSettings.enableAreaValue = areaValueSwitch.checked;
+        });
+
         mineSlider.addEventListener('input', () => {
              pendingSettings.numMines = parseInt(mineSlider.value, 10);
+
              mineCountDisplay.textContent = pendingSettings.numMines;
+
         });
+
+        hideRateSlider.addEventListener('input', () => {
+             pendingSettings.hideRateMax = parseInt(hideRateSlider.value, 10) / 100;
+
+             hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+        });
+
         digModeButton.addEventListener('click', () => switchMode('dig'));
+
         flagModeButton.addEventListener('click', () => switchMode('flag'));
-        pcOpModeRadios.forEach(radio => { radio.addEventListener('change', handlePcOperationModeChange); });
+
+        pcOpModeRadios.forEach(radio => {
+            radio.addEventListener('change', handlePcOperationModeChange);
+
+        });
+
         saveSettingsButton.addEventListener('click', saveSettingsAndReset);
+
+        resetRuleButtons.forEach(button => {
+            button.addEventListener('click', handleResetRule);
+
+        });
 
 
         // --- Popup Functions ---
         function openPopup() {
-            pendingSettings = { numMines: numMines, enableNumbers: enableNumbers, enableHide: enableHide, enableDirectional: enableDirectional, enableOddEven: enableOddEven, enableAreaValue: enableAreaValue };
-            mineSlider.value = pendingSettings.numMines; mineCountDisplay.textContent = pendingSettings.numMines;
-            numberSwitch.checked = pendingSettings.enableNumbers; hideSwitch.checked = pendingSettings.enableHide;
-            directionalSwitch.checked = pendingSettings.enableDirectional; oddEvenSwitch.checked = pendingSettings.enableOddEven; areaValueSwitch.checked = pendingSettings.enableAreaValue;
+            pendingSettings = {
+                numMines: numMines,
+                enableNumbers: enableNumbers,
+                enableHide: enableHide,
+                hideRateMax: hideRateMax,
+                enableDirectional: enableDirectional,
+                enableOddEven: enableOddEven,
+                enableAreaValue: enableAreaValue
+            };
+
+            mineSlider.value = pendingSettings.numMines;
+
+            mineCountDisplay.textContent = pendingSettings.numMines;
+
+            numberSwitch.checked = pendingSettings.enableNumbers;
+
+            hideSwitch.checked = pendingSettings.enableHide;
+
+            hideRateSlider.value = pendingSettings.hideRateMax * 100;
+
+            hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+            directionalSwitch.checked = pendingSettings.enableDirectional;
+
+            oddEvenSwitch.checked = pendingSettings.enableOddEven;
+
+            areaValueSwitch.checked = pendingSettings.enableAreaValue;
+
             const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
-            if (currentPcOpRadio) currentPcOpRadio.checked = true;
-            rulesPopup.classList.add('visible'); popupOverlay.classList.add('visible');
+
+            if (currentPcOpRadio) {
+                currentPcOpRadio.checked = true;
+
+            }
+            rulesPopup.classList.add('visible');
+
+            popupOverlay.classList.add('visible');
+
         }
 
         function closePopup() {
             rulesPopup.classList.remove('visible');
+
             popupOverlay.classList.remove('visible');
+
         }
 
-        function handleSettingChange() { /* No direct action needed here anymore */ }
+        function handleSettingChange() { /* Switches update pendingSettings directly now */ }
+
+        // Handle resetting individual rules to default
+        function handleResetRule(event) {
+            const rule = event.target.dataset.rule;
+
+            if (!rule) {
+                return;
+            }
+
+            switch (rule) {
+                case 'mines':
+                    pendingSettings.numMines = defaultSettings.numMines;
+
+                    mineSlider.value = pendingSettings.numMines;
+
+                    mineCountDisplay.textContent = pendingSettings.numMines;
+
+                    break;
+
+                case 'numbers':
+                    pendingSettings.enableNumbers = defaultSettings.enableNumbers;
+
+                    numberSwitch.checked = pendingSettings.enableNumbers;
+
+                    break;
+
+                case 'hide':
+                    pendingSettings.enableHide = defaultSettings.enableHide;
+
+                    pendingSettings.hideRateMax = defaultSettings.hideRateMax;
+
+                    hideSwitch.checked = pendingSettings.enableHide;
+
+                    hideRateSlider.value = pendingSettings.hideRateMax * 100;
+
+                    hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+                    hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+                    break;
+
+                case 'directional':
+                    pendingSettings.enableDirectional = defaultSettings.enableDirectional;
+
+                    directionalSwitch.checked = pendingSettings.enableDirectional;
+
+                    break;
+
+                case 'oddEven':
+                    pendingSettings.enableOddEven = defaultSettings.enableOddEven;
+
+                    oddEvenSwitch.checked = pendingSettings.enableOddEven;
+
+                    break;
+
+                case 'areaValue':
+                    pendingSettings.enableAreaValue = defaultSettings.enableAreaValue;
+
+                    areaValueSwitch.checked = pendingSettings.enableAreaValue;
+
+                    break;
+
+            }
+        }
+
 
         function saveSettingsAndReset() {
-            numMines = pendingSettings.numMines; enableNumbers = pendingSettings.enableNumbers;
-            enableHide = pendingSettings.enableHide; enableDirectional = pendingSettings.enableDirectional;
-            enableOddEven = pendingSettings.enableOddEven; enableAreaValue = pendingSettings.enableAreaValue;
-            resetGame();
+            numMines = pendingSettings.numMines;
+
+            enableNumbers = pendingSettings.enableNumbers;
+
+            enableHide = pendingSettings.enableHide;
+
+            hideRateMax = pendingSettings.hideRateMax; // Apply hide rate
+
+            enableDirectional = pendingSettings.enableDirectional;
+
+            enableOddEven = pendingSettings.enableOddEven;
+
+            enableAreaValue = pendingSettings.enableAreaValue;
+
+            resetGame(); // Reset the game with the newly applied settings
+
             closePopup();
+
         }
         function handlePcOperationModeChange(event) {
              pcOperationMode = event.target.value;
-             document.body.dataset.pcOpMode = pcOperationMode; // Update data attribute
+
+             document.body.dataset.pcOpMode = pcOperationMode;
+
              updateModeButtonsVisibility();
+
              switchMode('dig');
+
         }
         function switchMode(newMode) {
-            if (newMode === currentInteractionMode) return;
+            if (newMode === currentInteractionMode) {
+                return;
+            }
             currentInteractionMode = newMode;
-            if (newMode === 'dig') { digModeButton.classList.add('active'); flagModeButton.classList.remove('active'); }
-            else { digModeButton.classList.remove('active'); flagModeButton.classList.add('active'); }
+
+            if (newMode === 'dig') {
+                digModeButton.classList.add('active');
+
+                flagModeButton.classList.remove('active');
+
+            } else {
+                digModeButton.classList.remove('active');
+
+                flagModeButton.classList.add('active');
+
+            }
         }
 
         // --- Update Active Rules Display Function ---
         function updateActiveRulesDisplay() {
             let rulesHtml = '';
+
             if (!enableNumbers) {
                 rulesHtml += `<div>No Numbers</div>`;
+
             }
             if (enableHide) {
-                 rulesHtml += `<div>Concealment Squares</div>`;
+                 rulesHtml += `<div>Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
+
             }
             // if (enableDirectional) { // Currently disabled
             //     rulesHtml += `<div>Directional Squares</div>`;
             // }
             if (enableOddEven) {
                  rulesHtml += `<div>OddEven Squares</div>`;
+
             }
             if (enableAreaValue) {
                  rulesHtml += `<div>Range Value Squares</div>`;
+
             }
             if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
                  rulesHtml = '<div>Standard Rules</div>';
-            } else if (!rulesHtml && enableNumbers) { // Check if numbers are on but no special rules active
+
+            } else if (!rulesHtml && enableNumbers) {
                 rulesHtml = '<div>Standard Rules</div>';
-            } else if (!rulesHtml && !enableNumbers){ // Check if numbers off and no special rules active
-                 rulesHtml = '<div>No Numbers</div>'; // Should ideally not happen if hide defaults on
+
+            } else if (!rulesHtml && !enableNumbers){
+                 rulesHtml = '<div>No Numbers</div>';
+
             }
 
             activeRulesDisplay.innerHTML = rulesHtml;
+
         }
 
         // --- Game Logic Functions ---
         function resetGame() {
             gameOver = true;
+
             clearInterval(timerInterval);
-            elapsedMilliseconds = 0; startTime = 0; gameStarted = false;
+
+            elapsedMilliseconds = 0;
+
+            startTime = 0;
+
+            gameStarted = false;
+
             minesLeft = numMines;
+
             switchMode('dig');
+
             updateTimerDisplay();
+
             messageBox.textContent = '';
+
             activeRulesDisplay.innerHTML = ''; // Clear rules display
             body.classList.remove('game-over');
+
             body.style.backgroundColor = '#f0f0f0';
+
             setTimeout(createBoard, 50);
+
         }
 
         function createBoard() {
             board = [];
+
             minesLeft = numMines;
+
             gameOver = false;
+
             revealedNonMineCount = 0;
+
             boardElement.innerHTML = '';
 
             for (let i = 0; i < gridSize; i++) {
                 board[i] = [];
+
                 for (let j = 0; j < gridSize; j++) {
                     board[i][j] = {
-                        isMine: false, isRevealed: false, isFlagged: false,
+                        isMine: false,
+                        isRevealed: false,
+                        isFlagged: false,
                         adjacentMines: 0,
-                        isHide: false, isOddEven: false, isAreaValue: false, isDirectional: false,
-                        oddEvenValue: null, areaValue: null, direction: null, directionalCount: null, directionalSymbol: null,
+                        isHide: false,
+                        isOddEven: false,
+                        isAreaValue: false,
+                        isDirectional: false,
+                        oddEvenValue: null,
+                        areaValue: null,
+                        direction: null,
+                        directionalCount: null,
+                        directionalSymbol: null,
                         element: document.createElement('div')
                     };
+
                     const square = board[i][j];
+
                     const squareElement = square.element;
+
                     squareElement.classList.add('square', 'hidden');
-                    squareElement.dataset.row = i; squareElement.dataset.col = j;
+
+                    squareElement.dataset.row = i;
+
+                    squareElement.dataset.col = j;
+
                     squareElement.addEventListener('click', () => handleSquareInteraction(i, j));
+
                     squareElement.addEventListener('contextmenu', (event) => {
                         event.preventDefault();
-                        if (!isTouch && pcOperationMode === 'mouse') { handleFlagAction(i, j); }
+
+                        if (!isTouch && pcOperationMode === 'mouse') {
+                            handleFlagAction(i, j);
+                        }
                     });
+
                     let pressTimer;
+
                     squareElement.addEventListener('touchstart', (event) => {
                         // Logic adjusted: Long press always flags on touch devices
                         if (isTouch) {
                              clearTimeout(pressTimer);
+
                              pressTimer = setTimeout(() => {
                                  event.preventDefault();
+
                                  handleFlagAction(i, j);
+
                              }, 500);
+
                          }
                     }, { passive: false });
+
                     squareElement.addEventListener('touchend', () => clearTimeout(pressTimer));
+
                     squareElement.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
                     boardElement.appendChild(squareElement);
+
                 }
             }
             plantMines();
+
             calculateAdjacentMines();
+
             applySpecialSquares();
+
             updateMinesLeftDisplay();
+
             updateActiveRulesDisplay(); // Update rules display
             detectTouch(); // Detect touch after elements are created
+
         }
 
         function plantMines() {
              let minesPlanted = 0;
+
              const maxPossibleMines = gridSize * gridSize;
+
               if (numMines >= maxPossibleMines) {
                    numMines = maxPossibleMines - 1;
+
                    console.warn(`Mine count capped at ${numMines}`);
+
                    mineSlider.value = numMines;
+
                    mineCountDisplay.textContent = numMines;
+
                    minesLeft = numMines;
+
                    pendingSettings.numMines = numMines;
+
               }
-             if (numMines < 0) numMines = 0;
+             if (numMines < 0) {
+                 numMines = 0;
+             }
 
              while (minesPlanted < numMines) {
                  const r = Math.floor(Math.random() * gridSize);
+
                  const c = Math.floor(Math.random() * gridSize);
-                 if (!board[r][c].isMine) { board[r][c].isMine = true; minesPlanted++; }
+
+                 if (!board[r][c].isMine) {
+                     board[r][c].isMine = true;
+
+                     minesPlanted++;
+
+                 }
              }
         }
 
         function calculateAdjacentMines() {
              for (let i = 0; i < gridSize; i++) {
                  for (let j = 0; j < gridSize; j++) {
-                     if (board[i][j].isMine) { board[i][j].adjacentMines = -1; continue; }
+                     if (board[i][j].isMine) {
+                         board[i][j].adjacentMines = -1;
+
+                         continue;
+
+                     }
                      let count = 0;
+
                      for (let x = -1; x <= 1; x++) {
                          for (let y = -1; y <= 1; y++) {
-                             if (x === 0 && y === 0) continue;
-                             const ni = i + x, nj = j + y;
-                             if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) count++;
+                             if (x === 0 && y === 0) {
+                                 continue;
+                             }
+                             const ni = i + x;
+                             const nj = j + y;
+                             if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) {
+                                 count++;
+                             }
                          }
                      }
                      board[i][j].adjacentMines = count;
+
                  }
              }
         }
+
         function countMinesInDirection(startRow, startCol, dx, dy) {
-             let count = 0; let r = startRow + dx; let c = startCol + dy;
+             let count = 0;
+             let r = startRow + dx;
+             let c = startCol + dy;
              while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-                 if (board[r][c]?.isMine) { count++; }
-                 r += dx; c += dy;
-             } return count;
+                 if (board[r][c]?.isMine) {
+                     count++;
+                 }
+                 r += dx;
+                 c += dy;
+             }
+             return count;
         }
+
         function hasNeighborOfType(r, c, key) {
-             for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
-                 if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
-                 if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) return true;
-             } return false;
+             for (let x = -1; x <= 1; x++) {
+                 for (let y = -1; y <= 1; y++) {
+                     if (x === 0 && y === 0) {
+                         continue;
+                     }
+                     const ni = r + x;
+                     const nj = c + y;
+                     if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) {
+                         return true;
+                     }
+                 }
+             }
+             return false;
         }
 
         function applySpecialSquares() {
             const potentialNumberSquares = [];
+
             for (let i = 0; i < gridSize; i++) {
                  for (let j = 0; j < gridSize; j++) {
                      const square = board[i][j];
-                     square.isHide = square.isOddEven = square.isAreaValue = square.isDirectional = false;
-                     square.oddEvenValue = square.areaValue = square.direction = square.directionalCount = square.directionalSymbol = null;
+
+                     square.isHide = false;
+                     square.isOddEven = false;
+                     square.isAreaValue = false;
+                     square.isDirectional = false;
+                     square.oddEvenValue = null;
+                     square.areaValue = null;
+                     square.direction = null;
+                     square.directionalCount = null;
+                     square.directionalSymbol = null;
                      if (!square.isMine && square.adjacentMines > 0) {
                          potentialNumberSquares.push({ r: i, c: j });
                      }
                  }
             }
             potentialNumberSquares.sort(() => Math.random() - 0.5);
+
             const assignedSpecial = new Set();
+
             const totalSquares = gridSize * gridSize;
+
             const numPotential = potentialNumberSquares.length;
-            const baseDirections = [ /* ... */ ];
-            function hasDirectionalChain(r, c, dx, dy) { /* ... */ }
-            function getValidDirections(r, c) { /* ... */ }
+
+            // const baseDirections = [ /* ... */ ]; // Kept for future use
+            // function hasDirectionalChain(r, c, dx, dy) { /* ... */ } // Kept for future use
+            // function getValidDirections(r, c) { /* ... */ } // Kept for future use
 
             if (!enableNumbers) { // Uses current global enableNumbers
                 // Directional disabled: /* if (enableDirectional) { ... } */
@@ -724,53 +1135,100 @@
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
-                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
+                             const sq = board[r][c];
+                             sq.isAreaValue = true;
+                             sq.isHide = true;
+                             if (sq.adjacentMines <= 3) {
+                                 sq.areaValue = '-3';
+                             } else if (sq.adjacentMines <= 6) {
+                                 sq.areaValue = '4-6';
+                             } else {
+                                 sq.areaValue = '7+';
+                             }
                              assignedSpecial.add(k);
                          }
                     }
                 }
                 if (enableOddEven) {
                      for (const { r, c } of potentialNumberSquares) {
-                         const k = `${r}-${c}`; const sq = board[r][c];
+                         const k = `${r}-${c}`;
+                         const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             sq.isOddEven = true;
+                             sq.isHide = true;
+                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
                              assignedSpecial.add(k);
                          }
                     }
                 }
-                for (const { r, c } of potentialNumberSquares) {
-                     if (!assignedSpecial.has(`${r}-${c}`)) { board[r][c].isHide = true; }
-                 }
+                // Apply hide to remaining if enabled
+                if (enableHide) {
+                    for (const { r, c } of potentialNumberSquares) {
+                         if (!assignedSpecial.has(`${r}-${c}`)) {
+                             board[r][c].isHide = true;
+                         }
+                     }
+                }
             } else {
+                // --- Numbers ON: Apply probabilistically ---
                 // Directional disabled: /* if (enableDirectional) { ... } */
                 if (enableAreaValue) {
-                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
+                     const max = Math.floor(totalSquares * maxAreaValueRate);
+                     let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) break; const k = `${r}-${c}`;
+                         if (count >= max) {
+                             break;
+                         }
+                         const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const sq = board[r][c]; sq.isAreaValue = sq.isHide = true;
-                             if (sq.adjacentMines <= 3) sq.areaValue = '-3'; else if (sq.adjacentMines <= 6) sq.areaValue = '4-6'; else sq.areaValue = '7+';
-                             assignedSpecial.add(k); count++;
+                             const sq = board[r][c];
+                             sq.isAreaValue = true;
+                             sq.isHide = true;
+                             if (sq.adjacentMines <= 3) {
+                                 sq.areaValue = '-3';
+                             } else if (sq.adjacentMines <= 6) {
+                                 sq.areaValue = '4-6';
+                             } else {
+                                 sq.areaValue = '7+';
+                             }
+                             assignedSpecial.add(k);
+                             count++;
                          }
                      }
                 }
                 if (enableOddEven) {
-                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
+                     const max = Math.floor(totalSquares * maxOddEvenRate);
+                     let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) break; const k = `${r}-${c}`; const sq = board[r][c];
+                         if (count >= max) {
+                             break;
+                         }
+                         const k = `${r}-${c}`;
+                         const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             sq.isOddEven = sq.isHide = true; sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
-                             assignedSpecial.add(k); count++;
+                             sq.isOddEven = true;
+                             sq.isHide = true;
+                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             assignedSpecial.add(k);
+                             count++;
                          }
                      }
                 }
+                // Hide logic using hideRateMax
                 if (enableHide) {
-                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
-                     const max = Math.floor(totalSquares * rate); let count = 0;
+                     // Calculate max number based on *potential* number squares and the rate setting
+                     const maxHide = Math.floor(numPotential * hideRateMax);
+                     let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
-                         if (count >= max) break; const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k)) { board[r][c].isHide = true; count++; }
+                         if (count >= maxHide) {
+                             break;
+                         }
+                         const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k)) { // Only hide if not already assigned a special type
+                            board[r][c].isHide = true;
+                            // assignedSpecial.add(k); // Optionally track simple hides
+                            count++;
+                        }
                      }
                  }
             }
@@ -779,80 +1237,185 @@
 
         // --- Interaction and Rendering Functions ---
         function handleSquareInteraction(r, c) {
-             if (gameOver) return;
-             if (!gameStarted) { gameStarted = true; startTime = Date.now(); timerInterval = setInterval(updateTimer, timerUpdateInterval); }
+             if (gameOver || board[r][c].isRevealed || board[r][c].isFlagged) {
+                 return;
+             }
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
              const square = board[r][c];
-             if (square.isRevealed) return;
-             if (currentInteractionMode === 'flag') { handleFlagAction(r, c); }
-             else { if (square.isFlagged) return; if (square.isMine) { revealMine(r, c); endGame(false); } else { revealSquare(r, c); checkWinCondition(); } }
+             if (currentInteractionMode === 'flag') {
+                 handleFlagAction(r, c);
+             } else {
+                 if (square.isFlagged) {
+                     return;
+                 }
+                 if (square.isMine) {
+                     revealMine(r, c);
+                     endGame(false);
+                 } else {
+                     revealSquare(r, c);
+                     checkWinCondition();
+                 }
+             }
         }
         function handleFlagAction(r, c) {
-            if (gameOver || board[r][c].isRevealed) return;
-             if (!gameStarted) { gameStarted = true; startTime = Date.now(); timerInterval = setInterval(updateTimer, timerUpdateInterval); }
-            const sq = board[r][c]; sq.isFlagged = !sq.isFlagged;
-            if (sq.isFlagged) minesLeft--; else minesLeft++;
-            renderSquareContent(sq); updateMinesLeftDisplay();
+            if (gameOver || board[r][c].isRevealed) {
+                return;
+            }
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
+            const sq = board[r][c];
+            sq.isFlagged = !sq.isFlagged;
+            if (sq.isFlagged) {
+                minesLeft--;
+            } else {
+                minesLeft++;
+            }
+            renderSquareContent(sq);
+            updateMinesLeftDisplay();
         }
         function revealMine(r, c) {
-            const sq = board[r][c]; sq.isRevealed = true;
-            sq.element.classList.remove('hidden', 'flagged'); sq.element.classList.add('revealed', 'mine', 'mine-clicked'); sq.element.textContent = '💥';
+            const sq = board[r][c];
+            sq.isRevealed = true;
+            sq.element.classList.remove('hidden', 'flagged');
+            sq.element.classList.add('revealed', 'mine', 'mine-clicked');
+            sq.element.textContent = '💥';
         }
         function revealSquare(r, c) {
-            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) return;
+            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) {
+                return;
+            }
             const sq = board[r][c];
-            if (sq.isRevealed || sq.isFlagged || sq.isMine) return;
-            sq.isRevealed = true; revealedNonMineCount++; renderSquareContent(sq);
-            if (sq.adjacentMines === 0) { for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) revealSquare(r + x, c + y); }
-        }
-        function renderSquareContent(sq) {
-            const el = sq.element; el.className = 'square'; el.textContent = '';
-            if (!sq.isRevealed) { el.classList.add('hidden'); if (sq.isFlagged) el.textContent = '🚩'; }
-            else {
-                el.classList.add('revealed');
-                if (sq.isMine) { el.classList.add('mine'); el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣'; }
-                else if (sq.adjacentMines >= 0) {
-                    if (sq.isDirectional) { el.classList.add('directional-square'); el.textContent = sq.directionalSymbol + sq.directionalCount; }
-                    else if (sq.isAreaValue) { el.classList.add('special-square', 'area-value-square'); el.textContent = sq.areaValue; }
-                    else if (sq.isOddEven) { el.classList.add('special-square', 'odd-even-square'); el.textContent = sq.oddEvenValue; }
-                    else if (sq.isHide) { el.classList.add('special-square'); el.textContent = '・'; }
-                    else if (sq.adjacentMines > 0) { el.textContent = sq.adjacentMines; }
-                    else { el.textContent = ''; }
+            if (sq.isRevealed || sq.isFlagged || sq.isMine) {
+                return;
+            }
+            sq.isRevealed = true;
+            revealedNonMineCount++;
+            renderSquareContent(sq);
+            if (sq.adjacentMines === 0) {
+                for (let x = -1; x <= 1; x++) {
+                    for (let y = -1; y <= 1; y++) {
+                        revealSquare(r + x, c + y);
+                    }
                 }
-                 if (el.classList.contains('flag-wrong')) { el.textContent = '❌'; el.classList.add('flag-wrong'); }
             }
         }
-        function updateMinesLeftDisplay() { messageBox.textContent = `Mines: ${minesLeft}`; }
+        function renderSquareContent(sq) {
+            const el = sq.element;
+            el.className = 'square';
+            el.textContent = '';
+            if (!sq.isRevealed) {
+                el.classList.add('hidden');
+                if (sq.isFlagged) {
+                    el.textContent = '🚩';
+                }
+            } else {
+                el.classList.add('revealed');
+                if (sq.isMine) {
+                    el.classList.add('mine');
+                    el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣';
+                } else if (sq.adjacentMines >= 0) {
+                    if (sq.isDirectional) {
+                        el.classList.add('directional-square');
+                        el.textContent = sq.directionalSymbol + sq.directionalCount;
+                    } else if (sq.isAreaValue) {
+                        el.classList.add('special-square', 'area-value-square');
+                        el.textContent = sq.areaValue;
+                    } else if (sq.isOddEven) {
+                        el.classList.add('special-square', 'odd-even-square');
+                        el.textContent = sq.oddEvenValue;
+                    } else if (sq.isHide) {
+                        el.classList.add('special-square');
+                        el.textContent = '・';
+                    } else if (sq.adjacentMines > 0) {
+                        el.textContent = sq.adjacentMines;
+                    } else { // Blank square
+                        el.textContent = '';
+                    }
+                }
+                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added
+                    el.textContent = '❌';
+                    el.classList.add('flag-wrong'); // Ensure class stays
+                 }
+            }
+        }
+        function updateMinesLeftDisplay() {
+            messageBox.textContent = `Mines: ${minesLeft}`;
+        }
         function checkWinCondition() {
             const totalNonMine = gridSize * gridSize - numMines;
             if (revealedNonMineCount >= totalNonMine) {
                 let allRevealed = true;
-                for(let i=0; i<gridSize; i++) for(let j=0; j<gridSize; j++) if(!board[i][j].isMine && !board[i][j].isRevealed) {allRevealed = false; break;}
-                if(!allRevealed) return;
+                for(let i=0; i<gridSize; i++){
+                    for(let j=0; j<gridSize; j++){
+                        if(!board[i][j].isMine && !board[i][j].isRevealed) {
+                            allRevealed = false;
+                            break;
+                        }
+                    }
+                    if(!allRevealed){
+                         return;
+                    }
+                }
                 endGame(true);
             }
         }
         function endGame(isWin) {
-             if(gameOver) return; gameOver = true; clearInterval(timerInterval);
-             if(gameStarted) { elapsedMilliseconds = Date.now() - startTime; updateTimerDisplay(); }
+             if(gameOver) {
+                 return;
+             }
+             gameOver = true;
+             clearInterval(timerInterval);
+             if(gameStarted) {
+                 elapsedMilliseconds = Date.now() - startTime;
+                 updateTimerDisplay();
+             }
             if (isWin) {
-                messageBox.textContent = 'Game Clear!'; body.style.backgroundColor = '#aaffaa';
-                for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (board[i][j].isMine && !board[i][j].isFlagged) { board[i][j].isFlagged = true; renderSquareContent(board[i][j]); }
-                minesLeft = 0; updateMinesLeftDisplay();
+                messageBox.textContent = 'Game Clear!';
+                body.style.backgroundColor = '#aaffaa';
+                for (let i=0; i<gridSize; i++) {
+                    for (let j=0; j<gridSize; j++) {
+                        if (board[i][j].isMine && !board[i][j].isFlagged) {
+                            board[i][j].isFlagged = true;
+                            renderSquareContent(board[i][j]);
+                        }
+                    }
+                }
+                minesLeft = 0;
+                updateMinesLeftDisplay();
             } else {
-                if(messageBox.textContent !== 'Game Clear!') { messageBox.textContent = 'Game Over!'; body.classList.add('game-over'); }
+                if(messageBox.textContent !== 'Game Clear!') {
+                   messageBox.textContent = 'Game Over!';
+                   body.classList.add('game-over');
+                }
                 revealAllMines(true);
             }
         }
         function revealAllMines(showContent) {
             for (let i=0; i<gridSize; i++) {
                 for (let j=0; j<gridSize; j++) {
-                    const sq = board[i][j]; const el = sq.element;
+                    const sq = board[i][j];
+                    const el = sq.element;
                     if (sq.isMine) {
-                        if (sq.isFlagged) continue; if (el.classList.contains('mine-clicked')) continue;
-                        sq.isRevealed = true; renderSquareContent(sq); // Render '💣'
+                        if (sq.isFlagged) {
+                            continue;
+                        }
+                        if (el.classList.contains('mine-clicked')) {
+                            continue;
+                        }
+                        sq.isRevealed = true;
+                        renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true; el.className = 'square revealed flag-wrong'; el.textContent = '❌';
+                            sq.isRevealed = true;
+                            el.className = 'square revealed flag-wrong'; // Set classes directly
+                            el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
                             revealSquare(i, j);
                         }
@@ -860,23 +1423,68 @@
                 }
             }
         }
-        function updateTimer() { if (!gameStarted || gameOver) return; elapsedMilliseconds = Date.now() - startTime; updateTimerDisplay(); }
+        function updateTimer() {
+            if (!gameStarted || gameOver) {
+                return;
+            }
+            elapsedMilliseconds = Date.now() - startTime;
+            updateTimerDisplay();
+        }
         function updateTimerDisplay() {
-            let formattedTime; const displayMillis = Math.max(0, elapsedMilliseconds);
-            if (displayMillis < 60000) { const s = Math.floor(displayMillis / 1000), cs = Math.floor((displayMillis % 1000) / 10); formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`; }
-            else if (displayMillis < 3600000) { const m = Math.floor(displayMillis / 60000), s = Math.floor((displayMillis % 60000) / 1000); formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }
-            else { const h = Math.floor(displayMillis / 3600000), m = Math.floor((displayMillis % 3600000) / 60000), s = Math.floor((displayMillis % 60000) / 1000); formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }
+            let formattedTime;
+            const displayMillis = Math.max(0, elapsedMilliseconds);
+            if (displayMillis < 60000) {
+                const s = Math.floor(displayMillis / 1000);
+                const cs = Math.floor((displayMillis % 1000) / 10);
+                formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+            } else if (displayMillis < 3600000) {
+                const m = Math.floor(displayMillis / 60000);
+                const s = Math.floor((displayMillis % 60000) / 1000);
+                formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            } else {
+                const h = Math.floor(displayMillis / 3600000);
+                const m = Math.floor((displayMillis % 3600000) / 60000);
+                const s = Math.floor((displayMillis % 60000) / 1000);
+                formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
             timerDisplay.textContent = formattedTime;
         }
         function revealNonMines() {
-            if (gameOver) return; if (!gameStarted) { gameStarted = true; startTime = Date.now(); timerInterval = setInterval(updateTimer, timerUpdateInterval); }
-            for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (!board[i][j].isMine && !board[i][j].isRevealed) revealSquare(i,j);
-            checkWinCondition(); messageBox.textContent = 'All squares revealed!';
-            if (!gameOver) { endGame(true); messageBox.textContent = 'All squares revealed!'; }
+            if (gameOver) {
+                return;
+            }
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
+            for (let i=0; i<gridSize; i++) {
+                for (let j=0; j<gridSize; j++) {
+                    if (!board[i][j].isMine && !board[i][j].isRevealed) {
+                        revealSquare(i,j);
+                    }
+                }
+            }
+             checkWinCondition();
+             messageBox.textContent = 'All squares revealed!';
+             if (!gameOver) {
+                 endGame(true);
+                 messageBox.textContent = 'All squares revealed!';
+             }
         }
         function revealAll() {
-             if (gameOver) return; if (!gameStarted) { gameStarted = true; startTime = Date.now(); timerInterval = setInterval(updateTimer, timerUpdateInterval); }
-             revealAllMines(true); if (!gameOver) { endGame(false); }
+             if (gameOver) {
+                 return;
+             }
+             if (!gameStarted) {
+                 gameStarted = true;
+                 startTime = Date.now();
+                 timerInterval = setInterval(updateTimer, timerUpdateInterval);
+             }
+             revealAllMines(true);
+             if (!gameOver) {
+                 endGame(false);
+             }
              messageBox.textContent = 'All squares revealed!';
         }
 
