@@ -144,11 +144,46 @@
         }
 
         /* --- Popup Styles --- */
-         #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
-         #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; display: flex; flex-direction: column; /* For footer */ }
-         .popup-header { padding: 15px 20px 0 20px; /* Adjust padding */ }
+         #popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 99;
+            display: none; /* Hidden by default */
+        }
+         #rules-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background-color: #fdfdfd;
+            border: 2px solid #333;
+            border-radius: 8px;
+            z-index: 100;
+            display: none; /* Hidden by default */
+            font-size: 11px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            font-family: sans-serif;
+            color: #333;
+            flex-direction: column; /* Keep for layout when visible */
+        }
+        /* ★★★ Visibility classes using display ★★★ */
+        #popup-overlay.visible {
+            display: block;
+        }
+        #rules-popup.visible {
+            display: flex;
+        }
+        /* ★★★ End of Visibility classes ★★★ */
+
+         .popup-header { padding: 15px 20px 0 20px; }
          .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
-         .rules-content { max-height: 65vh; /* Adjust height considering footer */ overflow-y: auto; padding: 0 20px 10px 20px; /* Adjust padding */ }
+         .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
          #rules-popup h3 { font-size: 14px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; font-weight: bold; }
          #rules-popup h4 { font-size: 13px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: #555; }
          #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; }
@@ -157,8 +192,7 @@
          #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
          #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
          #rules-popup .switch { margin-left: 8px; }
-         #popup-overlay.visible, #rules-popup.visible { display: flex; /* Use flex for popup structure */ }
-         .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; /* Push to bottom */ }
+         .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; }
          #save-settings-button { padding: 6px 12px; font-size: 12px; font-family: 'Press Start 2P', cursive; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px; }
          #save-settings-button:hover { background-color: #45a049; }
 
@@ -318,7 +352,7 @@
         const minHideRate = 0;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
-        // const maxDirectionalRate = 0.10; // Keep for potential future use
+        // const maxDirectionalRate = 0.10;
 
         // --- Board State ---
         let board = [];
@@ -347,23 +381,18 @@
         const rulesPopup = document.getElementById('rules-popup');
         const closePopupButton = document.getElementById('close-popup-button');
         const popupOverlay = document.getElementById('popup-overlay');
-        // Switches
         const numberSwitch = document.getElementById('number-switch');
         const hideSwitch = document.getElementById('hide-switch');
         const directionalSwitch = document.getElementById('directional-switch');
         const oddEvenSwitch = document.getElementById('odd-even-switch');
         const areaValueSwitch = document.getElementById('area-value-switch');
-        // Mine Count Slider Elements
         const mineSlider = document.getElementById('mine-slider');
         const mineCountDisplay = document.getElementById('mine-count-display');
-        // Mode Buttons
         const modeToggleButtonsContainer = document.getElementById('mode-toggle-buttons');
         const digModeButton = document.getElementById('dig-mode-button');
         const flagModeButton = document.getElementById('flag-mode-button');
-        // PC Operation Mode Radios
         const pcOpModeRadios = document.querySelectorAll('input[name="pc-op-mode"]');
         const pcOpModeSection = document.getElementById('pc-op-mode-section');
-        // Save Settings Button
         const saveSettingsButton = document.getElementById('save-settings-button');
 
         // --- Settings (Current Applied) ---
@@ -398,6 +427,7 @@
                 document.body.classList.add('touch-device');
             } else {
                  document.body.classList.remove('touch-device');
+                 // Read initial PC operation mode setting only if NOT touch
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
             }
              updateModeButtonsVisibility();
@@ -474,10 +504,8 @@
             popupOverlay.classList.remove('visible');
         }
 
-        // Removed resetGame() call from handleSettingChange
-        function handleSettingChange() {
-            // Switch changes now only update pending settings (handled directly in listener)
-        }
+        // Switch changes update pendingSettings via their listeners now
+        function handleSettingChange() {}
 
         // New function to save settings and trigger reset
         function saveSettingsAndReset() {
@@ -489,7 +517,7 @@
             enableOddEven = pendingSettings.enableOddEven;
             enableAreaValue = pendingSettings.enableAreaValue;
 
-            // PC Op mode is applied instantly, so no need to apply from pending
+            // PC Op mode applies instantly, no need to save/apply here
 
             resetGame(); // Reset the game with the newly applied settings
             closePopup(); // Close the popup after saving
@@ -586,10 +614,9 @@
               if (numMines >= maxPossibleMines) {
                    numMines = maxPossibleMines - 1;
                    console.warn(`Mine count capped at ${numMines}`);
-                   // Update slider and display ONLY if capped (reflect reality)
                    mineSlider.value = numMines;
                    mineCountDisplay.textContent = numMines;
-                   minesLeft = numMines; // Update this too
+                   minesLeft = numMines;
                    pendingSettings.numMines = numMines; // Update pending too
               }
              if (numMines < 0) numMines = 0;
@@ -649,10 +676,7 @@
             const assignedSpecial = new Set();
             const totalSquares = gridSize * gridSize;
             const numPotential = potentialNumberSquares.length;
-            const baseDirections = [
-                 { dx: -1, dy: 0, symbol: '↑', name: 'up' }, { dx: 1, dy: 0, symbol: '↓', name: 'down' },
-                 { dx: 0, dy: -1, symbol: '←', name: 'left' }, { dx: 0, dy: 1, symbol: '→', name: 'right' }
-             ];
+            const baseDirections = [ /* ... */ ];
             function hasDirectionalChain(r, c, dx, dy) { /* ... */ }
             function getValidDirections(r, c) { /* ... */ }
 
@@ -813,9 +837,9 @@
                         el.textContent = '';
                     }
                 }
-                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added
+                 if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
-                    el.classList.add('flag-wrong'); // Ensure class stays
+                    el.classList.add('flag-wrong');
                  }
             }
         }
@@ -869,7 +893,7 @@
                             el.className = 'square revealed flag-wrong'; // Set classes directly
                             el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
-                            revealSquare(i, j);
+                             revealSquare(i, j);
                         }
                     }
                 }
