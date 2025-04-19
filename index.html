@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minesweeper2</title>
+    <title>マインスイーパー</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
@@ -142,7 +142,7 @@
         .slider.round:before { border-radius: 50%; }
 
         .special-square { font-size: 9px; }
-        .odd-even-square { color: #ccae00; font-weight: bold; }
+        .odd-even-square { color: #0000CD; font-weight: bold; } /* Updated color */
         .area-value-square{ color: #902094; font-weight: bold; }
         .directional-square {
             color: #1a759f;
@@ -235,38 +235,24 @@
 
          /* Rule Reset Button Style */
         .reset-rule-button {
-            font-size: 9px;
-            padding: 2px 6px;
-            margin-left: 10px;
-            cursor: pointer;
-            background-color: #ddd;
-            border: 1px solid #bbb;
-            border-radius: 3px;
-            font-family: sans-serif;
+            font-size: 9px; padding: 2px 6px; margin-left: 10px; cursor: pointer;
+            background-color: #ddd; border: 1px solid #bbb; border-radius: 3px; font-family: sans-serif;
         }
-        .reset-rule-button:hover {
-            background-color: #ccc;
-        }
+        .reset-rule-button:hover { background-color: #ccc; }
 
         /* Hide Rate Slider Styles */
         #hide-rate-control { margin-top: 10px; }
         #hide-rate-slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 3px; font-weight: normal; }
         #hide-rate-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 12px;}
         #hide-rate-slider { width: 100%; cursor: pointer; }
-        .setting-section[data-rule-id="hide"] > #hide-rate-control:not(.enabled) {
-             opacity: 0.5;
-             pointer-events: none;
-        }
+        .setting-section[data-rule-id="hide"] > #hide-rate-control:not(.enabled) { opacity: 0.5; pointer-events: none; }
 
          /* PC Operation Mode Setting Styles */
         .pc-op-mode-label { display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer; }
         .pc-op-mode-label input[type="radio"] { margin-right: 5px; }
         #pc-op-mode-section { display: block; }
         body.touch-device #pc-op-mode-section { display: none; }
-        /* PC operation mode visibility adjustment */
-        body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons {
-            display: none; /* Hide buttons in PC mouse mode */
-        }
+        body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons { display: none; }
 
     </style>
 </head>
@@ -454,8 +440,8 @@
 
         let numMines = defaultSettings.numMines;
 
-        const maxHideRate = 0.50; // Corresponds to slider max 50%
-        const minHideRate = 0.05; // Corresponds to slider min 5%
+        const maxHideRate = 0.50;
+        const minHideRate = 0.05;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
         // const maxDirectionalRate = 0.10;
@@ -623,7 +609,8 @@
         popupOverlay.addEventListener('click', closePopup);
 
         numberSwitch.addEventListener('change', () => {
-             pendingSettings.enableNumbers = numberSwitch.checked;
+            pendingSettings.enableNumbers = numberSwitch.checked;
+
         });
 
         hideSwitch.addEventListener('change', () => {
@@ -634,15 +621,18 @@
         });
 
         directionalSwitch.addEventListener('change', () => {
-             pendingSettings.enableDirectional = directionalSwitch.checked;
+            pendingSettings.enableDirectional = directionalSwitch.checked;
+
         });
 
         oddEvenSwitch.addEventListener('change', () => {
-             pendingSettings.enableOddEven = oddEvenSwitch.checked;
+            pendingSettings.enableOddEven = oddEvenSwitch.checked;
+
         });
 
         areaValueSwitch.addEventListener('change', () => {
-             pendingSettings.enableAreaValue = areaValueSwitch.checked;
+            pendingSettings.enableAreaValue = areaValueSwitch.checked;
+
         });
 
         mineSlider.addEventListener('input', () => {
@@ -1125,9 +1115,9 @@
 
             const numPotential = potentialNumberSquares.length;
 
-            // const baseDirections = [ /* ... */ ]; // Kept for future use
-            // function hasDirectionalChain(r, c, dx, dy) { /* ... */ } // Kept for future use
-            // function getValidDirections(r, c) { /* ... */ } // Kept for future use
+            // const baseDirections = [ /* Kept for future use */ ];
+            // function hasDirectionalChain(r, c, dx, dy) { /* Kept for future use */ }
+            // function getValidDirections(r, c) { /* Kept for future use */ }
 
             if (!enableNumbers) { // Uses current global enableNumbers
                 // Directional disabled: /* if (enableDirectional) { ... } */
@@ -1390,10 +1380,8 @@
                 minesLeft = 0;
                 updateMinesLeftDisplay();
             } else {
-                if(messageBox.textContent !== 'Game Clear!') {
-                   messageBox.textContent = 'Game Over!';
-                   body.classList.add('game-over');
-                }
+                messageBox.textContent = 'Game Over!';
+                body.classList.add('game-over');
                 revealAllMines(true);
             }
         }
