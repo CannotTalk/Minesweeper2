@@ -85,10 +85,10 @@
         .special-square { font-size: 9px; }
         .odd-even-square { color: #ccae00; font-weight: bold; }
         .area-value-square{ color: #902094; font-weight: bold; }
-        .directional-square { /* Style for directional squares */
-            color: #1a759f; /* Example color: blue-ish */
+        .directional-square {
+            color: #1a759f;
             font-weight: bold;
-            font-size: 9px; /* Match other special squares */
+            font-size: 9px;
         }
 
         #debug-buttons { display: flex; margin-top: 8px; }
@@ -109,6 +109,12 @@
          #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
          #rules-popup .switch { margin-left: 8px; }
          #popup-overlay.visible, #rules-popup.visible { display: block; }
+
+         /* Mine Count Slider Styles */
+         #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
+         #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px;}
+         .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
+
     </style>
 </head>
 <body>
@@ -136,6 +142,18 @@
                マスを右クリック (または長押し) すると旗 (🚩) を立てたり外したりできます。
             </p>
 
+            <!-- ★★★ Mine Count Setting Section ★★★ -->
+            <h3>ゲーム設定</h3>
+             <div class="setting-section">
+                 <div class="slider-label">
+                     <span>地雷の数:</span>
+                     <span id="mine-count-display">30</span> <!-- Initial value display -->
+                 </div>
+                 <input type="range" id="mine-slider" min="1" max="213" value="30"> <!-- Max will be set by JS -->
+                 <p style="font-size:10px; margin-top: 5px;">変更後、自動でリセットされます。</p>
+             </div>
+            <!-- ★★★ End of Mine Count Section ★★★ -->
+
             <!-- Number Setting Section -->
             <h3>表示設定</h3>
              <div class="setting-section">
@@ -153,7 +171,7 @@
              <!-- End of number setting section -->
 
             <h3>特殊マス設定</h3>
-            <p>これらのマスは数字の代わりにヒントを表示します。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。</p>
+            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。</p>
 
             <div class="setting-section">
                 <h4>ハイドマス (・)</h4>
@@ -170,8 +188,9 @@
             <!-- Directional Square Section -->
             <div class="setting-section">
                 <h4>ディレクションマス (矢印+数字)</h4>
-                <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。**矢印が指す方向に最低1マス存在する場合のみ生成されます** (盤面の壁を直接指すことはありません)。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。</p>
+                 <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。<br>
+                   **（現在この機能は調整中のため生成されません）**</p> <!-- ★ 説明更新 ★ -->
                 <div class="setting-label">
                      有効
                     <label class="switch">
@@ -211,16 +230,17 @@
     <script>
         // --- Constants ---
         const gridSize = 15;
-        const numMines = 30;
+        // ★ numMines is now adjustable, so use 'let' and set initial value ★
+        let numMines = 30;
         const maxHideRate = 0.15;
         const minHideRate = 0;
         const maxOddEvenRate = 0.05;
         const maxAreaValueRate = 0.10;
-        const maxDirectionalRate = 0.10; // Base rate relative to potential number squares
+        // const maxDirectionalRate = 0.10; // Keep definition but effectively ignore for now
 
         // --- Board State ---
         let board = [];
-        let minesLeft = numMines;
+        let minesLeft = numMines; // Initialized with adjustable numMines
         let gameOver = false;
         let timerInterval;
         let seconds = 0;
@@ -245,6 +265,9 @@
         const directionalSwitch = document.getElementById('directional-switch');
         const oddEvenSwitch = document.getElementById('odd-even-switch');
         const areaValueSwitch = document.getElementById('area-value-switch');
+        // ★ Mine Count Slider Elements ★
+        const mineSlider = document.getElementById('mine-slider');
+        const mineCountDisplay = document.getElementById('mine-count-display');
 
         // --- Settings ---
         let enableNumbers = numberSwitch.checked;
@@ -252,6 +275,16 @@
         let enableDirectional = directionalSwitch.checked;
         let enableOddEven = oddEvenSwitch.checked;
         let enableAreaValue = areaValueSwitch.checked;
+
+        // --- Initial Setup for Mine Slider ---
+        const maxMines = Math.floor(gridSize * gridSize * 0.95);
+        mineSlider.max = maxMines;
+        // Ensure initial numMines is within bounds
+        if (numMines < 1) numMines = 1;
+        if (numMines > maxMines) numMines = maxMines;
+        mineSlider.value = numMines;
+        mineCountDisplay.textContent = numMines;
+        minesLeft = numMines; // Ensure minesLeft also starts correctly
 
         // --- Event Listeners ---
         resetButton.addEventListener('click', resetGame);
@@ -266,6 +299,18 @@
         directionalSwitch.addEventListener('change', handleSettingChange);
         oddEvenSwitch.addEventListener('change', handleSettingChange);
         areaValueSwitch.addEventListener('change', handleSettingChange);
+        // ★ Mine Slider Listeners ★
+        mineSlider.addEventListener('input', () => {
+            // Update display while sliding
+            mineCountDisplay.textContent = mineSlider.value;
+        });
+        mineSlider.addEventListener('change', () => {
+            // Update game state and reset when slider stops moving
+            numMines = parseInt(mineSlider.value, 10);
+            mineCountDisplay.textContent = numMines; // Ensure display is final value
+            resetGame(); // Reset with the new number of mines
+        });
+
 
         // --- Popup Functions ---
         function openPopup() {
@@ -276,6 +321,7 @@
             rulesPopup.classList.remove('visible');
             popupOverlay.classList.remove('visible');
         }
+        // handleSettingChange now only handles switches, slider has its own listener
         function handleSettingChange() {
             enableNumbers = numberSwitch.checked;
             enableHide = hideSwitch.checked;
@@ -292,6 +338,8 @@
             seconds = 0;
             updateTimerDisplay();
             gameStarted = false;
+            // ★ Update minesLeft based on current numMines setting ★
+            minesLeft = numMines;
             messageBox.textContent = '';
             body.classList.remove('game-over');
             body.style.backgroundColor = '#f0f0f0';
@@ -300,6 +348,7 @@
 
         function createBoard() {
             board = [];
+            // ★ Use the current numMines for this board creation ★
             minesLeft = numMines;
             gameOver = false;
             revealedNonMineCount = 0;
@@ -330,14 +379,21 @@
                     boardElement.appendChild(squareElement);
                 }
             }
-            plantMines();
+            plantMines(); // Uses global numMines
             calculateAdjacentMines();
             applySpecialSquares();
-            updateMinesLeftDisplay();
+            updateMinesLeftDisplay(); // Uses global minesLeft
         }
 
         function plantMines() {
             let minesPlanted = 0;
+            // ★ Ensure planting logic uses the current numMines ★
+            if (numMines >= gridSize * gridSize) {
+                 console.error("Trying to plant too many mines!");
+                 // Plant all non-edge squares as mines or handle error appropriately
+                 // For now, just cap it slightly below full board
+                  numMines = gridSize * gridSize - 1;
+            }
             while (minesPlanted < numMines) {
                 const r = Math.floor(Math.random() * gridSize);
                 const c = Math.floor(Math.random() * gridSize);
@@ -345,30 +401,38 @@
             }
         }
 
-        function calculateAdjacentMines() {
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
-                    if (board[i][j].isMine) { board[i][j].adjacentMines = -1; continue; }
-                    let count = 0;
-                    for (let x = -1; x <= 1; x++) {
-                        for (let y = -1; y <= 1; y++) {
-                            if (x === 0 && y === 0) continue;
-                            const ni = i + x, nj = j + y;
-                            if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) count++;
-                        }
-                    }
-                    board[i][j].adjacentMines = count;
-                }
-            }
+        function calculateAdjacentMines() { /* ... no change ... */
+             for (let i = 0; i < gridSize; i++) {
+                 for (let j = 0; j < gridSize; j++) {
+                     if (board[i][j].isMine) { board[i][j].adjacentMines = -1; continue; }
+                     let count = 0;
+                     for (let x = -1; x <= 1; x++) {
+                         for (let y = -1; y <= 1; y++) {
+                             if (x === 0 && y === 0) continue;
+                             const ni = i + x, nj = j + y;
+                             if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) count++;
+                         }
+                     }
+                     board[i][j].adjacentMines = count;
+                 }
+             }
         }
 
         // Helper to count mines in a specific direction
-        function countMinesInDirection(startRow, startCol, dx, dy) {
-            let count = 0; let r = startRow + dx; let c = startCol + dy;
-            while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-                if (board[r][c]?.isMine) { count++; }
-                r += dx; c += dy;
-            } return count;
+        function countMinesInDirection(startRow, startCol, dx, dy) { /* ... no change ... */
+             let count = 0; let r = startRow + dx; let c = startCol + dy;
+             while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                 if (board[r][c]?.isMine) { count++; }
+                 r += dx; c += dy;
+             } return count;
+        }
+
+         // Helper to check if any neighbor has a specific property
+        function hasNeighborOfType(r, c, key) { /* ... no change ... */
+             for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
+                 if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
+                 if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) return true;
+             } return false;
         }
 
         // Applies special square types based on settings
@@ -388,67 +452,49 @@
             potentialNumberSquares.sort(() => Math.random() - 0.5); // Shuffle
 
             const assignedSpecial = new Set(); // Track assigned squares
-            const totalSquares = gridSize * gridSize; // Total board squares
-            const numPotential = potentialNumberSquares.length; // Number of potential number squares
+            const totalSquares = gridSize * gridSize;
+            const numPotential = potentialNumberSquares.length;
 
             // Base directions (Up, Down, Left, Right)
-            const baseDirections = [
-                { dx: -1, dy: 0, symbol: '↑', name: 'up' },
-                { dx: 1, dy: 0, symbol: '↓', name: 'down' },
-                { dx: 0, dy: -1, symbol: '←', name: 'left' },
-                { dx: 0, dy: 1, symbol: '→', name: 'right' }
-            ];
+            const baseDirections = [ /* ... same directions ... */
+                 { dx: -1, dy: 0, symbol: '↑', name: 'up' },
+                 { dx: 1, dy: 0, symbol: '↓', name: 'down' },
+                 { dx: 0, dy: -1, symbol: '←', name: 'left' },
+                 { dx: 0, dy: 1, symbol: '→', name: 'right' }
+             ];
 
             // Helper function to check for directional chains
-            function hasDirectionalChain(startRow, startCol, dx, dy) {
-                let r = startRow + dx; let c = startCol + dy;
-                while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-                    const nextSquare = board[r][c];
-                    if (nextSquare?.isDirectional && nextSquare.direction?.dx === dx && nextSquare.direction?.dy === dy) return true;
-                    r += dx; c += dy;
-                } return false;
+            function hasDirectionalChain(startRow, startCol, dx, dy) { /* ... same as before ... */
+                 let r = startRow + dx; let c = startCol + dy;
+                 while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                     const nextSquare = board[r][c];
+                     if (nextSquare?.isDirectional && nextSquare.direction?.dx === dx && nextSquare.direction?.dy === dy) return true;
+                     r += dx; c += dy;
+                 } return false;
             }
 
             // Helper to get valid directions for a given cell (avoids pointing off-board)
-            function getValidDirections(r, c) {
-                return baseDirections.filter(dir => {
-                    const nextR = r + dir.dx;
-                    const nextC = c + dir.dy;
-                    // Check if the next square in this direction is within the board boundaries
-                    return nextR >= 0 && nextR < gridSize && nextC >= 0 && nextC < gridSize;
-                });
+            function getValidDirections(r, c) { /* ... same as before ... */
+                 return baseDirections.filter(dir => {
+                     const nextR = r + dir.dx;
+                     const nextC = c + dir.dy;
+                     return nextR >= 0 && nextR < gridSize && nextC >= 0 && nextC < gridSize;
+                 });
             }
 
-
+            // --- Apply Special Square Logic ---
             if (!enableNumbers) {
                 // --- Numbers OFF: Apply deterministically ---
                 // Order: Directional -> AreaValue -> OddEven -> Hide
-                if (enableDirectional) {
-                    for (const { r, c } of potentialNumberSquares) {
-                        const k = `${r}-${c}`;
-                        if (!assignedSpecial.has(k)) {
-                            const sq = board[r][c];
-                            let assignedDir = false;
-                            const validDirs = getValidDirections(r, c); // Get directions pointing onto the board
 
-                            if (validDirs.length > 0) { // Only proceed if there's at least one valid direction
-                                const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
-                                for (const dir of shuffledValidDirs) {
-                                    if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
-                                        const count = countMinesInDirection(r, c, dir.dx, dir.dy);
-                                        sq.isDirectional = sq.isHide = true;
-                                        sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
-                                        sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
-                                        assignedSpecial.add(k);
-                                        assignedDir = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                 // ★★★ Directional generation is temporarily disabled ★★★
+                /*
+                if (enableDirectional) {
+                    for (const { r, c } of potentialNumberSquares) { // ... logic ... }
                 }
-                // Apply AreaValue if not assigned
+                */
+
+                // Apply AreaValue if not assigned and no AreaValue neighbor
                 if (enableAreaValue) {
                     for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
@@ -460,7 +506,7 @@
                          }
                     }
                 }
-                // Apply OddEven if not assigned
+                // Apply OddEven if not assigned and no OddEven neighbor
                 if (enableOddEven) {
                     for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
@@ -479,36 +525,17 @@
             } else {
                 // --- Numbers ON: Apply probabilistically ---
                 // Order: Directional -> AreaValue -> OddEven -> Hide
-                if (enableDirectional) {
-                    // Calculate max based on potential number squares rate
-                    const maxDir = Math.floor(numPotential * maxDirectionalRate);
-                    let count = 0;
-                    for (const { r, c } of potentialNumberSquares) {
-                        if (count >= maxDir) break; const k = `${r}-${c}`;
-                        if (!assignedSpecial.has(k)) {
-                            const sq = board[r][c];
-                             let assignedDir = false;
-                             const validDirs = getValidDirections(r, c); // Get valid directions
 
-                             if (validDirs.length > 0) { // Only proceed if there's at least one valid direction
-                                 const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
-                                 for (const dir of shuffledValidDirs) {
-                                     if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) { // Check chain
-                                         const dirCount = countMinesInDirection(r, c, dir.dx, dir.dy);
-                                         sq.isDirectional = sq.isHide = true;
-                                         sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
-                                         sq.directionalCount = dirCount; sq.directionalSymbol = dir.symbol;
-                                         assignedSpecial.add(k);
-                                         assignedDir = true;
-                                         count++; // Increment count only when assigned
-                                         break;
-                                     }
-                                 }
-                             }
-                        }
-                    }
+                // ★★★ Directional generation is temporarily disabled ★★★
+                const maxDir = 0; // Force 0% generation for now
+                /*
+                if (enableDirectional && maxDir > 0) { // Check maxDir > 0 as well
+                    let count = 0;
+                    for (const { r, c } of potentialNumberSquares) { // ... logic ... }
                 }
-                // Apply AreaValue probabilistically if not assigned
+                 */
+
+                // Apply AreaValue probabilistically if not assigned and no AreaValue neighbor
                 if (enableAreaValue) {
                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -521,7 +548,7 @@
                          }
                      }
                 }
-                // Apply OddEven probabilistically if not assigned
+                // Apply OddEven probabilistically if not assigned and no OddEven neighbor
                 if (enableOddEven) {
                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -545,13 +572,7 @@
             }
         }
 
-        // Helper to check if any neighbor has a specific property
-        function hasNeighborOfType(r, c, key) {
-            for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
-                if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
-                if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) return true;
-            } return false;
-        }
+        // --- Other Game Logic Functions (No changes below this line) ---
 
         // Handles left click on a square
         function handleSquareClick(r, c) {
@@ -604,7 +625,7 @@
                     el.classList.add('mine');
                     el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣';
                 } else if (sq.adjacentMines >= 0) {
-                    if (sq.isDirectional) {
+                    if (sq.isDirectional) { // Render logic remains, even if generation is off
                         el.classList.add('directional-square');
                         el.textContent = sq.directionalSymbol + sq.directionalCount;
                     } else if (sq.isAreaValue) {
@@ -644,9 +665,9 @@
 
         // Checks if all non-mine squares have been revealed
         function checkWinCondition() {
-            const totalNonMine = gridSize * gridSize - numMines;
-            if (revealedNonMineCount === totalNonMine) {
-                let allRevealed = true; // Double check
+            const totalNonMine = gridSize * gridSize - numMines; // Use current numMines
+            if (revealedNonMineCount >= totalNonMine) { // Check >= for safety
+                let allRevealed = true;
                 for(let i=0; i<gridSize; i++) for(let j=0; j<gridSize; j++) if(!board[i][j].isMine && !board[i][j].isRevealed) allRevealed = false;
                 if(allRevealed) endGame(true);
             }
@@ -674,14 +695,14 @@
                 for (let j=0; j<gridSize; j++) {
                     const sq = board[i][j]; const el = sq.element;
                     if (sq.isMine) {
-                        if (sq.isFlagged) continue; // Keep correct flag
-                        if (el.classList.contains('mine-clicked')) continue; // Keep clicked style
+                        if (sq.isFlagged) continue;
+                        if (el.classList.contains('mine-clicked')) continue;
                         sq.isRevealed = true;
                         renderSquareContent(sq); // Will show '💣'
-                    } else { // Not a mine
-                        if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true; // Reveal to show X
-                            el.classList.add('flag-wrong'); // Add class for styling
+                    } else {
+                        if (sq.isFlagged) {
+                            sq.isRevealed = true;
+                            el.classList.add('flag-wrong');
                             renderSquareContent(sq); // Will show '❌'
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
                              revealSquare(i, j);
@@ -690,7 +711,6 @@
                 }
             }
         }
-
 
         // Updates the game timer every second
         function updateTimer() { seconds++; updateTimerDisplay(); }
@@ -706,9 +726,9 @@
             if (gameOver) return;
              if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
             for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (!board[i][j].isMine && !board[i][j].isRevealed) revealSquare(i,j);
-             checkWinCondition(); // Should trigger win
-             messageBox.textContent = 'All squares revealed!'; // Override message
-             if (!gameOver) { // Ensure game over state
+             checkWinCondition();
+             messageBox.textContent = 'All squares revealed!';
+             if (!gameOver) {
                  endGame(true);
                  messageBox.textContent = 'All squares revealed!';
              }
@@ -717,8 +737,8 @@
         function revealAll() {
              if (gameOver) return;
              if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
-             revealAllMines(true); // Show everything
-             if (!gameOver) { // Ensure game over state
+             revealAllMines(true);
+             if (!gameOver) {
                  gameOver = true; clearInterval(timerInterval);
              }
              messageBox.textContent = 'All squares revealed!';
