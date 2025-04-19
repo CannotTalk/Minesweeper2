@@ -53,7 +53,8 @@
         .revealed { background-color: #b4c687; }
         .mine { background-color: #ff4444; color: #000; font-size: 12px; }
         .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
-        .flag-wrong { background-color: #fdd; }
+        /* Style for incorrectly flagged squares */
+        .flag-wrong { background-color: #fdd !important; /* Use !important to override .revealed */ }
 
         #reset-button, #rules-button {
             padding: 6px 12px;
@@ -194,7 +195,7 @@
                 <div class="setting-label">
                      有効
                     <label class="switch">
-                        <input type="checkbox" id="directional-switch"> <!-- 'checked' removed -->
+                        <input type="checkbox" id="directional-switch"> <!-- Default OFF -->
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -230,8 +231,7 @@
     <script>
         // --- Constants ---
         const gridSize = 15;
-        // numMines is adjustable
-        let numMines = 30; // Default value
+        let numMines = 30; // Default value, adjustable
         const maxHideRate = 0.15;
         const minHideRate = 0;
         const maxOddEvenRate = 0.05;
@@ -305,7 +305,6 @@
             mineCountDisplay.textContent = numMines;
             resetGame();
         });
-
 
         // --- Popup Functions ---
         function openPopup() {
@@ -387,6 +386,9 @@
                   mineCountDisplay.textContent = numMines;
                   minesLeft = numMines;
              }
+            // Ensure numMines is not negative after adjustment
+            if (numMines < 0) numMines = 0;
+
             while (minesPlanted < numMines) {
                 const r = Math.floor(Math.random() * gridSize);
                 const c = Math.floor(Math.random() * gridSize);
@@ -543,7 +545,7 @@
                 // ★★★ Directional generation is temporarily disabled ★★★
                  const maxDir = 0; // Force 0 generation
                  /*
-                 if (enableDirectional && maxDir > 0) {
+                 if (enableDirectional && maxDir > 0) { // Check maxDir > 0 as well
                     let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
                         if (count >= maxDir) break; const k = `${r}-${c}`;
@@ -598,7 +600,7 @@
         }
 
 
-        // --- Other Game Logic Functions (No changes below this line) ---
+        // --- Other Game Logic Functions ---
 
         function handleSquareClick(r, c) {
             if (gameOver || board[r][c].isRevealed || board[r][c].isFlagged) return;
@@ -707,20 +709,21 @@
             }
         }
 
+        // Reveals all mines and incorrect flags at game end
         function revealAllMines(showContent) {
             for (let i=0; i<gridSize; i++) {
                 for (let j=0; j<gridSize; j++) {
                     const sq = board[i][j]; const el = sq.element;
                     if (sq.isMine) {
-                        if (sq.isFlagged) continue;
-                        if (el.classList.contains('mine-clicked')) continue;
+                        if (sq.isFlagged) continue; // Keep correct flag
+                        if (el.classList.contains('mine-clicked')) continue; // Keep clicked style
                         sq.isRevealed = true;
                         renderSquareContent(sq); // Will show '💣'
-                    } else {
-                        if (sq.isFlagged) {
-                            sq.isRevealed = true;
-                            el.classList.add('flag-wrong');
-                            renderSquareContent(sq); // Will show '❌'
+                    } else { // Not a mine
+                        if (sq.isFlagged) { // Incorrect flag
+                            sq.isRevealed = true; // Mark revealed to override default hidden style
+                            el.className = 'square revealed flag-wrong'; // Set classes directly
+                            el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
                              revealSquare(i, j);
                         }
