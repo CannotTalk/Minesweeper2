@@ -15,13 +15,70 @@
             margin: 0;
             padding: 10px 0;
             background-color: #f0f0f0;
+            font-family: 'Press Start 2P', cursive;はい
+            transition: background-color 0.5s ease;
+        、承知いたしました。
+ボタン切り替えモードでの旗削除の問題を修正した、}
+        body.game-over {
+            background-color: #ff4444;
+        }
+        #game-container {現時点での完全なHTMLコードを以下に示します。
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper 2</title>
+    <link;
+            position: relative;
+            width: 90%;
+            max-width: 350px;
+        }
+        /* Game Header Styling */
+        #game-header {
+            display: href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 314px;
+            margin-bottom: 5px;
+            padding: 0 5px;
+            box-sizing: border-box;
+            min-height: 30;
+            margin: 0;
+            padding: 10px 0;
+            background-color: #f0f0f0;
             font-family: 'Press Start 2P', cursive;
             transition: background-color 0.5s ease;
         }
         body.game-over {
             background-color: #ff4444;
         }
-        #game-container {
+        #game-container {px;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(15, 20px);
+            border: 2px solid #333;
+            background-color: #b4c687;
+            padding: 4px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -36,7 +93,20 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 314px;
+            maxsquare {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            user-select: none;
+            background-color: #eee;
+            line-height: 1;
+            overflow: hidden;
+            text-align: center;-width: 314px;
             margin-bottom: 5px;
             padding: 0 5px;
             box-sizing: border-box;
@@ -47,7 +117,13 @@
             grid-template-columns: repeat(15, 20px);
             border: 2px solid #333;
             background-color: #b4c687;
-            padding: 4px;
+            padding
+        }
+        .hidden { background-color: #ddd; }
+        .revealed { background-color: #b4c687; }
+        .mine { background-color: #ff4444; color: #000; font-size: 12px; }
+        .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
+        .flag-wrong { background-color:: 4px;
             margin-top: 5px;
             margin-bottom: 10px;
         }
@@ -62,15 +138,7 @@
             font-size: 11px;
             user-select: none;
             background-color: #eee;
-            line-height: 1;
-            overflow: hidden;
-            text-align: center;
-        }
-        .hidden { background-color: #ddd; }
-        .revealed { background-color: #b4c687; }
-        .mine { background-color: #ff4444; color: #000; font-size: 12px; }
-        .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
-        .flag-wrong { background-color: #fdd !important; }
+            line-height:  #fdd !important; }
 
         #reset-button {
             padding: 6px 12px;
@@ -85,7 +153,18 @@
             font-size: 10px;
             cursor: pointer;
             font-family: 'Press Start 2P', cursive;
-            background-color: #e0e0e0;
+1;
+            overflow: hidden;
+            text-align: center;
+        }
+        .hidden { background-color: #ddd; }
+        .revealed { background-color: #b4c687; }
+        .mine { background-color: #ff4444; color: #000; font-size: 12px; }
+        .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
+        .flag-wrong { background-color: #fdd !important; }
+
+        #reset-button {
+                        background-color: #e0e0e0;
             border: 1px solid #999;
             border-radius: 3px;
             z-index: 10;
@@ -104,7 +183,23 @@
         }
 
         #message-box {
+            font-sizepadding: 6px 12px;
             font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        #rules-button {
+            position: static;
+            padding: 5px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 3px;
+            z-index: 10;
+            : 12px;
             color: #333;
             margin-bottom: 2px;
             height: 14px;
@@ -117,6 +212,60 @@
             margin-bottom: 8px;
             line-height: 1.3;
             text-align: center;
+            min-height: 40px;
+        }
+        margin-top: 0;
+            order: 3;
+        }
+        #rules-button:hover { background-color: #d0d0d0; }
+
+        /* Info Controls Container Styling */
+        #info-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 314px;
+        }
+
+        #message-box {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 2px;
+            height: 14#active-rules-display div { margin-bottom: 2px; }
+
+        .timer {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            order: 2;
+            flex-grow: 1;
+            margin: 0;
+        }
+
+
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 18px; }
+        .slider:before { position: absolute; content: ""; height: 10px; width: 10px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;px;
+            text-align: center;
+        }
+        #active-rules-display {
+            font-size: 9px;
+            color: #555;
+            margin-top: 0px;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            text-align: center; }
+        input:checked + .slider { background-color: #2196F3; }
+        input:focus + .slider { box-shadow: 0 0 1px #2196F3; }
+        input:checked + .slider:before { transform: translateX(16px); }
+        .slider.round { border-radius: 18px; }
+        .slider.round:before { border-radius: 50%; }
+
+        .special-square { font-size: 9px; }
+        .odd-even-square { color: #0000CD; font-weight: bold; } /* Updated color */
+        .area-value-square{
             min-height: 40px;
         }
         #active-rules-display div { margin-bottom: 2px; }
@@ -133,7 +282,26 @@
 
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 18px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0 color: #902094; font-weight: bold; }
+        .directional-square {
+            color: #1a759f;
+            font-weight: bold;
+            font-size: 9px;
+        }
+
+        #debug-buttons { display: flex; margin-top: 8px; }
+        #debug-buttons button { margin-left: 4px; padding: 6px 10px; font-size: 10px; cursor: pointer; font-family: 'Press Start 2P', cursive; }
+        #debug-buttons button:first-child { margin-left: 0; }
+
+        /* Mode Toggle Button Styles */
+        #mode-toggle-buttons {
+            display: none;
+            user-select: none;
+            order: 1;
+        }
+        #mode-toggle-buttons.visible {
+            display: flex;
+            gap: 5; background-color: #ccc; transition: .4s; border-radius: 18px; }
         .slider:before { position: absolute; content: ""; height: 10px; width: 10px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #2196F3; }
         input:focus + .slider { box-shadow: 0 0 1px #2196F3; }
@@ -141,7 +309,27 @@
         .slider.round { border-radius: 18px; }
         .slider.round:before { border-radius: 50%; }
 
-        .special-square { font-size: 9px; }
+        .specialpx;
+        }
+        .mode-button {
+            font-size: 20px;
+            padding: 3px 6px;
+            cursor: pointer;
+            border: 2px solid #888;
+            background-color: #eee;
+            border-radius: 5px;
+            line-height: 1;
+        }
+        .mode-button.active {
+            background-color: #ccc;
+            border-color: #333;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- Popup Styles --- */
+         #popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 9-square { font-size: 9px; }
         .odd-even-square { color: #0000CD; font-weight: bold; }
         .area-value-square{ color: #902094; font-weight: bold; }
         .directional-square {
@@ -157,7 +345,18 @@
         /* Mode Toggle Button Styles */
         #mode-toggle-buttons {
             display: none;
-            user-select: none;
+            user-select: none9; display: none;
+        }
+         #rules-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 500px; background-color: #fdfdfd;
+            border: 2px solid #333; border-radius: 8px; z-index: 100;
+            display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            font-family: sans-serif; color: #333; flex-direction: column;
+        }
+        #popup-overlay.visible, #rules-popup.visible { display: flex !important; }
+         .popup-header { padding: 15px 20px 0 20px; }
+         .popup-header h2 { margin-top: 0;
             order: 1;
         }
         #mode-toggle-buttons.visible {
@@ -183,7 +382,12 @@
          #popup-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none;
-        }
+        ; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
+         .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
+         #rules-popup h3 { font-size: 14px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; font-weight: bold; }
+         #rules-popup h4 { font-size: 13px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: #555; }
+         #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; }
+         #close-popup-button { position: absolute; top: 8px; right: 8px;}
          #rules-popup {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 500px; background-color: #fdfdfd;
@@ -193,16 +397,16 @@
         }
         #popup-overlay.visible, #rules-popup.visible { display: flex !important; }
          .popup-header { padding: 15px 20px 0 20px; }
-         .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
+         .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center background: none; border: 1px solid transparent; font-size: 26px; font-weight: bold; color: #777; cursor: pointer; font-family: sans-serif; line-height: 1; padding: 0 6px; transition: color 0.2s, border-color 0.2s; }
+         #close-popup-button:hover, #close-popup-button:focus { color: #000; border-color: #ccc; outline: none; }
+         #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
+         #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
+         #rules-popup .; font-family: 'Press Start 2P', cursive; color: #111; }
          .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
          #rules-popup h3 { font-size: 14px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; font-weight: bold; }
          #rules-popup h4 { font-size: 13px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: #555; }
          #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; }
-         #close-popup-button { position: absolute; top: 8px; right: 8px; background: none; border: 1px solid transparent; font-size: 26px; font-weight: bold; color: #777; cursor: pointer; font-family: sans-serif; line-height: 1; padding: 0 6px; transition: color 0.2s, border-color 0.2s; }
-         #close-popup-button:hover, #close-popup-button:focus { color: #000; border-color: #ccc; outline: none; }
-         #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
-         #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
-         #rules-popup .switch { margin-left: 8px; }
+         #close-popup-button { position: absolute; top: 8px; right: 8px; background: none; border: 1px solid transparent; font-size: 26px; font-weight: bold;switch { margin-left: 8px; }
          .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; }
          #save-settings-button { padding: 6px 12px; font-size: 12px; font-family: 'Press Start 2P', cursive; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px; }
          #save-settings-button:hover { background-color: #45a049; }
@@ -210,7 +414,12 @@
          /* Mine Count Slider Styles */
          #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
          #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px;}
-         .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
+         .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: color: #777; cursor: pointer; font-family: sans-serif; line-height: 1; padding: 0 6px; transition: color 0.2s, border-color 0.2s; }
+         #close-popup-button:hover, #close-popup-button:focus { color: #000; border-color: #ccc; outline: none; }
+         #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
+         #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
+         #rules-popup .switch { margin-left: 8px; }
+         .popup-footer { padding: 10px 20px 'Press Start 2P', cursive; margin-bottom: 5px; }
 
          /* Rule Reset Button Style */
         .reset-rule-button {
@@ -224,7 +433,18 @@
         #hide-rate-slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 3px; font-weight: normal; }
         #hide-rate-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 12px;}
         #hide-rate-slider { width: 100%; cursor: pointer; }
-        .setting-section[data-rule-id="hide"] > #hide-rate-control:not(.enabled) { opacity: 0.5; pointer-events: none; }
+        .setting-; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; }
+         #save-settings-button { padding: 6px 12px; font-size: 12px; font-family: 'Press Start 2P', cursive; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px; }
+         #save-settings-button:hover { background-color: #45a049; }
+
+         /* Mine Count Slider Styles */
+         #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
+         #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px;}
+         .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
+
+         /* Rule Reset Button Style */
+        .reset-rule-button {
+            font-size: 9pxsection[data-rule-id="hide"] > #hide-rate-control:not(.enabled) { opacity: 0.5; pointer-events: none; }
 
          /* PC Operation Mode Setting Styles */
         .pc-op-mode-label { display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer; }
@@ -240,7 +460,17 @@
          <!-- Header for Timer and Rules Button -->
         <div id="game-header">
              <div id="mode-toggle-buttons">
-                 <button id="dig-mode-button" class="mode-button active" title="掘るモード">⛏️</button>
+                 <button id="dig-mode-button" class; padding: 2px 6px; margin-left: 10px; cursor: pointer;
+            background-color: #ddd; border: 1px solid #bbb; border-radius: 3px; font-family: sans-serif;
+        }
+        .reset-rule-button:hover { background-color: #ccc; }
+
+        /* Hide Rate Slider Styles */
+        #hide-rate-control { margin-top: 10px; }
+        #hide-rate-slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 3px; font-weight: normal; }
+        #hide-rate-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 12px;}
+        #hide-rate-slider { width: 100%; cursor: pointer; }
+        .setting-section[data-rule-id="hide"] > #="mode-button active" title="掘るモード">⛏️</button>
                  <button id="flag-mode-button" class="mode-button" title="旗モード">🚩</button>
              </div>
             <div class="timer">Time: <span id="timer">00.00</span></div>
@@ -253,10 +483,65 @@
         <div id="info-controls">
             <div id="message-box"></div>
             <div id="active-rules-display"></div>
-            <button id="reset-button">Reset</button>
+            <button id="resethide-rate-control:not(.enabled) { opacity: 0.5; pointer-events: none; }
+
+         /* PC Operation Mode Setting Styles */
+        .pc-op-mode-label { display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer; }
+        .pc-op-mode-label input[type="radio"] { margin-right: 5px; }
+        #pc-op-mode-section { display: block; }
+        body.touch-device #pc-op-mode-section { display: none; }
+        body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons { display: none; }
+
+    </style>
+</head>
+<body>
+    -button">Reset</button>
             <div id="debug-buttons">
                 <button id="reveal-non-mines">Open Non-Mines</button>
                 <button id="reveal-all">Open All</button>
+            </div>
+        </div>
+
+    </div>
+
+     <!-- Popup Structure -->
+    <div id="popup-overlay"></div>
+    <div id="rules-popup">
+        <button id="close-popup-button" aria-label="閉じる">×</button>
+        <div<div id="game-container">
+         <!-- Header for Timer and Rules Button -->
+        <div id="game-header">
+             <div id="mode-toggle-buttons">
+                 <button id="dig-mode-button" class="mode-button active" title="掘るモード">⛏️</button>
+                 <button id="flag-mode-button" class="mode-button" title="旗モード">🚩</button>
+             </div>
+            <div class="timer">Time: <span id="timer">00.00</span></div>
+            <button id="rules-button">Rules & Settings</button>
+        </div>
+
+         class="popup-header">
+             <h2>ルールと設定</h2>
+        </div>
+        <div class="rules-content">
+            <h3>基本ルール</h3>
+            <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
+               地雷のマスを開かずに<div id="board"></div>
+
+        <!-- Info and Controls Container -->
+        <div id="info-controls">
+            <div id="message-box"></div>
+            <div id="active-rules-display"></div>
+            <button id="reset-button">Reset</button>
+            <div id="debug-buttons">
+                <button id="reveal-non-mines">Open Non-Mines</button>
+                <、地雷以外のすべてのマスを開くとクリアです。<br>
+               マウス操作の場合、右クリックで旗 (🚩) を立てたり外したりできます。<br>
+               タッチ操作またはボタン切り替え操作の場合、⛏️(掘る)モードと🚩(旗)モードを切り替えてタップします。
+            </p>
+
+            <!-- Mine Count Setting Section -->
+            <h3>ゲーム設定</h3>
+             <div class="setting-section" data-rule-button id="reveal-all">Open All</button>
             </div>
         </div>
 
@@ -272,14 +557,7 @@
         <div class="rules-content">
             <h3>基本ルール</h3>
             <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
-               地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
-               マウス操作の場合、右クリックで旗 (🚩) を立てたり外したりできます。<br>
-               タッチ操作またはボタン切り替え操作の場合、⛏️(掘る)モードと🚩(旗)モードを切り替えてタップします。
-            </p>
-
-            <!-- Mine Count Setting Section -->
-            <h3>ゲーム設定</h3>
-             <div class="setting-section" data-rule-id="mines">
+id="mines">
                  <div class="slider-label">
                      <span>地雷の数:</span>
                      <span id="mine-count-display">30</span>
@@ -289,12 +567,31 @@
                  <p style="font-size:10px; margin-top: 5px;">変更を適用するには「設定を保存」を押してください。</p>
              </div>
 
-            <!-- PC Operation Mode Setting -->
+                           地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
+               マウス操作の場合、右クリックで旗 (🚩) を立てたり外したりできます。<br>
+               タッチ操作またはボタン切り替え操作の場合、⛏️(掘る)モードと🚩(旗)モードを切り替えてタップします。
+            </p>
+
+            <!-- Mine Count Setting Section -->
+            <h3>ゲーム設定</h3>
+             <div class="setting-section" data-rule-id="mines">
+                 <div class="slider-label">
+                     <span>地雷の数:</span>
+                     <span id="mine<!-- PC Operation Mode Setting -->
             <div class="setting-section" id="pc-op-mode-section">
                 <h4>PC操作モード</h4>
                  <p style="margin-bottom: 8px;">マウス操作（右クリックで旗を立てる）か、ボタン切り替え操作（画面上部の⛏️/🚩ボタン）かを選択します。<b>この設定は即時反映されます。</b></p>
                 <label class="pc-op-mode-label">
-                    <input type="radio" name="pc-op-mode" value="mouse" checked> マウス操作 (右クリックで旗)
+                    <input type="radio" name="pc-op-mode" value="mouse" checked> マウス操作-count-display">30</span>
+                     <button class="reset-rule-button" data-rule="mines">デフォルトに戻す</button>
+                 </div>
+                 <input type="range" id="mine-slider" min="0" max="225" value="30">
+                 <p style="font-size:10px; margin-top: 5px;">変更を適用するには「設定を保存」を押してください。</p>
+             </div>
+
+            <!-- PC Operation Mode Setting -->
+            <div class="setting-section" id="pc-op-mode-section">
+                 (右クリックで旗)
                 </label>
                 <label class="pc-op-mode-label">
                     <input type="radio" name="pc-op-mode" value="button"> ボタン切り替え操作 (⛏️/🚩)
@@ -308,7 +605,8 @@
                  <p>オンの場合、地雷に隣接するマスに数字が表示されます。<br>
                     オフの場合、数字が表示されるべきマスは、可能な限り他の特殊マス (Directional, AreaValue, OddEven) に置き換えられ、残りはハイドマス (・) になります。</p>
                  <div class="setting-label">
-                      <span>有効</span>
+                      <span><h4>PC操作モード</h4>
+                 <p style="margin-bottom: 8px;">マウス操作（右クリックで旗を立てる）か、ボタン切り替え操作（画面上部の⛏️/🚩ボタン）かを選択します。<b>この設定は有効</span>
                        <div>
                          <button class="reset-rule-button" data-rule="numbers">デフォルト</button>
                          <label class="switch">
@@ -321,13 +619,29 @@
 
             <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
-            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
+            <p>これらのマスは数字の即時反映されます。</b></p>
+                <label class="pc-op-mode-label">
+                    <input type="radio" name="pc-op-mode" value="mouse" checked> マウス操作 (右クリックで旗)
+                </label>
+                <label class="pc-op-mode-label">
+                    <input type="radio" name="pc-op-mode" value="button"> ボタン切り替え操作 (代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
 
-            <div class="setting-section" data-rule-id="hide">
+            <div class="setting-section"⛏️/🚩)
+                </label>
+            </div>
+
+            <!-- Number Setting Section -->
+            <h3>表示設定</h3>
+             <div class="setting-section" data-rule-id="numbers">
+                 <h4>数字マス生成 (Numbers Squares)</h4>
+                 <p>オンの場合、地雷に隣接する data-rule-id="hide">
                 <h4>ハイドマス (Concealment Squares)</h4>
                 <p>数字が表示される代わりに「・」が表示されます。周囲の状況から数字を推測する必要があります。</p>
                 <div class="setting-label">
-                     <span>有効</span>
+                     <span>有効</span>マスに数字が表示されます。<br>
+                    オフの場合、数字が表示されるべきマスは、可能な限り他の特殊マス (Directional, AreaValue, OddEven) に置き換えられ、残りはハイドマス (・) になります。</p>
+                 <div class="setting-label">
+                      <span>有効
                       <div>
                           <button class="reset-rule-button" data-rule="hide">デフォルト</button>
                           <label class="switch">
@@ -336,22 +650,49 @@
                           </label>
                       </div>
                 </div>
-                <div id="hide-rate-control" class="enabled">
+                <div id="hide-rate-</span>
+                       <div>
+                         <button class="reset-rule-button" data-rule="numbers">デフォルト</button>
+                         <label class="switch">
+                             <input type="checkbox" id="number-switch" checked>
+                             <span class="slider round"></span>
+                         </label>
+                      control" class="enabled">
                     <div id="hide-rate-slider-label">
                         <span>最大割合:</span>
                         <span id="hide-rate-display">10%</span>
                     </div>
                     <input type="range" id="hide-rate-slider" min="5" max="50" step="5" value="10">
                 </div>
-            </div>
+            </div></div>
+                 </div>
+             </div>
+
+            <!-- Special Square Settings -->
+            <h3>特殊マス設定</h3>
+            <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」
 
             <!-- Directional Square Section -->
             <div class="setting-section" data-rule-id="directional">
                 <h4>ディレクションマス (Directional Squares)</h4>
                  <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
+                   指定された方向の地雷のみをカウントします。矢印が指を押してください。</p>
+
+            <div class="setting-section" data-rule-id="hide">
+                <h4>ハイドマス (Concealment Squares)</h4>
+                <p>数字が表示される代わりに「・」が表示されます。周囲の状況から数字を推測する必要があります。</p>
+                <divす方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
                    <b>（現在この機能は調整中のため生成されません）</b></p>
-                <div class="setting-label">
+                <div class="setting- class="setting-label">
+                     <span>有効</span>
+                      <div>
+                          <button class="reset-rule-button" data-rule="hide">デフォルト</button>
+                          <label class="switch">
+                              <input type="checkbox" id="hide-switch" checked>
+                              <span class="slider round"></span>
+                          </label>
+                      </div>
+                label">
                      <span>有効</span>
                       <div>
                           <button class="reset-rule-button" data-rule="directional">デフォルト</button>
@@ -363,13 +704,88 @@
                 </div>
             </div>
 
+             <div class="setting-section" data-rule-id="oddEven</div>
+                <div id="hide-rate-control" class="enabled">
+                    <div id="hide-rate-slider-label">
+                        <span>最大割合:</span>
+                        <span id="hide-rate-display">10%</span>
+                    </div>
+                    <input type="range" id="hide-rate-slider" min="5" max="50" step="">
+                <h4>オッドイーブンマス (OddEven Squares)</h4>
+                 <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。</p>
+                <div class="setting-label">
+                     <span>有効</span>
+                      <div>
+                          <button class="reset-rule-button" data-rule="oddEven">デフォルト</5" value="10">
+                </div>
+            </div>
+
+            <!-- Directional Square Section -->
+            <div class="setting-section" data-rule-id="directional">
+                <h4>ディレクションマス (Directional Squares)</h4>
+                 <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
+                   指定された方向の地雷のみbutton>
+                          <label class="switch">
+                              <input type="checkbox" id="odd-even-switch" checked>
+                              <span class="slider round"></span>
+                          </label>
+                      </div>
+                 </div>
+             </div>
+
+             <div class="setting-section" data-rule-id="areaValue">
+                <h4>エリアバリューマス (Range Value Squares)</h4>
+                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。</p>
+                 をカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。<br>
+                   <b>（現在この機能は調整中のため生成されません）</b></p>
+                <div class="setting-label">
+                     <span>有効</span>
+                      <div>
+                          <button class="reset-rule-button" data-rule="directional">デフォルト</button>
+                          <label class="switch">
+                              <input type="checkbox" id="directional-switch"> <!-- Default OFF -->
+                              <span class="<div class="setting-label">
+                      <span>有効</span>
+                      <div>
+                         <button class="reset-rule-button" data-rule="areaValue">デフォルト</button>
+                         <label class="switch">
+                             <input type="checkbox" id="area-value-switch" checked>
+                             <span class="slider round"></span>
+                         </label>
+                     </div>
+                 </div>
+             </div>
+        </div>
+        <!-- Popup Footer -->
+        <div class="popup-footer">
+            <button id="save-settingsslider round"></span>
+                          </label>
+                      </div>
+                </div>
+            </div>
+
              <div class="setting-section" data-rule-id="oddEven">
                 <h4>オッドイーブンマス (OddEven Squares)</h4>
                  <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。</p>
                 <div class="setting-label">
                      <span>有効</span>
                       <div>
-                          <button class="reset-rule-button" data-rule="oddEven">デフォルト</button>
+                          <button class-button">設定を保存してリセット</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants ---
+        const gridSize = 15;
+
+        const defaultSettings = {
+             numMines: 30,
+             enableNumbers: true,
+             enableHide: true,
+             hideRateMax: 0.10, // 10%
+             enableDirectional: false,
+             enableOddEven: true,
+             enable="reset-rule-button" data-rule="oddEven">デフォルト</button>
                           <label class="switch">
                               <input type="checkbox" id="odd-even-switch" checked>
                               <span class="slider round"></span>
@@ -386,7 +802,15 @@
                       <div>
                          <button class="reset-rule-button" data-rule="areaValue">デフォルト</button>
                          <label class="switch">
-                             <input type="checkbox" id="area-value-switch" checked>
+                             <input typeAreaValue: true
+        };
+
+        let numMines = defaultSettings.numMines;
+
+        const maxHideRate = 0.50; // Corresponds to slider max 50%
+        const minHideRate = 0.05; // Corresponds to slider min 5%
+        const maxOddEvenRate = 0.05;
+        const max="checkbox" id="area-value-switch" checked>
                              <span class="slider round"></span>
                          </label>
                      </div>
@@ -404,7 +828,30 @@
         const gridSize = 15;
 
         const defaultSettings = {
-             numMines: 30,
+             AreaValueRate = 0.10;
+        // const maxDirectionalRate = 0.10;
+
+        // --- Board State ---
+        let board = [];
+
+        let minesLeft = numMines;
+
+        let gameOver = false;
+
+        let timerInterval;
+
+        let elapsedMilliseconds = 0;
+
+        const timerUpdateInterval = 50;
+
+        let gameStarted = false;
+
+        let startTime = 0;
+
+        // Interaction Mode State
+        let currentInteractionMode = 'dig';
+
+        let pcOperationnumMines: 30,
              enableNumbers: true,
              enableHide: true,
              hideRateMax: 0.10, // 10%
@@ -418,7 +865,27 @@
         const maxHideRate = 0.50;
         const minHideRate = 0.05;
         const maxOddEvenRate = 0.05;
-        const maxAreaValueRate = 0.10;
+        const maxAreaValueRate = 0.10Mode = 'mouse';
+
+        let isTouch = false;
+        // Flag to prevent double interaction on touch
+        let justFlagged = false;
+
+
+        // --- Get DOM Elements ---
+        const boardElement = document.getElementById('board');
+
+        const resetButton = document.getElementById('reset-button');
+
+        const messageBox = document.getElementById('message-box');
+
+        const timerDisplay = document.getElementById('timer');
+
+        const body = document.body;
+
+        const revealNonMinesButton = document.getElementById('reveal-non-mines');
+
+        ;
         // const maxDirectionalRate = 0.10;
 
         // --- Board State ---
@@ -445,6 +912,24 @@
 
         let isTouch = false;
 
+        let justFlagconst revealAllButton = document.getElementById('reveal-all');
+
+        const rulesButton = document.getElementById('rules-button');
+
+        const rulesPopup = document.getElementById('rules-popup');
+
+        const closePopupButton = document.getElementById('close-popup-button');
+
+        const popupOverlay = document.getElementById('popup-overlay');
+
+        const numberSwitch = document.getElementById('number-switch');
+
+        const hideSwitch = document.getElementById('hide-switch');
+
+        const directionalSwitch = document.getElementById('directional-switch');
+
+        const oddEvenSwitch = document.getElementById('odd-even-switch');ged = false; // Flag to prevent double interaction on touch
+
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
 
@@ -462,7 +947,21 @@
 
         const rulesButton = document.getElementById('rules-button');
 
-        const rulesPopup = document.getElementById('rules-popup');
+
+
+        const areaValueSwitch = document.getElementById('area-value-switch');
+
+        const mineSlider = document.getElementById('mine-slider');
+
+        const mineCountDisplay = document.getElementById('mine-count-display');
+
+        const modeToggleButtonsContainer = document.getElementById('mode-toggle-buttons');
+
+        const digModeButton = document.getElementById('dig-mode-button');
+
+        const flagModeButton = document.getElementById('flag-mode-button');
+
+        const pcOpModeRadios = document.querySelectorAll        const rulesPopup = document.getElementById('rules-popup');
 
         const closePopupButton = document.getElementById('close-popup-button');
 
@@ -476,7 +975,21 @@
 
         const oddEvenSwitch = document.getElementById('odd-even-switch');
 
-        const areaValueSwitch = document.getElementById('area-value-switch');
+        const areaValueSwitch = document.getElementById('area('input[name="pc-op-mode"]');
+
+        const pcOpModeSection = document.getElementById('pc-op-mode-section');
+
+        const saveSettingsButton = document.getElementById('save-settings-button');
+
+        const activeRulesDisplay = document.getElementById('active-rules-display');
+
+        const hideRateSlider = document.getElementById('hide-rate-slider');
+
+        const hideRateDisplay = document.getElementById('hide-rate-display');
+
+        const hideRateControl = document.getElementById('hide-rate-control');
+
+        const resetRuleButtons = document.querySelectorAll('.-value-switch');
 
         const mineSlider = document.getElementById('mine-slider');
 
@@ -492,7 +1005,23 @@
 
         const pcOpModeSection = document.getElementById('pc-op-mode-section');
 
-        const saveSettingsButton = document.getElementById('save-settings-button');
+        const saveSettingsButton = document.getElementById('savereset-rule-button');
+
+        // --- Settings (Current Applied) ---
+        let enableNumbers = defaultSettings.enableNumbers;
+
+        let enableHide = defaultSettings.enableHide;
+
+        let hideRateMax = defaultSettings.hideRateMax;
+
+        let enableDirectional = defaultSettings.enableDirectional;
+
+        let enableOddEven = defaultSettings.enableOddEven;
+
+        let enableAreaValue = defaultSettings.enableAreaValue;
+
+        // Pending Settings Object - Initialized with defaults
+        let pendingSettings = { ...defaultSettings-settings-button');
 
         const activeRulesDisplay = document.getElementById('active-rules-display');
 
@@ -511,14 +1040,7 @@
 
         let hideRateMax = defaultSettings.hideRateMax;
 
-        let enableDirectional = defaultSettings.enableDirectional;
-
-        let enableOddEven = defaultSettings.enableOddEven;
-
-        let enableAreaValue = defaultSettings.enableAreaValue;
-
-        // Pending Settings Object - Initialized with defaults
-        let pendingSettings = { ...defaultSettings };
+        let enableDirectional };
 
         // --- Initial Setup for Sliders ---
         if (pendingSettings.numMines < 0) {
@@ -541,7 +1063,29 @@
 
         hideRateDisplay.textContent = `${hideRateSlider.value}%`;
 
-        hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+        hide = defaultSettings.enableDirectional;
+
+        let enableOddEven = defaultSettings.enableOddEven;
+
+        let enableAreaValue = defaultSettings.enableAreaValue;
+
+        // Pending Settings Object - Initialized with defaults
+        let pendingSettings = { ...defaultSettings };
+
+        // --- Initial Setup for Sliders ---
+        if (pendingSettings.numMines < 0) {
+            pendingSettings.numMines = 0;
+
+        }
+        if (pendingSettings.numMines > 225) {
+            pendingSettings.numMines = 225;
+
+        }
+        mineSlider.value = pendingSettings.numMines;
+
+        mineCountDisplay.textContent = pendingSettings.numMines;
+
+        numMinesRateControl.classList.toggle('enabled', pendingSettings.enableHide);
 
         // --- Device Detection and UI Initialization ---
         function detectTouch() {
@@ -563,7 +1107,28 @@
         }
 
         function updateModeButtonsVisibility() {
-            if (isTouch || pcOperationMode === 'button') {
+            if = pendingSettings.numMines;
+
+        minesLeft = numMines;
+
+        hideRateSlider.value = pendingSettings.hideRateMax * 100;
+
+        hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+        hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+        // --- Device Detection and UI Initialization ---
+        function detectTouch() {
+            isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+            if (isTouch) {
+                document.body.classList.add('touch-device');
+
+                pcOperationMode = 'button'; // Force button mode logic for touch
+            } else {
+                 document.body.classList.remove('touch-device');
+
+                 pcOperationMode = document.querySelector('input[name="pc (isTouch || pcOperationMode === 'button') {
                 modeToggleButtonsContainer.classList.add('visible');
 
             } else {
@@ -593,7 +1158,32 @@
         hideSwitch.addEventListener('change', () => {
             pendingSettings.enableHide = hideSwitch.checked;
 
-            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+            hideRateControl.classList.toggle-op-mode"]:checked').value;
+
+                 document.body.dataset.pcOpMode = pcOperationMode; // Set data attribute for CSS
+            }
+             updateModeButtonsVisibility();
+
+        }
+
+        function updateModeButtonsVisibility() {
+            if (isTouch || pcOperationMode === 'button') {
+                modeToggleButtonsContainer.classList.add('visible');
+
+            } else {
+                modeToggleButtonsContainer.classList.remove('visible');
+
+            }
+        }
+
+        // --- Event Listeners ---
+        resetButton.addEventListener('click', resetGame);
+
+        revealNonMinesButton.addEventListener('click', revealNonMines);
+
+        revealAllButton.addEventListener('click', revealAll);
+
+        rulesButton.addEventListener('('enabled', pendingSettings.enableHide);
 
         });
 
@@ -604,6 +1194,62 @@
 
         oddEvenSwitch.addEventListener('change', () => {
             pendingSettings.enableOddEven = oddEvenSwitch.checked;
+
+        });
+
+        areaValueSwitch.addEventListener('change', () => {
+            pendingSettings.enableAreaValue = areaValueSwitch.checked;
+
+        });
+
+        mineSlider.addEventListener('input', () => {
+             pendingSettings.numMines = parseInt(mineSlider.value, 10);
+
+             mineCountDisplay.textContent = pendingSettings.numclick', openPopup);
+
+        closePopupButton.addEventListener('click', closePopup);
+
+        popupOverlay.addEventListener('click', closePopup);
+
+        numberSwitch.addEventListener('change', () => {
+            pendingSettings.enableNumbers = numberSwitch.checked;
+
+        });
+
+        hideSwitch.addEventListener('change', () => {
+            pendingSettings.enableHide = hideSwitch.checked;
+
+            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+        });
+
+        directionalSwitch.addEventListener('change', () => {
+            pendingSettings.enableDirectional = directionalSwitch.checked;
+
+        });
+
+        oddEvenSwitch.addEventListener('change', () => {
+Mines;
+
+        });
+
+        hideRateSlider.addEventListener('input', () => {
+             pendingSettings.hideRateMax = parseInt(hideRateSlider.value, 10) / 100;
+
+             hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+        });
+
+        digModeButton.addEventListener('click', () => switchMode('dig'));
+
+        flagModeButton.addEventListener('click', () => switchMode('flag'));
+
+        pcOpModeRadios.forEach(radio => {
+            radio.addEventListener('change', handlePcOperationModeChange);
+
+        });
+
+        saveSettingsButton            pendingSettings.enableOddEven = oddEvenSwitch.checked;
 
         });
 
@@ -626,7 +1272,33 @@
 
         });
 
-        digModeButton.addEventListener('click', () => switchMode('dig'));
+        digModeButton.addEventListener('click',.addEventListener('click', saveSettingsAndReset);
+
+        resetRuleButtons.forEach(button => {
+            button.addEventListener('click', handleResetRule);
+
+        });
+
+
+        // --- Popup Functions ---
+        function openPopup() {
+            pendingSettings = {
+                numMines: numMines,
+                enableNumbers: enableNumbers,
+                enableHide: enableHide,
+                hideRateMax: hideRateMax,
+                enableDirectional: enableDirectional,
+                enableOddEven: enableOddEven,
+                enableAreaValue: enableAreaValue
+            };
+
+            mineSlider.value = pendingSettings.numMines;
+
+            mineCountDisplay.textContent = pendingSettings.numMines;
+
+            numberSwitch.checked = pendingSettings.enableNumbers;
+
+            hideSwitch.checked = pendingSettings.enableHide () => switchMode('dig'));
 
         flagModeButton.addEventListener('click', () => switchMode('flag'));
 
@@ -653,15 +1325,7 @@
                 enableDirectional: enableDirectional,
                 enableOddEven: enableOddEven,
                 enableAreaValue: enableAreaValue
-            };
-
-            mineSlider.value = pendingSettings.numMines;
-
-            mineCountDisplay.textContent = pendingSettings.numMines;
-
-            numberSwitch.checked = pendingSettings.enableNumbers;
-
-            hideSwitch.checked = pendingSettings.enableHide;
+;
 
             hideRateSlider.value = pendingSettings.hideRateMax * 100;
 
@@ -695,6 +1359,121 @@
         }
 
         function handleSettingChange() { /* Switches update pendingSettings directly now */ }
+
+        // Handle resetting individual rules to default
+        function handleResetRule(event) {
+            const rule = event.            };
+
+            mineSlider.value = pendingSettings.numMines;
+
+            mineCountDisplay.textContent = pendingSettings.numMines;
+
+            numberSwitch.checked = pendingSettings.enableNumbers;
+
+            hideSwitch.checked = pendingSettings.enableHide;
+
+            hideRateSlider.value = pendingtarget.dataset.rule;
+
+            if (!rule) {
+                return;
+            }
+
+            switch (rule) {
+                case 'mines':
+                    pendingSettings.numMines = defaultSettings.numMines;
+
+                    mineSlider.value = pendingSettings.numMines;
+
+                    mineCountDisplay.textContent = pendingSettings.numMines;
+
+                    break;
+
+                case 'numbers':
+                    pendingSettings.enableNumbers = defaultSettings.enableNumbers;
+
+                    numberSwitch.checked = pendingSettings.enableNumbers;
+
+                    break;
+
+                case 'hide':
+                    pendingSettings.enableHide = defaultSettings.enableHide;
+
+                    pendingSettings.hideRateMax = defaultSettings.hideRateMax;
+
+                    hideSwitch.checked = pendingSettings.enableHide;
+
+                    hideRateSlider.value = pendingSettings.hideRateMax * 100;
+
+                    hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+                    hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+                    break;
+
+Settings.hideRateMax * 100;
+
+            hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+
+            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+
+            directionalSwitch.checked = pendingSettings.enableDirectional;
+
+            oddEvenSwitch.checked = pendingSettings.enableOddEven;
+
+            areaValueSwitch.checked = pendingSettings.enableAreaValue;
+
+            const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
+
+            if (currentPcOpRadio) {
+                currentPcOpRadio.checked = true;
+
+            }
+            rulesPopup.classList.add('visible');
+
+            popupOverlay.classList.add('visible');
+
+        }
+
+        function closePopup() {
+            rulesPopup.classList.remove('visible');
+
+            popupOverlay.classList.remove('visible');
+
+        }
+
+        function handleSettingChange() { /* Switches update pendingSettings directly now                case 'directional':
+                    pendingSettings.enableDirectional = defaultSettings.enableDirectional;
+
+                    directionalSwitch.checked = pendingSettings.enableDirectional;
+
+                    break;
+
+                case 'oddEven':
+                    pendingSettings.enableOddEven = defaultSettings.enableOddEven;
+
+                    oddEvenSwitch.checked = pendingSettings.enableOddEven;
+
+                    break;
+
+                case 'areaValue':
+                    pendingSettings.enableAreaValue = defaultSettings.enableAreaValue;
+
+                    areaValueSwitch.checked = pendingSettings.enableAreaValue;
+
+                    break;
+
+            }
+        }
+
+
+        function saveSettingsAndReset() {
+            numMines = pendingSettings.numMines;
+
+            enableNumbers = pendingSettings.enableNumbers;
+
+            enableHide = pendingSettings.enableHide;
+
+            hideRateMax = pendingSettings.hideRate */ }
 
         // Handle resetting individual rules to default
         function handleResetRule(event) {
@@ -732,7 +1511,46 @@
 
                     hideRateDisplay.textContent = `${hideRateSlider.value}%`;
 
-                    hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+                    hideMax; // Apply hide rate
+
+            enableDirectional = pendingSettings.enableDirectional;
+
+            enableOddEven = pendingSettings.enableOddEven;
+
+            enableAreaValue = pendingSettings.enableAreaValue;
+
+            resetGame(); // Reset the game with the newly applied settings
+
+            closePopup();
+
+        }
+
+        function handlePcOperationModeChange(event) {
+             pcOperationMode = event.target.value;
+
+             document.body.dataset.pcOpMode = pcOperationMode;
+
+             updateModeButtonsVisibility();
+
+             switchMode('dig');
+
+        }
+
+        function switchMode(newMode) {
+            if (newMode === currentInteractionMode) {
+                return;
+            }
+            currentInteractionMode = newMode;
+
+            if (newMode === 'dig') {
+                digModeButton.classList.add('active');
+
+                flagModeButton.classList.remove('active');
+
+            } else {
+                digModeButton.classList.remove('active');
+
+                flagModeButton.classList.addRateControl.classList.toggle('enabled', pendingSettings.enableHide);
 
                     break;
 
@@ -774,7 +1592,17 @@
 
             enableOddEven = pendingSettings.enableOddEven;
 
-            enableAreaValue = pendingSettings.enableAreaValue;
+            enableAreaValue = pendingSettings.enableAreaValue;('active');
+
+            }
+        }
+
+        // --- Update Active Rules Display Function ---
+        function updateActiveRulesDisplay() {
+            let rulesHtml = '';
+
+            if (!enableNumbers) {
+                rulesHtml += `<div>No
 
             resetGame(); // Reset the game with the newly applied settings
 
@@ -799,25 +1627,7 @@
             }
             currentInteractionMode = newMode;
 
-            if (newMode === 'dig') {
-                digModeButton.classList.add('active');
-
-                flagModeButton.classList.remove('active');
-
-            } else {
-                digModeButton.classList.remove('active');
-
-                flagModeButton.classList.add('active');
-
-            }
-        }
-
-        // --- Update Active Rules Display Function ---
-        function updateActiveRulesDisplay() {
-            let rulesHtml = '';
-
-            if (!enableNumbers) {
-                rulesHtml += `<div>No Numbers</div>`;
+            if Numbers</div>`;
 
             }
             if (enableHide) {
@@ -835,10 +1645,99 @@
                  rulesHtml += `<div>Range Value Squares</div>`;
 
             }
-            if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
+            if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && (newMode === 'dig') {
+                digModeButton.classList.add('active');
+
+                flagModeButton.classList.remove('active');
+
+            } else {
+                digModeButton.classList.remove('active');
+
+                flagModeButton.classList.add('active');
+
+            }
+        }
+
+        // !enableAreaValue) {
                  rulesHtml = '<div>Standard Rules</div>';
 
             } else if (!rulesHtml && enableNumbers) {
+                rulesHtml = '<div>Standard Rules</div>';
+
+            } else if (!rulesHtml && !enableNumbers){ --- Update Active Rules Display Function ---
+        function updateActiveRulesDisplay() {
+            let rulesHtml = '';
+
+            if (!enableNumbers) {
+
+                 rulesHtml = '<div>No Numbers</div>';
+
+            }
+
+            activeRulesDisplay.innerHTML = rulesHtml;
+
+        }
+
+        // --- Game Logic Functions ---
+        function resetGame() {
+            gameOver = true                rulesHtml += `<div>No Numbers</div>`;
+
+            }
+            if (enableHide) {
+                 rulesHtml += `<div>Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
+
+            }
+            // if (enableDirectional) {;
+
+            clearInterval(timerInterval);
+
+            elapsedMilliseconds = 0;
+
+            startTime = 0;
+
+            gameStarted = false;
+
+            minesLeft = num // Currently disabled
+            //     rulesHtml += `<div>Directional Squares</div>Mines;
+
+            switchMode('dig');
+
+            updateTimerDisplay();
+
+            messageBox.textContent = '';
+
+            activeRulesDisplay.innerHTML = '';`;
+            // }
+            if (enableOddEven) {
+                 rulesHtml += `<div>OddEven Squares</div>`;
+
+            }
+            if (enable // Clear rules display
+            body.classList.remove('game-over');
+
+            body.style.backgroundColor = ''; // ★ Reset inline background style ★AreaValue) {
+                 rulesHtml += `<div>Range Value Squares</div>`;
+
+            }
+            if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue) {
+                 rulesHtml = '<div>Standard Rules</div>';
+
+            } else if (!rulesHtml && enable
+
+            setTimeout(createBoard, 50);
+
+        }
+
+        function createBoard() {
+            board = [];
+
+            minesLeft = numMines;
+
+            gameOver = false;
+
+            revealedNonMineCount = 0;
+
+            Numbers) {
                 rulesHtml = '<div>Standard Rules</div>';
 
             } else if (!rulesHtml && !enableNumbers){
@@ -851,7 +1750,14 @@
         }
 
         // --- Game Logic Functions ---
-        function resetGame() {
+        function resetboardElement.innerHTML = '';
+
+            for (let i = 0; i < gridSize; i++) {
+                board[i] = [];
+
+                for (let j = 0; j < gridSize; j++) {
+                    board[i][j] = {
+                        isMine: falseGame() {
             gameOver = true;
 
             clearInterval(timerInterval);
@@ -873,7 +1779,23 @@
             activeRulesDisplay.innerHTML = ''; // Clear rules display
             body.classList.remove('game-over');
 
-            body.style.backgroundColor = ''; // ★ Reset inline background style ★
+            body.style.backgroundColor =,
+                        isRevealed: false,
+                        isFlagged: false,
+                        adjacentMines: 0,
+                        isHide: false,
+                        isOddEven: false,
+                        isAreaValue: false,
+                        isDirectional: false,
+                        oddEvenValue: null,
+                        areaValue: null,
+                        direction: null,
+                        directionalCount: null,
+                        directionalSymbol: null,
+                        element: document.createElement('div')
+                    };
+
+                    const square = board[ ''; // Reset inline background style
 
             setTimeout(createBoard, 50);
 
@@ -893,7 +1815,19 @@
             for (let i = 0; i < gridSize; i++) {
                 board[i] = [];
 
-                for (let j = 0; j < gridSize; j++) {
+                for (leti][j];
+
+                    const squareElement = square.element;
+
+                    squareElement.classList.add('square', 'hidden');
+
+                    squareElement.dataset.row = i;
+
+                    squareElement.dataset.col = j;
+
+                    squareElement.addEventListener('click', () => handleSquareInteraction(i, j));
+
+                    squareElement.addEventListener('contextmenu', (event) => j = 0; j < gridSize; j++) {
                     board[i][j] = {
                         isMine: false,
                         isRevealed: false,
@@ -908,7 +1842,30 @@
                         direction: null,
                         directionalCount: null,
                         directionalSymbol: null,
-                        element: document.createElement('div')
+                        element: document.createElement(' {
+                        event.preventDefault();
+
+                        if (!isTouch && pcOperationMode === 'mouse') {
+                            handleFlagAction(i, j);
+                        }
+                    });
+
+                    let pressTimer;
+
+                    squareElement.addEventListener('touchstart', (event) => {
+                        // Logic adjusted: Long press always flags on touch devices
+                        if (isTouch) {
+                             clearTimeout(pressTimer);
+
+                             pressTimer = setTimeout(() => {
+                                 event.preventDefault();
+
+                                 handleFlagAction(i, j);
+
+                             }, 500);
+
+                         }
+                    }, { passive:div')
                     };
 
                     const square = board[i][j];
@@ -924,7 +1881,58 @@
                     squareElement.addEventListener('click', () => handleSquareInteraction(i, j));
 
                     squareElement.addEventListener('contextmenu', (event) => {
-                        event.preventDefault();
+                        event false });
+
+                    squareElement.addEventListener('touchend', () => clearTimeout(pressTimer));
+
+                    squareElement.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
+                    boardElement.appendChild(squareElement);
+
+                }
+            }
+            plantMines();
+
+            calculateAdjacentMines();
+
+            applySpecialSquares();
+
+            updateMinesLeftDisplay();
+
+            updateActiveRulesDisplay(); // Update rules display
+            detectTouch(); // Detect touch after elements are created
+
+        }
+
+        function plantMines() {
+             let minesPlanted = 0;
+
+             const maxPossibleMines = gridSize * gridSize;
+
+              if (numMines >= maxPossibleMines) {
+                   numMines = maxPossibleMines - 1;
+
+                   console.warn(`Mine count capped at ${numMines}`);
+
+                   mineSlider.value = numMines;
+
+                   mineCountDisplay.textContent = numMines;
+
+                   minesLeft = numMines;
+
+                   pendingSettings.numMines = numMines;
+
+              }
+             if (numMines < 0) {
+                 numMines = 0;
+             }
+
+             while (minesPlanted < numMines) {
+                 const r = Math.floor(Math.random() * gridSize);
+
+                 const c = Math.floor(Math.random() * gridSize);
+
+.preventDefault();
 
                         if (!isTouch && pcOperationMode === 'mouse') {
                             handleFlagAction(i, j);
@@ -985,7 +1993,80 @@
 
                    minesLeft = numMines;
 
-                   pendingSettings.numMines = numMines;
+                   pendingSettings                 if (!board[r][c].isMine) {
+                     board[r][c].isMine = true;
+
+                     minesPlanted++;
+
+                 }
+             }
+        }
+
+        function calculateAdjacentMines() {
+             for (let i = 0; i < gridSize; i++) {
+                 for (let j = 0; j < gridSize; j++) {
+                     if (board[i][j].isMine) {
+                         board[i][j].adjacentMines = -1;
+
+                         continue;
+
+                     }
+                     let count = 0;
+
+                     for (let x = -1; x <= 1; x++) {
+                         for (let y = -1; y <= 1; y++) {
+                             if (x === 0 && y === 0) {
+                                 continue;
+                             }
+                             const ni = i + x;
+                             const nj = j + y;
+                             if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) {
+                                 count++;
+                             }
+                         }
+                     }
+                     board[i][j].adjacentMines = count;
+
+                 }
+             }
+        }
+
+        function countMinesInDirection(startRow, startCol, dx, dy) {
+             let count = 0;
+             let r = startRow + dx;
+             let c = startCol + dy;
+             while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                 if (board[r][c]?.isMine) {
+                     count++;
+                 }
+                 r += dx;
+                 c += dy;
+             }
+             return count;
+
+        }
+
+        function hasNeighborOfType(r, c, key) {
+             for (let x = -1; x <= 1; x++) {
+                 for (let y = -1; y <= 1; y++) {
+                     if (x === 0 && y === 0) {
+                         continue;
+                     }
+                     const ni = r + x;
+                     const nj = c + y;
+                     if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) {
+                         return true;
+                     }
+                 }
+             }
+             return false;
+
+        }
+
+        function applySpecialSquares() {
+            const potentialNumberSquares = [];
+
+            for (let i = 0.numMines = numMines;
 
               }
              if (numMines < 0) {
@@ -1071,6 +2152,44 @@
             const potentialNumberSquares = [];
 
             for (let i = 0; i < gridSize; i++) {
+                 for (let j = 0; j < gridSize; j++) {
+                     const square = board[i][j];
+
+                     square.isHide = false;
+                     square.isOddEven = false;
+                     square.isAreaValue = false;
+                     square.isDirectional = false;
+                     square.oddEvenValue = null;
+                     square.areaValue = null;
+                     square.direction = null;
+                     square.directionalCount = null;
+                     square.directionalSymbol = null;
+                     if (!square.isMine && square.adjacentMines > 0) {
+                         potentialNumberSquares.push({ r: i, c: j });
+                     }
+                 }
+            }
+            potentialNumberSquares.sort(() => Math.random() - 0.5);
+
+            const assignedSpecial = new Set();
+
+            const totalSquares = gridSize * gridSize;
+
+            const numPotential = potentialNumberSquares.length;
+
+            // const baseDirections = [ /* Kept for future use */ ];
+            // function hasDirectionalChain(r, c, dx, dy) { /* Kept for future use */ }
+            // function getValidDirections(r, c) { /* Kept for future use */ }
+
+            if (!enableNumbers) { // Uses current global enableNumbers
+                // Directional disabled: /* if (enableDirectional) { ... } */
+                if (enableAreaValue) {
+                     for (const { r, c } of potentialNumberSquares) {
+                         const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
+                             const sq = board[r][c];
+                             sq.isAreaValue = true;
+                             sq.is; i < gridSize; i++) {
                  for (let j = 0; j < gridSize; j++) {
                      const square = board[i][j];
 
@@ -1208,19 +2327,32 @@
 
         // --- Interaction and Rendering Functions ---
         function handleSquareInteraction(r, c) {
-             if (gameOver || board[r][c].isRevealed || board[r][c].isFlagged) {
+             // Skip interaction immediately after flagging via touch/button
+             if (justFlagged) {
                  return;
              }
+             if (gameOver) {
+                 return;
+             }
+
              if (!gameStarted) {
                  gameStarted = true;
                  startTime = Date.now();
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
              }
+
              const square = board[r][c];
-             if (currentInteractionMode === 'flag') {
+             if (square.isRevealed) {
+                 return;
+             }
+
+             // Determine action based on current mode (dig or flag)
+             // This applies to standard click/tap, AND PC button mode
+             if (currentInteractionMode === 'flag' && (isTouch || pcOperationMode === 'button')) {
+                 // If in flag mode (via buttons), call the flag action directly
                  handleFlagAction(r, c);
-             } else {
-                 if (square.isFlagged) {
+             } else { // Default action is 'dig' (or mouse mode click)
+                 if (square.isFlagged) { // Cannot dig a flagged square
                      return;
                  }
                  if (square.isMine) {
@@ -1232,6 +2364,7 @@
                  }
              }
         }
+
         function handleFlagAction(r, c) {
             if (gameOver || board[r][c].isRevealed) {
                 return;
@@ -1242,7 +2375,7 @@
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
              }
             const sq = board[r][c];
-            sq.isFlagged = !sq.isFlagged;
+            sq.isFlagged = !sq.isFlagged; // Toggle the flag state
             if (sq.isFlagged) {
                 minesLeft--;
             } else {
@@ -1250,7 +2383,13 @@
             }
             renderSquareContent(sq);
             updateMinesLeftDisplay();
+
+            // Set the flag to prevent immediate re-interaction
+            justFlagged = true;
+            // Reset the flag shortly after to allow subsequent intended clicks
+            setTimeout(() => { justFlagged = false; }, 50); // 50ms delay
         }
+
         function revealMine(r, c) {
             const sq = board[r][c];
             sq.isRevealed = true;
@@ -1258,6 +2397,7 @@
             sq.element.classList.add('revealed', 'mine', 'mine-clicked');
             sq.element.textContent = '💥';
         }
+
         function revealSquare(r, c) {
             if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) {
                 return;
@@ -1277,6 +2417,7 @@
                 }
             }
         }
+
         function renderSquareContent(sq) {
             const el = sq.element;
             el.className = 'square';
@@ -1316,9 +2457,11 @@
                  }
             }
         }
+
         function updateMinesLeftDisplay() {
             messageBox.textContent = `Mines: ${minesLeft}`;
         }
+
         function checkWinCondition() {
             const totalNonMine = gridSize * gridSize - numMines;
             if (revealedNonMineCount >= totalNonMine) {
@@ -1337,6 +2480,7 @@
                 endGame(true);
             }
         }
+
         function endGame(isWin) {
              if(gameOver) {
                  return;
@@ -1366,6 +2510,7 @@
                 revealAllMines(true);
             }
         }
+
         function revealAllMines(showContent) {
             for (let i=0; i<gridSize; i++) {
                 for (let j=0; j<gridSize; j++) {
@@ -1382,7 +2527,7 @@
                         renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true;
+                            sq.isRevealed = true; // Mark revealed
                             el.className = 'square revealed flag-wrong'; // Set classes directly
                             el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
@@ -1392,6 +2537,7 @@
                 }
             }
         }
+
         function updateTimer() {
             if (!gameStarted || gameOver) {
                 return;
@@ -1399,6 +2545,7 @@
             elapsedMilliseconds = Date.now() - startTime;
             updateTimerDisplay();
         }
+
         function updateTimerDisplay() {
             let formattedTime;
             const displayMillis = Math.max(0, elapsedMilliseconds);
@@ -1418,6 +2565,7 @@
             }
             timerDisplay.textContent = formattedTime;
         }
+
         function revealNonMines() {
             if (gameOver) {
                 return;
@@ -1441,6 +2589,7 @@
                  messageBox.textContent = 'All squares revealed!';
              }
         }
+
         function revealAll() {
              if (gameOver) {
                  return;
