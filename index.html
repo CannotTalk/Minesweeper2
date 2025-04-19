@@ -170,8 +170,8 @@
             <!-- Directional Square Section -->
             <div class="setting-section">
                 <h4>ディレクションマス (矢印+数字)</h4>
-                <p>矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。</p>
+                <p>上下左右いずれかの矢印とその方向にある地雷の数を表示します (例:「→4」はそのマスより右にある地雷が4個)。<br>
+                   指定された方向の地雷のみをカウントします。数字マスの0～10%が置き換えられます (「数字マス生成」がオンの場合のみ確率適用)。同じ方向への連鎖はしません。</p>
                 <div class="setting-label">
                      有効
                     <label class="switch">
@@ -398,12 +398,31 @@
 
             const assignedSpecial = new Set(); // Track assigned squares
             const totalSquares = gridSize * gridSize;
-            const directions = [ // Possible directions and symbols
-                { dx: -1, dy: 0, symbol: '↑' }, { dx: 1, dy: 0, symbol: '↓' },
-                { dx: 0, dy: -1, symbol: '←' }, { dx: 0, dy: 1, symbol: '→' },
-                { dx: -1, dy: -1, symbol: '↖' }, { dx: -1, dy: 1, symbol: '↗' },
-                { dx: 1, dy: -1, symbol: '↙' }, { dx: 1, dy: 1, symbol: '↘' }
+            // Directions limited to Up, Down, Left, Right
+            const directions = [
+                { dx: -1, dy: 0, symbol: '↑', name: 'up' },
+                { dx: 1, dy: 0, symbol: '↓', name: 'down' },
+                { dx: 0, dy: -1, symbol: '←', name: 'left' },
+                { dx: 0, dy: 1, symbol: '→', name: 'right' }
             ];
+
+            // Helper function to check for directional chains
+            function hasDirectionalChain(startRow, startCol, dx, dy) {
+                let r = startRow + dx;
+                let c = startCol + dy;
+                while (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                    const nextSquare = board[r][c];
+                    if (nextSquare?.isDirectional && nextSquare.direction?.dx === dx && nextSquare.direction?.dy === dy) {
+                        return true; // Found a chain
+                    }
+                    // Optimization: If we hit a non-directional square, the chain is broken for this path
+                    // We could add `if (!nextSquare?.isDirectional) return false;` here, but it might miss chains beyond the next square.
+                    // The current check iterates the whole line, which is safer for the rule as stated.
+                    r += dx;
+                    c += dy;
+                }
+                return false; // No chain found
+            }
 
             if (!enableNumbers) {
                 // --- Numbers OFF: Apply deterministically (no probability) ---
@@ -413,15 +432,25 @@
                         const k = `${r}-${c}`;
                         if (!assignedSpecial.has(k)) {
                             const sq = board[r][c];
-                            const randDir = directions[Math.floor(Math.random() * directions.length)];
-                            const count = countMinesInDirection(r, c, randDir.dx, randDir.dy);
-                            sq.isDirectional = sq.isHide = true;
-                            sq.direction = { dx: randDir.dx, dy: randDir.dy };
-                            sq.directionalCount = count; sq.directionalSymbol = randDir.symbol;
-                            assignedSpecial.add(k);
+                            let assignedDirection = false;
+                            const shuffledDirections = [...directions].sort(() => Math.random() - 0.5); // Try directions randomly
+
+                            for (const dir of shuffledDirections) {
+                                if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) { // Check for chain
+                                    const count = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                    sq.isDirectional = sq.isHide = true;
+                                    sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                    sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
+                                    assignedSpecial.add(k);
+                                    assignedDirection = true;
+                                    break; // Direction assigned, move to next square
+                                }
+                            }
+                            // If no non-chaining direction found, it remains non-directional
                         }
                     }
                 }
+                // Apply AreaValue if not already assigned
                 if (enableAreaValue) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`;
@@ -433,6 +462,7 @@
                         }
                     }
                 }
+                // Apply OddEven if not already assigned
                 if (enableOddEven) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`; const sq = board[r][c];
@@ -456,15 +486,26 @@
                         if (count >= max) break; const k = `${r}-${c}`;
                         if (!assignedSpecial.has(k)) {
                             const sq = board[r][c];
-                            const randDir = directions[Math.floor(Math.random() * directions.length)];
-                            const dirCount = countMinesInDirection(r, c, randDir.dx, randDir.dy);
-                            sq.isDirectional = sq.isHide = true;
-                            sq.direction = { dx: randDir.dx, dy: randDir.dy };
-                            sq.directionalCount = dirCount; sq.directionalSymbol = randDir.symbol;
-                            assignedSpecial.add(k); count++;
+                             let assignedDirection = false;
+                             const shuffledDirections = [...directions].sort(() => Math.random() - 0.5);
+
+                             for (const dir of shuffledDirections) {
+                                 if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) { // Check for chain
+                                     const dirCount = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                     sq.isDirectional = sq.isHide = true;
+                                     sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                     sq.directionalCount = dirCount; sq.directionalSymbol = dir.symbol;
+                                     assignedSpecial.add(k);
+                                     assignedDirection = true;
+                                     count++; // Increment count only when assigned
+                                     break;
+                                 }
+                             }
+                             // If no non-chaining direction found, it remains non-directional
                         }
                     }
                 }
+                 // Apply AreaValue probabilistically if not already assigned
                 if (enableAreaValue) {
                     const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
@@ -477,6 +518,7 @@
                         }
                     }
                 }
+                // Apply OddEven probabilistically if not already assigned
                 if (enableOddEven) {
                     const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
@@ -488,6 +530,7 @@
                         }
                     }
                 }
+                // Apply simple Hide probabilistically if enabled and not already assigned
                 if (enableHide) {
                     const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
                     const max = Math.floor(totalSquares * rate); let count = 0;
@@ -499,7 +542,7 @@
             }
         }
 
-        // Helper to check if any neighbor has a specific property (e.g., isAreaValue)
+        // Helper to check if any neighbor has a specific property
         function hasNeighborOfType(r, c, key) {
             for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
                 if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
@@ -524,7 +567,7 @@
             sq.element.textContent = '💥';
         }
 
-        // Reveals a square and its neighbors if it's blank (0 adjacent mines)
+        // Reveals a square and its neighbors if it's blank
         function revealSquare(r, c) {
             if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) return;
             const sq = board[r][c];
@@ -532,7 +575,7 @@
 
             sq.isRevealed = true;
             revealedNonMineCount++;
-            renderSquareContent(sq); // Update display for this square
+            renderSquareContent(sq); // Update display
 
             if (sq.adjacentMines === 0) { // If blank, reveal neighbors
                 for (let x = -1; x <= 1; x++) {
@@ -557,8 +600,8 @@
                 if (sq.isMine) {
                     el.classList.add('mine');
                     el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣';
-                } else if (sq.adjacentMines > 0) {
-                    // Apply special square styles/text if applicable
+                } else if (sq.adjacentMines >= 0) { // Includes 0 for blank revealed squares
+                    // Apply special styles/text first
                     if (sq.isDirectional) {
                         el.classList.add('directional-square');
                         el.textContent = sq.directionalSymbol + sq.directionalCount;
@@ -571,19 +614,19 @@
                     } else if (sq.isHide) {
                         el.classList.add('special-square');
                         el.textContent = '・';
-                    } else {
-                        // Regular number display
+                    } else if (sq.adjacentMines > 0) {
+                        // Only display number if no special type applied and adjacent > 0
                         el.textContent = sq.adjacentMines;
+                    } else {
+                        // Blank square (adjacentMines === 0 and no special type)
+                        el.textContent = '';
                     }
-                } else {
-                    // Blank revealed square
-                    el.textContent = '';
                 }
-                // Handle display of incorrectly flagged squares ('X')
-                if (el.classList.contains('flag-wrong')) {
+                 // Handle display of incorrectly flagged squares ('X')
+                 if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
-                    el.classList.add('flag-wrong'); // Ensure class stays for styling
-                }
+                    el.classList.add('flag-wrong'); // Ensure class stays
+                 }
             }
         }
 
@@ -611,22 +654,21 @@
 
         // Handles the end of the game (win or loss)
         function endGame(isWin) {
-            if (gameOver && !isWin) return; // Avoid duplicate game over calls
+            if (gameOver && !isWin) return;
             gameOver = true; clearInterval(timerInterval);
             if (isWin) {
                 messageBox.textContent = 'Game Clear!'; body.style.backgroundColor = '#aaffaa';
-                // Auto-flag remaining mines
                 for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (board[i][j].isMine && !board[i][j].isFlagged) { board[i][j].isFlagged = true; renderSquareContent(board[i][j]); }
                 minesLeft = 0; updateMinesLeftDisplay();
             } else {
-                if(messageBox.textContent !== 'Game Clear!') { // Avoid overwriting win message if loss triggered somehow after win
+                if(messageBox.textContent !== 'Game Clear!') {
                    messageBox.textContent = 'Game Over!'; body.classList.add('game-over');
                 }
-                revealAllMines(true); // Show all mines and incorrect flags
+                revealAllMines(true); // Show results
             }
         }
 
-        // Reveals all mines and incorrect flags at the end of a game loss
+        // Reveals all mines and incorrect flags at game end
         function revealAllMines(showContent) {
             for (let i=0; i<gridSize; i++) {
                 for (let j=0; j<gridSize; j++) {
@@ -635,21 +677,21 @@
                         if (sq.isFlagged) continue; // Keep correct flag
                         if (el.classList.contains('mine-clicked')) continue; // Keep clicked style
                         sq.isRevealed = true;
-                        // Call renderSquareContent AFTER setting state
-                        renderSquareContent(sq); // Will add 'mine' and '💣'
+                        renderSquareContent(sq); // Will show '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true; // Reveal to show the X
+                            sq.isRevealed = true; // Reveal to show X
                             el.classList.add('flag-wrong'); // Add class for styling
                             renderSquareContent(sq); // Will show '❌'
-                        } else if (showContent && !sq.isRevealed && revealAllButton === document.activeElement) {
-                            // If called by revealAll debug button, reveal non-mines too
-                            revealSquare(i, j);
+                        } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
+                            // Reveal non-mines ONLY if 'Reveal All' button specifically triggered this
+                             revealSquare(i, j);
                         }
                     }
                 }
             }
         }
+
 
         // Updates the game timer every second
         function updateTimer() { seconds++; updateTimerDisplay(); }
