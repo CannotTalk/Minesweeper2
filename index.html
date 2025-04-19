@@ -26,6 +26,8 @@
             flex-direction: column;
             align-items: center;
             margin-bottom: 12px;
+            position: relative; /* ★ Set position context for absolute positioning */
+            padding-top: 40px; /* ★ Add padding to prevent overlap with button */
         }
         #board {
             display: grid;
@@ -33,6 +35,8 @@
             border: 2px solid #333;
             background-color: #b4c687;
             padding: 4px;
+            /* ★ Add margin top to ensure space below buttons */
+            margin-top: 5px;
         }
         .square {
             width: 20px;
@@ -55,13 +59,33 @@
         .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
         .flag-wrong { background-color: #fdd !important; }
 
-        #reset-button, #rules-button {
+        #reset-button { /* Keep reset button styling separate */
             padding: 6px 12px;
             font-size: 12px;
             cursor: pointer;
             margin-top: 8px;
             font-family: 'Press Start 2P', cursive;
         }
+        /* ★★★ Rules & Settings Button Styling ★★★ */
+        #rules-button {
+            position: absolute;
+            top: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+            padding: 5px 8px; /* Slightly smaller padding */
+            font-size: 10px; /* Smaller font */
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 3px;
+            z-index: 10; /* Ensure it's above other elements if needed */
+            margin-top: 0; /* Remove default margin */
+        }
+        #rules-button:hover {
+            background-color: #d0d0d0;
+        }
+        /* ★★★ End of Rules Button Styling ★★★ */
+
         #message-box {
             margin-top: 8px;
             font-size: 12px;
@@ -142,7 +166,7 @@
 
          /* PC Operation Mode Setting Styles */
         .pc-op-mode-label {
-            display: block; /* Each option on a new line */
+            display: block;
             margin-bottom: 5px;
             font-size: 12px;
             cursor: pointer;
@@ -150,30 +174,31 @@
         .pc-op-mode-label input[type="radio"] {
             margin-right: 5px;
         }
-         /* Hide PC settings on touch devices by default */
         #pc-op-mode-section {
-            display: block; /* Show by default, JS will hide if needed */
+            display: block;
         }
         body.touch-device #pc-op-mode-section {
-            display: none; /* Hide PC specific settings on touch */
+            display: none;
         }
 
     </style>
 </head>
 <body>
     <div id="game-container">
-         <!-- Mode Toggle Buttons (Initially Hidden) -->
+         <!-- Mode Toggle Buttons -->
         <div id="mode-toggle-buttons">
             <button id="dig-mode-button" class="mode-button active" title="掘るモード (クリック/タップでマスを開く)">⛏️</button>
             <button id="flag-mode-button" class="mode-button" title="旗モード (クリック/タップで旗を立てる/外す)">🚩</button>
         </div>
-        <!-- End of Mode Toggle Buttons -->
+
+        <!-- ★ Rules Button Moved Here (Positioned with CSS) ★ -->
+        <button id="rules-button">Rules & Settings</button>
 
         <div id="board"></div>
         <div class="timer">Time: <span id="timer">00.00</span></div>
         <div id="message-box"></div>
         <button id="reset-button">Reset</button>
-        <button id="rules-button">ルール説明</button>
+        <!-- Rules Button Moved -->
         <div id="debug-buttons">
             <button id="reveal-non-mines">Open Non-Mines</button>
             <button id="reveal-all">Open All</button>
@@ -204,7 +229,7 @@
                  <p style="font-size:10px; margin-top: 5px;">変更後、自動でリセットされます。</p>
              </div>
 
-            <!-- PC Operation Mode Setting (Hidden on Touch) -->
+            <!-- PC Operation Mode Setting -->
             <div class="setting-section" id="pc-op-mode-section">
                 <h4>PC操作モード</h4>
                 <label class="pc-op-mode-label">
@@ -214,7 +239,6 @@
                     <input type="radio" name="pc-op-mode" value="button"> ボタン切り替え操作 (⛏️/🚩)
                 </label>
             </div>
-            <!-- End of PC Operation Mode Setting -->
 
             <!-- Number Setting Section -->
             <h3>表示設定</h3>
@@ -230,8 +254,8 @@
                      </label>
                  </div>
              </div>
-             <!-- End of number setting section -->
 
+            <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
             <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。</p>
 
@@ -261,7 +285,6 @@
                     </label>
                 </div>
             </div>
-            <!-- End of Directional Square Section -->
 
              <div class="setting-section">
                 <h4>オッドイーブンマス (Od/Ev)</h4>
@@ -310,9 +333,9 @@
         let startTime = 0;
 
         // Interaction Mode State
-        let currentInteractionMode = 'dig'; // 'dig' or 'flag'
-        let pcOperationMode = 'mouse'; // 'mouse' or 'button', relevant only for PC
-        let isTouch = false; // Flag for touch device detection
+        let currentInteractionMode = 'dig';
+        let pcOperationMode = 'mouse';
+        let isTouch = false;
 
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
@@ -364,7 +387,6 @@
                 document.body.classList.add('touch-device');
             } else {
                  document.body.classList.remove('touch-device');
-                 // Read initial PC operation mode setting only if NOT touch
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
             }
              updateModeButtonsVisibility();
@@ -428,7 +450,7 @@
         function handlePcOperationModeChange(event) {
              pcOperationMode = event.target.value;
              updateModeButtonsVisibility();
-             switchMode('dig'); // Default to dig mode when switching PC op mode
+             switchMode('dig');
         }
 
         // Function to Switch Interaction Mode
@@ -453,7 +475,7 @@
             startTime = 0;
             gameStarted = false;
             minesLeft = numMines;
-            switchMode('dig'); // Reset mode to dig
+            switchMode('dig');
             updateTimerDisplay();
             messageBox.textContent = '';
             body.classList.remove('game-over');
@@ -494,7 +516,6 @@
                     // Long-press listener (Touch devices, acts like flag mode click)
                     let pressTimer;
                     squareElement.addEventListener('touchstart', (event) => {
-                        // Only trigger long press if touch device AND (not button mode OR flag mode active)
                         if (isTouch && (!modeToggleButtonsContainer.classList.contains('visible') || currentInteractionMode === 'flag')) {
                              clearTimeout(pressTimer);
                              pressTimer = setTimeout(() => {
@@ -751,7 +772,8 @@
                         el.textContent = '';
                     }
                 }
-                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added by revealAllMines
+                 // Check if flag-wrong class was added (by revealAllMines)
+                 if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
                     el.classList.add('flag-wrong'); // Ensure class stays
                  }
@@ -771,7 +793,7 @@
         }
 
         function endGame(isWin) {
-             if(gameOver) return; // Prevent multiple calls
+             if(gameOver) return;
 
              gameOver = true;
              clearInterval(timerInterval);
@@ -803,7 +825,7 @@
                         renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (sq.isFlagged) { // Incorrect flag
-                            sq.isRevealed = true;
+                            sq.isRevealed = true; // Mark revealed
                             el.className = 'square revealed flag-wrong'; // Set classes directly
                             el.textContent = '❌';                           // Set content directly
                         } else if (showContent && !sq.isRevealed && document.activeElement === revealAllButton) {
@@ -868,7 +890,7 @@
              }
              revealAllMines(true);
              if (!gameOver) {
-                 endGame(false); // Use endGame to ensure proper state setting
+                 endGame(false);
              }
              messageBox.textContent = 'All squares revealed!';
         }
