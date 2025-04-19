@@ -1,90 +1,344 @@
-    <script>
-        // ... (他の定数や変数宣言はそのまま) ...
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マインスイーパー</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px 0;
+            background-color: #f0f0f0;
+            font-family: 'Press Start 2P', cursive;
+            transition: background-color 0.5s ease;
+        }
+        body.game-over {
+            background-color: #ff4444;
+        }
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(15, 20px);
+            border: 2px solid #333;
+            background-color: #b4c687;
+            padding: 4px;
+        }
+        .square {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            user-select: none;
+            background-color: #eee;
+            line-height: 1;
+            overflow: hidden;
+            text-align: center;
+        }
+        .hidden { background-color: #ddd; }
+        .revealed { background-color: #b4c687; }
+        .mine { background-color: #ff4444; color: #000; font-size: 12px; }
+        .mine-clicked { background-color: #cc0000; color: #fff; font-size: 14px; }
+        .flag-wrong { background-color: #fdd; }
 
+        #reset-button, #rules-button {
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        #message-box {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 8px;
+            height: 14px;
+            text-align: center;
+        }
+        .timer { font-size: 14px; margin-top: 8px; color: #333; }
+
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 18px; }
+        .slider:before { position: absolute; content: ""; height: 10px; width: 10px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #2196F3; }
+        input:focus + .slider { box-shadow: 0 0 1px #2196F3; }
+        input:checked + .slider:before { transform: translateX(16px); }
+        .slider.round { border-radius: 18px; }
+        .slider.round:before { border-radius: 50%; }
+
+        .special-square { font-size: 9px; }
+        .odd-even-square { color: #ccae00; font-weight: bold; }
+        .area-value-square{ color: #902094; font-weight: bold; }
+
+        #debug-buttons { display: flex; margin-top: 8px; }
+        #debug-buttons button { margin-left: 4px; padding: 6px 10px; font-size: 10px; cursor: pointer; font-family: 'Press Start 2P', cursive; }
+        #debug-buttons button:first-child { margin-left: 0; }
+
+        /* --- Popup Styles --- */
+         #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
+         #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; padding: 15px 20px 20px 20px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; }
+         #rules-popup h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
+         #rules-popup h3 { font-size: 14px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid #ccc; padding-bottom: 4px; font-weight: bold; }
+         #rules-popup h4 { font-size: 13px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: #555; }
+         #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; }
+         #close-popup-button { position: absolute; top: 8px; right: 8px; background: none; border: 1px solid transparent; font-size: 26px; font-weight: bold; color: #777; cursor: pointer; font-family: sans-serif; line-height: 1; padding: 0 6px; transition: color 0.2s, border-color 0.2s; }
+         #close-popup-button:hover, #close-popup-button:focus { color: #000; border-color: #ccc; outline: none; }
+         .rules-content { max-height: 70vh; overflow-y: auto; padding-right: 10px; }
+         #rules-popup .setting-section { background-color: #f0f0f0; padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid #ddd; }
+         #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 12px; margin-top: 8px; font-weight: bold; font-family: 'Press Start 2P', cursive; }
+         #rules-popup .switch { margin-left: 8px; }
+         #popup-overlay.visible, #rules-popup.visible { display: block; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="board"></div>
+        <div class="timer">Time: <span id="timer">0:00:00</span></div>
+        <div id="message-box"></div>
+        <button id="reset-button">Reset</button>
+        <button id="rules-button">ルール説明</button>
+        <div id="debug-buttons">
+            <button id="reveal-non-mines">Open Non-Mines</button>
+            <button id="reveal-all">Open All</button>
+        </div>
+    </div>
+
+     <!-- Popup Structure -->
+    <div id="popup-overlay"></div>
+    <div id="rules-popup">
+        <button id="close-popup-button" aria-label="閉じる">×</button>
+        <h2>ルールと設定</h2>
+        <div class="rules-content">
+            <h3>基本ルール</h3>
+            <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
+               地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
+               マスを右クリック (または長押し) すると旗 (🚩) を立てたり外したりできます。
+            </p>
+
+            <!-- Number Setting Section -->
+            <h3>表示設定</h3>
+             <div class="setting-section">
+                 <h4>数字マス生成</h4>
+                 <p>オンの場合、地雷に隣接するマスに数字が表示されます。<br>
+                    オフの場合、数字が表示されるべきマスは、可能な限り他の特殊マス (AreaValue, OddEven) に置き換えられ、残りはハイドマス (・) になります。</p>
+                 <div class="setting-label">
+                      有効
+                     <label class="switch">
+                         <input type="checkbox" id="number-switch" checked> <!-- New Switch -->
+                         <span class="slider round"></span>
+                     </label>
+                 </div>
+             </div>
+             <!-- End of number setting section -->
+
+            <h3>特殊マス設定</h3>
+            <p>これらのマスは数字の代わりにヒントを表示します。「数字マス生成」がオフの場合、これらの設定は確率ではなく、可能な限り適用されるようになります。</p>
+            <!-- Existing setting sections for Hide, OddEven, AreaValue follow -->
+            <div class="setting-section">
+                <h4>ハイドマス (・)</h4>
+                <p>数字が表示される代わりに「・」が表示されます。周囲の状況から数字を推測する必要があります。</p>
+                <div class="setting-label">
+                     有効
+                    <label class="switch">
+                        <input type="checkbox" id="hide-switch" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+             <div class="setting-section">
+                <h4>オッドイーブンマス (Od/Ev)</h4>
+                 <p>数字の代わりに、周囲の地雷数が奇数(Odd)か偶数(Even)かを示します。「Ev」または「Od」で表示されます。(これもハイドマスの一種です)</p>
+                <div class="setting-label">
+                     有効
+                    <label class="switch">
+                        <input type="checkbox" id="odd-even-switch" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+             </div>
+             <div class="setting-section">
+                <h4>エリアバリューマス (-3/4-6/7+)</h4>
+                 <p>数字の代わりに、周囲の地雷数のおおよその範囲を示します。「-3」(3以下)、「4-6」、「7+」(7以上)で表示されます。(これもハイドマスの一種です)</p>
+                <div class="setting-label">
+                     有効
+                    <label class="switch">
+                        <input type="checkbox" id="area-value-switch" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+             </div>
+        </div>
+    </div>
+
+    <script>
+        const gridSize = 15;
+        const numMines = 30;
+        const maxHideRate = 0.15;
+        const minHideRate = 0;
+        const maxOddEvenRate = 0.05;
+        const maxAreaValueRate = 0.10;
+
+        let board = [];
+        let minesLeft = numMines;
+        let gameOver = false;
+        let timerInterval;
+        let seconds = 0;
         let revealedNonMineCount = 0;
         let gameStarted = false;
 
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
         const resetButton = document.getElementById('reset-button');
-        // ... (他の要素取得はそのまま) ...
+        const messageBox = document.getElementById('message-box');
+        const timerDisplay = document.getElementById('timer');
+        const body = document.body;
+        const revealNonMinesButton = document.getElementById('reveal-non-mines');
+        const revealAllButton = document.getElementById('reveal-all');
+        const rulesButton = document.getElementById('rules-button');
+        const rulesPopup = document.getElementById('rules-popup');
+        const closePopupButton = document.getElementById('close-popup-button');
         const popupOverlay = document.getElementById('popup-overlay');
+        // Switches
+        const numberSwitch = document.getElementById('number-switch'); // Added
         const hideSwitch = document.getElementById('hide-switch');
         const oddEvenSwitch = document.getElementById('odd-even-switch');
         const areaValueSwitch = document.getElementById('area-value-switch');
-        const numberSwitch = document.getElementById('number-switch'); // ★ 新しいスイッチ要素
 
         // --- Initial Settings ---
+        let enableNumbers = numberSwitch.checked;
         let enableHide = hideSwitch.checked;
         let enableOddEven = oddEvenSwitch.checked;
         let enableAreaValue = areaValueSwitch.checked;
-        let enableNumbers = numberSwitch.checked; // ★ 新しい設定変数
+
 
         // --- Event Listeners ---
-        // ... (他のリスナーはそのまま) ...
-        numberSwitch.addEventListener('change', handleSettingChange); // ★ 新しいスイッチのリスナー
+        resetButton.addEventListener('click', resetGame);
+        revealNonMinesButton.addEventListener('click', revealNonMines);
+        revealAllButton.addEventListener('click', revealAll);
+        rulesButton.addEventListener('click', openPopup);
+        closePopupButton.addEventListener('click', closePopup);
+        popupOverlay.addEventListener('click', closePopup);
+        // Switch Listeners
+        numberSwitch.addEventListener('change', handleSettingChange);
         hideSwitch.addEventListener('change', handleSettingChange);
         oddEvenSwitch.addEventListener('change', handleSettingChange);
         areaValueSwitch.addEventListener('change', handleSettingChange);
 
         // --- Popup Functions ---
-        function openPopup() { /* ... no change ... */ }
-        function closePopup() { /* ... no change ... */ }
-
+        function openPopup() {
+            rulesPopup.classList.add('visible');
+            popupOverlay.classList.add('visible');
+        }
+        function closePopup() {
+            rulesPopup.classList.remove('visible');
+            popupOverlay.classList.remove('visible');
+        }
         function handleSettingChange() {
             // Update all settings from their switches
+            enableNumbers = numberSwitch.checked;
             enableHide = hideSwitch.checked;
             enableOddEven = oddEvenSwitch.checked;
             enableAreaValue = areaValueSwitch.checked;
-            enableNumbers = numberSwitch.checked; // ★ 設定変数を更新
             resetGame();
         }
 
         // --- Game Logic Functions ---
-        function resetGame() { /* ... no change ... */ }
+        function resetGame() {
+            gameOver = true;
+            clearInterval(timerInterval);
+            seconds = 0;
+            updateTimerDisplay();
+            gameStarted = false;
+            messageBox.textContent = '';
+            body.classList.remove('game-over');
+            body.style.backgroundColor = '#f0f0f0';
+            // Delay slightly to allow UI to update before potentially heavy board creation
+            setTimeout(createBoard, 50);
+        }
 
         function createBoard() {
-            // ... (ボード初期化、要素生成、リスナー設定はほぼ同じ) ...
-            // Reset flags inside the loop for clarity upon board creation
+            board = [];
+            minesLeft = numMines;
+            gameOver = false; // Ensure game isn't over at start
+            revealedNonMineCount = 0;
+            boardElement.innerHTML = '';
+
             for (let i = 0; i < gridSize; i++) {
-                 board[i] = [];
-                 for (let j = 0; j < gridSize; j++) {
-                     board[i][j] = {
-                         isMine: false, isRevealed: false, isFlagged: false,
-                         isHide: false, isOddEven: false, isAreaValue: false, // Reset flags
-                         oddEvenValue: null, areaValue: null, adjacentMines: 0,
-                         element: document.createElement('div')
-                     };
-                     // ... (element setup and listeners) ...
-                      const square = board[i][j];
-                      const squareElement = square.element;
-                      squareElement.classList.add('square', 'hidden');
-                      squareElement.dataset.row = i; squareElement.dataset.col = j;
-                      squareElement.addEventListener('click', () => handleSquareClick(i, j));
-                      squareElement.addEventListener('contextmenu', (event) => { event.preventDefault(); handleRightClick(i, j); });
-                      // Touch listener
-                      let pressTimer;
-                      squareElement.addEventListener('touchstart', (event) => {
-                          pressTimer = setTimeout(() => { event.preventDefault(); handleRightClick(i, j); }, 500);
-                      }, { passive: false });
-                      squareElement.addEventListener('touchend', () => { clearTimeout(pressTimer); });
-                      squareElement.addEventListener('touchmove', () => { clearTimeout(pressTimer); });
-                      boardElement.appendChild(squareElement);
-                 }
-             }
+                board[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    board[i][j] = {
+                        isMine: false, isRevealed: false, isFlagged: false,
+                        isHide: false, isOddEven: false, isAreaValue: false,
+                        oddEvenValue: null, areaValue: null, adjacentMines: 0,
+                        element: document.createElement('div')
+                    };
+                    const square = board[i][j];
+                    const squareElement = square.element;
+                    squareElement.classList.add('square', 'hidden');
+                    squareElement.dataset.row = i; squareElement.dataset.col = j;
+                    squareElement.addEventListener('click', () => handleSquareClick(i, j));
+                    squareElement.addEventListener('contextmenu', (event) => { event.preventDefault(); handleRightClick(i, j); });
+                    // Touch listener
+                    let pressTimer;
+                    squareElement.addEventListener('touchstart', (event) => {
+                        pressTimer = setTimeout(() => { event.preventDefault(); handleRightClick(i, j); }, 500);
+                    }, { passive: false });
+                    squareElement.addEventListener('touchend', () => { clearTimeout(pressTimer); });
+                    squareElement.addEventListener('touchmove', () => { clearTimeout(pressTimer); });
+                    boardElement.appendChild(squareElement);
+                }
+            }
             plantMines();
             calculateAdjacentMines();
-            applySpecialSquares(); // ★ この関数が変更される
+            applySpecialSquares();
             updateMinesLeftDisplay();
         }
 
-        function plantMines() { /* ... no change ... */ }
-        function calculateAdjacentMines() { /* ... no change ... */ }
+        function plantMines() {
+            let minesPlanted = 0;
+            while (minesPlanted < numMines) {
+                const r = Math.floor(Math.random() * gridSize);
+                const c = Math.floor(Math.random() * gridSize);
+                if (!board[r][c].isMine) { board[r][c].isMine = true; minesPlanted++; }
+            }
+        }
 
-        // ★★★ applySpecialSquares 関数を大幅に変更 ★★★
+        function calculateAdjacentMines() {
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (board[i][j].isMine) { board[i][j].adjacentMines = -1; continue; }
+                    let count = 0;
+                    for (let x = -1; x <= 1; x++) {
+                        for (let y = -1; y <= 1; y++) {
+                            if (x === 0 && y === 0) continue;
+                            const ni = i + x, nj = j + y;
+                            if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) count++;
+                        }
+                    }
+                    board[i][j].adjacentMines = count;
+                }
+            }
+        }
+
         function applySpecialSquares() {
-            const potentialNumberSquares = []; // 数字が表示される可能性のあるマス (Mineでなく、adjacent > 0)
-            // Reset flags explicitly before applying new logic
+            const potentialNumberSquares = [];
+            // Reset flags and collect potential squares
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
                     const square = board[i][j];
@@ -98,126 +352,282 @@
                     }
                 }
             }
-            potentialNumberSquares.sort(() => Math.random() - 0.5); // Shuffle for variety
+            potentialNumberSquares.sort(() => Math.random() - 0.5);
 
-            const assignedSpecial = new Set(); // Keep track of assigned special squares
-            const totalSquares = gridSize * gridSize; // For probability calculation when enableNumbers is true
+            const assignedSpecial = new Set();
+            const totalSquares = gridSize * gridSize;
 
             if (!enableNumbers) {
-                // --- 数字マスを生成しない場合 ---
-                // 1. AreaValue を可能な限り適用
+                // --- Numbers OFF: Apply special types deterministically (no probability) ---
                 if (enableAreaValue) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`;
                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                            const square = board[r][c];
-                            square.isAreaValue = true;
-                            square.isHide = true; // Special implies Hide
-                            if (square.adjacentMines <= 3) square.areaValue = '-3';
-                            else if (square.adjacentMines <= 6) square.areaValue = '4-6';
-                            else square.areaValue = '7+';
+                            const sq = board[r][c];
+                            sq.isAreaValue = true; sq.isHide = true;
+                            if (sq.adjacentMines <= 3) sq.areaValue = '-3';
+                            else if (sq.adjacentMines <= 6) sq.areaValue = '4-6';
+                            else sq.areaValue = '7+';
                             assignedSpecial.add(k);
                         }
                     }
                 }
-                // 2. OddEven を可能な限り適用 (AreaValue にならなかったもの)
                 if (enableOddEven) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`;
-                        const square = board[r][c];
-                        // Check if not already assigned, requires > 1 adjacent mine, and no OddEven neighbors
-                        if (!assignedSpecial.has(k) && square.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                            square.isOddEven = true;
-                            square.isHide = true; // Special implies Hide
-                            square.oddEvenValue = square.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                        const sq = board[r][c];
+                        if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
+                            sq.isOddEven = true; sq.isHide = true;
+                            sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
                             assignedSpecial.add(k);
                         }
                     }
                 }
-                // 3. 残りの数字マス候補をすべて Hide マスにする
-                //    enableHide の設定に関わらず、数字を表示しない設定が優先されるため、「・」を表示
+                // Remaining potential number squares become Hide
                 for (const { r, c } of potentialNumberSquares) {
                     const k = `${r}-${c}`;
                     if (!assignedSpecial.has(k)) {
-                         board[r][c].isHide = true;
-                         // Note: We don't need to add to assignedSpecial here unless tracking simple hides specifically matters later
+                        board[r][c].isHide = true;
+                        // No need to add to assignedSpecial here for the current logic
                     }
                 }
-
             } else {
-                // --- 数字マスを生成する場合 (従来の確率ベースのロジック) ---
-                 // Apply Area Value first based on probability
+                // --- Numbers ON: Apply special types probabilistically ---
                 if (enableAreaValue) {
-                    const maxArea = Math.floor(totalSquares * maxAreaValueRate);
-                    let count = 0;
+                    const max = Math.floor(totalSquares * maxAreaValueRate); let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
-                        if (count >= maxArea) break;
-                         const key = `${r}-${c}`;
-                         if (!assignedSpecial.has(key) && !hasNeighborOfType(r, c, 'isAreaValue')) {
-                             const square = board[r][c];
-                             square.isAreaValue = true;
-                             square.isHide = true;
-                             if (square.adjacentMines <= 3) square.areaValue = '-3';
-                             else if (square.adjacentMines <= 6) square.areaValue = '4-6';
-                             else square.areaValue = '7+';
-                             assignedSpecial.add(key);
-                             count++;
-                         }
-                     }
-                }
-                // Apply Odd/Even next based on probability
-                if (enableOddEven) {
-                    const maxOddEven = Math.floor(totalSquares * maxOddEvenRate);
-                    let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                        if (count >= maxOddEven) break;
-                        const key = `${r}-${c}`;
-                         const square = board[r][c];
-                        if (!assignedSpecial.has(key) && square.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
-                             square.isOddEven = true;
-                             square.isHide = true;
-                             square.oddEvenValue = square.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
-                             assignedSpecial.add(key);
-                             count++;
-                         }
+                        if (count >= max) break; const k = `${r}-${c}`;
+                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
+                            const sq = board[r][c];
+                            sq.isAreaValue = true; sq.isHide = true;
+                            if (sq.adjacentMines <= 3) sq.areaValue = '-3';
+                            else if (sq.adjacentMines <= 6) sq.areaValue = '4-6';
+                            else sq.areaValue = '7+';
+                            assignedSpecial.add(k); count++;
+                        }
                     }
                 }
-                // Apply simple Hide last (based on probability) only if enabled
-                if (enableHide) {
-                     const hideRate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
-                     const maxHide = Math.floor(totalSquares * hideRate);
-                     let count = 0;
-                     for (const { r, c } of potentialNumberSquares) {
-                          if (count >= maxHide) break;
-                          const key = `${r}-${c}`;
-                          if (!assignedSpecial.has(key)) { // Only hide if not already a special type
-                              board[r][c].isHide = true;
-                              // assignedSpecial.add(key); // Optionally track simple hides too
-                              count++;
-                          }
-                      }
-                  }
-                  // Squares in potentialNumberSquares not marked as isHide=true will display numbers
+                if (enableOddEven) {
+                    const max = Math.floor(totalSquares * maxOddEvenRate); let count = 0;
+                    for (const { r, c } of potentialNumberSquares) {
+                        if (count >= max) break; const k = `${r}-${c}`;
+                        const sq = board[r][c];
+                        if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
+                            sq.isOddEven = true; sq.isHide = true;
+                            sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                            assignedSpecial.add(k); count++;
+                        }
+                    }
+                }
+                if (enableHide) { // Only apply simple hide if enabled
+                    const rate = Math.random() * (maxHideRate - minHideRate) + minHideRate;
+                    const max = Math.floor(totalSquares * rate); let count = 0;
+                    for (const { r, c } of potentialNumberSquares) {
+                        if (count >= max) break; const k = `${r}-${c}`;
+                        if (!assignedSpecial.has(k)) { // Only hide if not already special
+                            board[r][c].isHide = true;
+                            // assignedSpecial.add(k); // Optionally track
+                            count++;
+                        }
+                    }
+                }
+                // Squares not marked as isHide/isOddEven/isAreaValue will show numbers
             }
         }
 
-        function hasNeighborOfType(r, c, key) { /* ... no change ... */ }
-        function handleSquareClick(r, c) { /* ... no change ... */ }
-        function revealMine(r, c) { /* ... no change ... */ }
-        function revealSquare(r, c) { /* ... no change ... */ }
+        function hasNeighborOfType(r, c, key) {
+            for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) {
+                if (x === 0 && y === 0) continue; const ni = r + x, nj = c + y;
+                if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) return true;
+            } return false;
+        }
 
-        // renderSquareContent は isHide, isOddEven, isAreaValue フラグを見ているので変更不要
-        function renderSquareContent(sq) { /* ... no change ... */ }
+        function handleSquareClick(r, c) {
+            if (gameOver || board[r][c].isRevealed || board[r][c].isFlagged) return;
+            if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+            const square = board[r][c];
+            if (square.isMine) { revealMine(r, c); endGame(false); }
+            else { revealSquare(r, c); checkWinCondition(); }
+        }
 
-        function handleRightClick(r, c) { /* ... no change ... */ }
-        function updateMinesLeftDisplay() { /* ... no change ... */ }
-        function checkWinCondition() { /* ... no change ... */ }
-        function endGame(isWin) { /* ... no change ... */ }
-        function revealAllMines(showContent) { /* ... no change ... */ }
-        function updateTimer() { /* ... no change ... */ }
-        function updateTimerDisplay() { /* ... no change ... */ }
-        function revealNonMines() { /* ... no change ... */ }
-        function revealAll() { /* ... no change ... */ }
+        function revealMine(r, c) {
+            const sq = board[r][c]; sq.isRevealed = true;
+            sq.element.classList.remove('hidden', 'flagged');
+            sq.element.classList.add('revealed', 'mine', 'mine-clicked');
+            sq.element.textContent = '💥';
+        }
+
+        function revealSquare(r, c) {
+            // Check boundaries and game state first
+            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) return;
+            const sq = board[r][c];
+            // Check square state
+            if (sq.isRevealed || sq.isFlagged || sq.isMine) return;
+
+            sq.isRevealed = true;
+            revealedNonMineCount++;
+            renderSquareContent(sq); // Render the square itself
+
+            // If it's a blank square (0 adjacent mines), reveal neighbors
+            if (sq.adjacentMines === 0) {
+                for (let x = -1; x <= 1; x++) {
+                    for (let y = -1; y <= 1; y++) {
+                        // No need to check for self (x=0, y=0) because revealSquare already checks isRevealed
+                        revealSquare(r + x, c + y);
+                    }
+                }
+            }
+        }
+
+        function renderSquareContent(sq) {
+            const el = sq.element;
+            // Reset classes and content
+            el.className = 'square'; // Reset to base class first
+            el.textContent = '';
+
+            if (!sq.isRevealed) {
+                el.classList.add('hidden');
+                if (sq.isFlagged) {
+                    el.textContent = '🚩';
+                }
+            } else {
+                el.classList.add('revealed');
+                if (sq.isMine) {
+                     el.classList.add('mine');
+                     // If specifically the clicked mine, add that class too
+                     // This is usually handled by revealMine/revealAllMines, but good fallback
+                     if (el.classList.contains('mine-clicked')) {
+                         el.textContent = '💥';
+                     } else {
+                         el.textContent = '💣';
+                     }
+                } else if (sq.adjacentMines > 0) {
+                    if (sq.isHide) {
+                        el.classList.add('special-square');
+                        if (sq.isOddEven) { el.textContent = sq.oddEvenValue; el.classList.add('odd-even-square'); }
+                        else if (sq.isAreaValue) { el.textContent = sq.areaValue; el.classList.add('area-value-square'); }
+                        else el.textContent = '・'; // Simple hide
+                    } else {
+                        // Only display number if isHide is false (which happens when enableNumbers is true and it didn't get assigned a special type)
+                        el.textContent = sq.adjacentMines;
+                        // Optional: Add number class, e.g., el.classList.add(`num-${sq.adjacentMines}`);
+                    }
+                } else {
+                    // Revealed blank square (adjacentMines === 0)
+                    el.textContent = '';
+                }
+
+                 // Handle incorrectly flagged square display if revealed (e.g., by revealAllMines)
+                 if (el.classList.contains('flag-wrong')) {
+                    el.textContent = '❌';
+                 }
+            }
+        }
+
+
+        function handleRightClick(r, c) {
+            if (gameOver || board[r][c].isRevealed) return;
+            if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+            const sq = board[r][c]; sq.isFlagged = !sq.isFlagged;
+            if (sq.isFlagged) minesLeft--; else minesLeft++;
+            renderSquareContent(sq); updateMinesLeftDisplay();
+        }
+
+        function updateMinesLeftDisplay() { messageBox.textContent = `Mines: ${minesLeft}`; }
+
+        function checkWinCondition() {
+            const totalNonMine = gridSize * gridSize - numMines;
+            if (revealedNonMineCount === totalNonMine) {
+                // Ensure all non-mine squares are indeed revealed before declaring win
+                let allNonMinesRevealed = true;
+                for(let i=0; i<gridSize; i++){
+                    for(let j=0; j<gridSize; j++){
+                        if(!board[i][j].isMine && !board[i][j].isRevealed){
+                            allNonMinesRevealed = false;
+                            break;
+                        }
+                    }
+                    if(!allNonMinesRevealed) break;
+                }
+                if(allNonMinesRevealed){
+                    endGame(true);
+                }
+            }
+        }
+
+        function endGame(isWin) {
+            if (gameOver && !isWin) return; // Prevent multiple calls if already game over by loss
+            gameOver = true; clearInterval(timerInterval);
+            if (isWin) {
+                messageBox.textContent = 'Game Clear!'; body.style.backgroundColor = '#aaffaa';
+                for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (board[i][j].isMine && !board[i][j].isFlagged) { board[i][j].isFlagged = true; renderSquareContent(board[i][j]); }
+                minesLeft = 0; updateMinesLeftDisplay();
+            } else {
+                // Only set message/background if not already won
+                 if(messageBox.textContent !== 'Game Clear!'){
+                    messageBox.textContent = 'Game Over!'; body.classList.add('game-over');
+                 }
+                revealAllMines(true); // Pass true to show content
+            }
+        }
+
+        function revealAllMines(showContent) {
+            for (let i=0; i<gridSize; i++) {
+                for (let j=0; j<gridSize; j++) {
+                    const sq = board[i][j]; const el = sq.element;
+                    if (sq.isMine) {
+                        if (sq.isFlagged) continue; // Keep correct flag
+                        if (el.classList.contains('mine-clicked')) continue; // Keep clicked mine style
+                        sq.isRevealed = true;
+                        // Ensure renderSquareContent is called after setting flags/classes
+                        renderSquareContent(sq); // This will add 'mine' class and '💣'
+                    } else {
+                        if (sq.isFlagged) { // Incorrect flag
+                            sq.isRevealed = true;
+                            el.classList.add('flag-wrong'); // Add class for styling X
+                            renderSquareContent(sq); // This will set text to X
+                        } else if (showContent && !sq.isRevealed) { // Reveal non-mine for debug
+                             revealSquare(i, j); // Use revealSquare to handle numbers/blanks correctly
+                        }
+                    }
+                }
+            }
+        }
+
+        function updateTimer() { seconds++; updateTimerDisplay(); }
+
+        function updateTimerDisplay() {
+            const h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60), s = seconds % 60;
+            timerDisplay.textContent = h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // --- Debug Functions ---
+        function revealNonMines() {
+            if (gameOver) return;
+             if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+            for (let i=0; i<gridSize; i++) for (let j=0; j<gridSize; j++) if (!board[i][j].isMine && !board[i][j].isRevealed) revealSquare(i,j);
+             // checkWinCondition should now be accurate as revealSquare increments the count
+             checkWinCondition();
+             // Set message regardless of whether win was triggered by checkWinCondition or fallback
+             messageBox.textContent = 'All squares revealed!';
+             // Ensure game state is truly over
+             if (!gameOver) {
+                 endGame(true); // Force win state if checkWinCondition didn't fire for some reason
+                 messageBox.textContent = 'All squares revealed!'; // Re-set message just in case
+             }
+        }
+
+        function revealAll() {
+             if (gameOver) return;
+             if (!gameStarted) { gameStarted = true; timerInterval = setInterval(updateTimer, 1000); }
+             revealAllMines(true); // Show everything
+             // Ensure game is marked as over, even if called multiple times
+             if (!gameOver) {
+                 gameOver = true; // Set game over state
+                 clearInterval(timerInterval); // Stop timer
+             }
+             messageBox.textContent = 'All squares revealed!';
+        }
 
         // --- Initial Setup ---
         createBoard();
