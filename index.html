@@ -110,28 +110,24 @@
             height: 14px;
             text-align: center;
         }
-        /* Active Rules Display Styles */
         #active-rules-display {
             font-size: 9px;
-            color: #555; /* Default color */
+            color: #555;
             margin-top: 0px;
             margin-bottom: 8px;
             line-height: 1.3;
             text-align: center;
             min-height: 40px;
         }
-        #active-rules-display div {
-            margin-bottom: 2px;
-        }
-        /* Add specific colors for each rule type */
-        #active-rules-display .rule-display-hide { /* No specific color, uses default */ }
+        #active-rules-display div { margin-bottom: 2px; }
+        #active-rules-display .rule-display-hide {}
         #active-rules-display .rule-display-directional { color: #1a759f; }
         #active-rules-display .rule-display-oddEven { color: #0000CD; }
         #active-rules-display .rule-display-areaValue { color: #902094; }
         #active-rules-display .rule-display-naturalNumber { color: #2E8B57; }
-        #active-rules-display .rule-display-noNumbers { /* Uses default color */ }
-        #active-rules-display .rule-display-noFlags { /* Uses default color */ }
-        #active-rules-display .rule-display-standard { /* Uses default color */ }
+        #active-rules-display .rule-display-noNumbers {}
+        #active-rules-display .rule-display-noFlags {}
+        #active-rules-display .rule-display-standard {}
 
         .timer {
             font-size: 14px;
@@ -155,7 +151,11 @@
 
         .special-square { font-size: 9px; }
         .odd-even-square { color: #0000CD; font-weight: bold; }
-        .area-value-square{ color: #902094; font-weight: bold; }
+        .area-value-square{
+            color: #902094;
+            font-weight: bold;
+            font-size: 9px; /* ★ Adjusted font size ★ */
+        }
         .directional-square {
             color: #1a759f;
             font-weight: bold;
@@ -294,9 +294,8 @@
                <b>「フラグなしモード」</b>が有効な場合、旗を立てることはできません。
             </p>
 
-            <!-- ★ Settings Sections Reordered ★ -->
+            <!-- Settings Sections Reordered -->
             <h3>ゲーム設定</h3>
-            <!-- PC Operation Mode Setting -->
             <div class="setting-section" id="pc-op-mode-section">
                 <h4>PC操作モード</h4>
                  <p style="margin-bottom: 8px;">マウス操作（右クリックで旗🚩を立てる）か、ボタン切り替え操作（画面上部の⛏️/🚩ボタン）かを選択します。<b>この設定は即時反映されます。</b><br>※フラグなしモード有効時は右クリック/🚩ボタンは無効です。</p>
@@ -307,7 +306,6 @@
                     <input type="radio" name="pc-op-mode" value="button"> ボタン切り替え操作 (⛏️/🚩)
                 </label>
             </div>
-            <!-- Mine Count Setting Section -->
              <div class="setting-section" data-rule-id="mines">
                  <div class="slider-label">
                      <span>地雷の数:</span>
@@ -317,7 +315,6 @@
                  <input type="range" id="mine-slider" min="0" max="225" value="30">
                  <p style="font-size:10px; margin-top: 5px;">変更を適用するには「設定を保存」を押してください。</p>
              </div>
-            <!-- No Flags Mode Section -->
             <div class="setting-section" data-rule-id="noFlags">
                 <h4>フラグなしモード (No Flags)</h4>
                 <p>旗を立てる操作が無効になります。記憶力だけで挑戦！</p>
@@ -326,14 +323,13 @@
                     <div>
                         <button class="reset-rule-button" data-rule="noFlags">デフォルト</button>
                         <label class="switch">
-                            <input type="checkbox" id="no-flags-switch"> <!-- Default OFF -->
+                            <input type="checkbox" id="no-flags-switch">
                             <span class="slider round"></span>
                         </label>
                     </div>
                 </div>
             </div>
 
-            <!-- Number Setting Section -->
             <h3>表示設定</h3>
              <div class="setting-section" data-rule-id="numbers">
                  <h4>数字マス生成 (Numbers Squares)</h4>
@@ -351,7 +347,6 @@
                  </div>
              </div>
 
-            <!-- Special Square Settings -->
             <h3>特殊マス設定</h3>
             <p>これらのマスは数字の代わりにヒントを表示します。同じ種類の特殊マス（ハイドマスを除く）は隣り合いません。「数字マス生成」がオフの場合、これらの設定は可能な限り適用されるようになります。<br>変更を適用するには「設定を保存」を押してください。</p>
 
@@ -377,7 +372,6 @@
                 </div>
             </div>
 
-            <!-- Directional Square Section -->
             <div class="setting-section" data-rule-id="directional">
                 <h4>ディレクションマス (Directional Squares)</h4>
                  <p>方向(<b>T</b>:上, <b>B</b>:下, <b>L</b>:左, <b>R</b>:右)とその方向にある地雷の数を表示します (例:「R4」はそのマスより右にある地雷が4個)。<br>
@@ -387,7 +381,7 @@
                       <div>
                           <button class="reset-rule-button" data-rule="directional">デフォルト</button>
                           <label class="switch">
-                              <input type="checkbox" id="directional-switch" checked> <!-- Default ON -->
+                              <input type="checkbox" id="directional-switch" checked>
                               <span class="slider round"></span>
                           </label>
                       </div>
@@ -466,10 +460,10 @@
 
         const maxHideRate = 0.50;
         const minHideRate = 0.05;
-        const maxOddEvenRate = 0.10; // ★ Updated Rate ★
-        const maxAreaValueRate = 0.05; // ★ Updated Rate ★
+        const maxOddEvenRate = 0.10; // ★ Rate updated ★
+        const maxAreaValueRate = 0.05; // ★ Rate updated ★
         const maxDirectionalRate = 0.05; // ★ Set Rate ★
-        const maxNaturalNumberRate = 0.05; // ★ Updated Rate ★
+        const maxNaturalNumberRate = 0.05; // ★ Rate updated ★
 
         // --- Board State ---
         let board = [];
@@ -616,12 +610,9 @@
             } else {
                  document.body.classList.remove('touch-device');
 
-                 // Read initial PC operation mode setting only if NOT touch
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
 
-                 // Add data attribute to body for CSS targeting
-                 document.body.dataset.pcOpMode = pcOperationMode;
-
+                 document.body.dataset.pcOpMode = pcOperationMode; // Set data attribute for CSS
             }
              updateModeButtonsVisibility();
 
@@ -944,7 +935,7 @@
                  rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
 
             }
-            if (enableDirectional) {
+            if (enableDirectional) { // Display even if generation logic is commented for now
                  rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`;
             }
             if (enableOddEven) {
@@ -1228,6 +1219,7 @@
                  for (let j = 0; j < gridSize; j++) {
                      const square = board[i][j];
 
+                     // Reset all special flags and values
                      square.isHide = false;
                      square.isOddEven = false;
                      square.isAreaValue = false;
@@ -1253,7 +1245,7 @@
 
             const numPotential = potentialNumberSquares.length;
 
-            // ★ Updated directions with T/B/L/R symbols ★
+            // Directions with T/B/L/R symbols
             const baseDirections = [
                  { dx: -1, dy: 0, symbol: 'T', name: 'up' },
                  { dx: 1, dy: 0, symbol: 'B', name: 'down' },
@@ -1319,9 +1311,9 @@
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = true; sq.isHide = true;
-                             if (sq.adjacentMines <= 3) { sq.areaValue = '~3'; }
-                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4~6'; }
-                             else { sq.areaValue = '7~'; }
+                             if (sq.adjacentMines <= 3) { sq.areaValue = '~3'; } // Updated text
+                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4~6'; } // Updated text
+                             else { sq.areaValue = '7~'; } // Updated text
                              assignedSpecial.add(k);
                          }
                     }
@@ -1385,7 +1377,8 @@
                         }
                     }
                  }
-                if (enableAreaValue) { // AreaValue (Probabilistic)
+                 // ★★★ Restore other probabilistic logic ★★★
+                if (enableAreaValue) {
                      const max = Math.floor(numPotential * maxAreaValueRate); // Use numPotential based rate
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -1400,7 +1393,7 @@
                          }
                      }
                 }
-                if (enableOddEven) { // OddEven (Probabilistic)
+                if (enableOddEven) {
                      const max = Math.floor(numPotential * maxOddEvenRate); // Use numPotential based rate
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -1433,7 +1426,7 @@
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= maxHide) { break; }
                          const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k)) {
+                         if (!assignedSpecial.has(k)) { // Only hide if not already special
                             board[r][c].isHide = true;
                             count++;
                         }
@@ -1608,8 +1601,7 @@
                     } else if (sq.isAreaValue) {
                         el.classList.add('special-square', 'area-value-square');
 
-                        // ★ Updated Area Value text display ★
-                        el.textContent = sq.areaValue === '~3' ? '~3' : sq.areaValue === '7~' ? '7~' : sq.areaValue === '4~6' ? '4~6' : sq.areaValue; // Ensure all cases are handled
+                        el.textContent = sq.areaValue; // Already set to ~3, 4~6, 7~
 
                     } else if (sq.isOddEven) {
                         el.classList.add('special-square', 'odd-even-square');
