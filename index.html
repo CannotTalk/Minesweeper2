@@ -124,14 +124,14 @@
             margin-bottom: 2px;
         }
         /* Add specific colors for each rule type */
-        #active-rules-display .rule-display-hide { /* No specific color, uses default */ }
+        #active-rules-display .rule-display-hide {}
         #active-rules-display .rule-display-directional { color: #1a759f; }
         #active-rules-display .rule-display-oddEven { color: #0000CD; }
         #active-rules-display .rule-display-areaValue { color: #902094; }
         #active-rules-display .rule-display-naturalNumber { color: #2E8B57; }
-        #active-rules-display .rule-display-noNumbers { /* Uses default color */ }
-        #active-rules-display .rule-display-noFlags { /* Uses default color */ }
-        #active-rules-display .rule-display-standard { /* Uses default color */ }
+        #active-rules-display .rule-display-noNumbers {}
+        #active-rules-display .rule-display-noFlags {}
+        #active-rules-display .rule-display-standard {}
         #active-rules-display .rule-display-timeBomb { color: #DC143C; }
 
         .timer {
@@ -444,7 +444,7 @@
         const defaultSettings = {
              numMines: 30,
              enableNoFlags: false,
-             enableTimeBomb: false, // Added Time Bomb default
+             enableTimeBomb: false,
              enableNumbers: true,
              enableHide: true,
              hideRateMax: 0.10,
@@ -472,16 +472,15 @@
 
         let timerInterval;
 
-        // Use milliseconds for timer
         let elapsedMilliseconds = 0;
 
-        let remainingMilliseconds = 0; // For Time Bomb mode
-        let timeLimitMilliseconds = 0; // Stores the initial limit
-        const timerUpdateInterval = 50; // Update timer logic every 50ms
+        let remainingMilliseconds = 0;
+        let timeLimitMilliseconds = 0;
+        const timerUpdateInterval = 50;
 
         let gameStarted = false;
 
-        let startTime = 0; // To calculate elapsed time accurately
+        let startTime = 0;
 
         // Interaction Mode State
         let currentInteractionMode = 'dig';
@@ -501,7 +500,7 @@
         const messageBox = document.getElementById('message-box');
 
         const timerDisplay = document.getElementById('timer');
-        const timerSpan = timerDisplay.querySelector('span'); // Get the span inside timer div
+        const timerSpan = timerDisplay.querySelector('span');
 
         const body = document.body;
 
@@ -552,13 +551,13 @@
         const hideRateControl = document.getElementById('hide-rate-control');
 
         const resetRuleButtons = document.querySelectorAll('.reset-rule-button');
-        // Get No Flags Switch
+
         const noFlagsSwitch = document.getElementById('no-flags-switch');
-        // Get Natural Number Switch
+
         const naturalNumberSwitch = document.getElementById('natural-number-switch');
-        // Get Time Bomb Switch
+
         const timeBombSwitch = document.getElementById('time-bomb-switch');
-        // Get Timer Start Display Element
+
         const timerStartDisplay = document.getElementById('timer-start-display');
 
 
@@ -984,10 +983,10 @@
                  rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
 
             } else if (!rulesHtml && enableNumbers) {
-                if (enableNoFlags && enableTimeBomb) rulesHtml = '<div class="rule-display-noFlags rule-display-timeBomb">No Flags, Time Bomb</div>';
-                else if(enableNoFlags) rulesHtml = '<div class="rule-display-noFlags">No Flags</div>';
-                else if(enableTimeBomb) rulesHtml = '<div class="rule-display-timeBomb">Time Bomb Mode</div>';
-                else rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
+                 if (enableNoFlags && enableTimeBomb) rulesHtml = '<div class="rule-display-noFlags rule-display-timeBomb">No Flags, Time Bomb</div>';
+                 else if(enableNoFlags) rulesHtml = '<div class="rule-display-noFlags">No Flags</div>';
+                 else if(enableTimeBomb) rulesHtml = '<div class="rule-display-timeBomb">Time Bomb Mode</div>';
+                 else rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
 
             } else if (!rulesHtml && !enableNumbers){
                  if (enableNoFlags && enableTimeBomb) rulesHtml = '<div class="rule-display-noFlags rule-display-timeBomb rule-display-noNumbers">No Numbers, No Flags, Time Bomb</div>';
@@ -1031,8 +1030,8 @@
 
             elapsedMilliseconds = 0;
 
-            remainingMilliseconds = 0; // Reset remaining time
-            timeLimitMilliseconds = 0; // Reset time limit
+            remainingMilliseconds = 0;
+            timeLimitMilliseconds = 0;
             startTime = 0;
 
             gameStarted = false;
@@ -1041,7 +1040,7 @@
 
             switchMode('dig');
 
-            updateTimerDisplay(); // Reset display
+            updateTimerDisplay(); // Reset display to initial state (00.00 or time limit)
 
             messageBox.textContent = '';
 
@@ -1049,11 +1048,9 @@
             body.classList.remove('game-over');
 
             body.style.backgroundColor = '';
-            // Remove blinking class if present
-            timerSpan.classList.remove('blinking');
-             // Ensure large timer display is hidden
-             timerStartDisplay.classList.remove('visible', 'move-to-corner');
-             timerSpan.parentElement.classList.remove('hide-during-intro');
+            timerSpan.parentElement.classList.remove('blinking');
+            timerStartDisplay.classList.remove('visible', 'move-to-corner');
+            timerSpan.parentElement.classList.remove('hide-during-intro');
 
 
             setTimeout(createBoard, 50);
@@ -1073,7 +1070,6 @@
 
             // Set up time bomb if enabled BEFORE creating squares
             if (enableTimeBomb) {
-                // Random time between 3:00 (180000ms) and 10:00 (600000ms)
                 timeLimitMilliseconds = Math.floor(Math.random() * (600000 - 180000 + 1)) + 180000;
 
                 remainingMilliseconds = timeLimitMilliseconds;
@@ -1163,7 +1159,7 @@
 
         }
 
-        // ★★★ Timer Start Animation Function ★★★
+        // Timer Start Animation Function
         function startTimerAnimation() {
              const minutes = Math.floor(timeLimitMilliseconds / 60000);
              const seconds = Math.floor((timeLimitMilliseconds % 60000) / 1000);
@@ -1367,19 +1363,103 @@
             if (!enableNumbers) { // Uses current global enableNumbers
                 // --- Numbers OFF: Apply deterministically ---
                 // Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide
-                if (enableDirectional) { /* ... Directional Logic ... */ }
-                if (enableAreaValue) { /* ... AreaValue Logic ... */ }
-                if (enableOddEven) { /* ... OddEven Logic ... */ }
-                if (enableNaturalNumber) { /* ... NaturalNumber Logic ... */ }
+                if (enableDirectional) {
+                    for (const { r, c } of potentialNumberSquares) {
+                        const k = `${r}-${c}`;
+                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
+                            const sq = board[r][c];
+                            let assignedDir = false;
+                            const validDirs = getValidDirections(r, c);
+                            if (validDirs.length > 0) {
+                                const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                                for (const dir of shuffledValidDirs) {
+                                    if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
+                                        const count = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                        sq.isDirectional = true; sq.isHide = true;
+                                        sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                        sq.directionalCount = count; sq.directionalSymbol = dir.symbol;
+                                        assignedSpecial.add(k);
+                                        assignedDir = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (enableAreaValue) {
+                     for (const { r, c } of potentialNumberSquares) {
+                         const k = `${r}-${c}`;
+                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
+                             const sq = board[r][c]; sq.isAreaValue = true; sq.isHide = true;
+                             if (sq.adjacentMines <= 3) { sq.areaValue = '~3'; }
+                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4~6'; }
+                             else { sq.areaValue = '7~'; }
+                             assignedSpecial.add(k);
+                         }
+                    }
+                }
+                if (enableOddEven) {
+                     for (const { r, c } of potentialNumberSquares) {
+                         const k = `${r}-${c}`; const sq = board[r][c];
+                         if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
+                             sq.isOddEven = true; sq.isHide = true;
+                             sq.oddEvenValue = sq.adjacentMines % 2 === 0 ? 'Ev' : 'Od';
+                             assignedSpecial.add(k);
+                         }
+                    }
+                }
+                if (enableNaturalNumber) {
+                    for (const { r, c } of potentialNumberSquares) {
+                        const k = `${r}-${c}`; const sq = board[r][c];
+                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isNaturalNumber')) {
+                            sq.isNaturalNumber = true; sq.isHide = true;
+                            sq.naturalNumberValue = calculateNaturalNumberValue(sq.adjacentMines);
+                            assignedSpecial.add(k);
+                        }
+                    }
+                }
                 // Apply hide to remaining if enabled (or if numbers off and hide off)
-                if (enableHide || !enableNumbers) { /* ... Hide Logic ... */ }
+                if (enableHide || !enableNumbers) {
+                    for (const { r, c } of potentialNumberSquares) {
+                         if (!assignedSpecial.has(`${r}-${c}`)) {
+                             board[r][c].isHide = true;
+                         }
+                     }
+                }
             } else {
                 // --- Numbers ON: Apply probabilistically ---
                  // Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide
-                 if (enableDirectional) { /* ... Probabilistic Directional ... */ }
-                 // ★★★ Restore probabilistic logic for others ★★★
+                 if (enableDirectional) {
+                    const maxDir = (numPotential > 0) ? Math.floor(numPotential * maxDirectionalRate) : 0; // ★ Avoid NaN if numPotential is 0 ★
+                    let count = 0;
+                    for (const { r, c } of potentialNumberSquares) {
+                        if (count >= maxDir) { break; }
+                        const k = `${r}-${c}`;
+                        if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
+                            const sq = board[r][c];
+                             let assignedDir = false;
+                             const validDirs = getValidDirections(r, c);
+                             if (validDirs.length > 0) {
+                                 const shuffledValidDirs = [...validDirs].sort(() => Math.random() - 0.5);
+                                 for (const dir of shuffledValidDirs) {
+                                     if (!hasDirectionalChain(r, c, dir.dx, dir.dy)) {
+                                         const dirCount = countMinesInDirection(r, c, dir.dx, dir.dy);
+                                         sq.isDirectional = true; sq.isHide = true;
+                                         sq.direction = { dx: dir.dx, dy: dir.dy, name: dir.name };
+                                         sq.directionalCount = dirCount; sq.directionalSymbol = dir.symbol;
+                                         assignedSpecial.add(k);
+                                         assignedDir = true;
+                                         count++;
+                                         break;
+                                     }
+                                 }
+                             }
+                        }
+                    }
+                 }
                 if (enableAreaValue) {
-                     const max = Math.floor(numPotential * maxAreaValueRate);
+                     const max = (numPotential > 0) ? Math.floor(numPotential * maxAreaValueRate) : 0; // ★ Avoid NaN ★
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) { break; }
@@ -1394,7 +1474,7 @@
                      }
                 }
                 if (enableOddEven) {
-                     const max = Math.floor(numPotential * maxOddEvenRate);
+                     const max = (numPotential > 0) ? Math.floor(numPotential * maxOddEvenRate) : 0; // ★ Avoid NaN ★
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) { break; }
@@ -1407,7 +1487,7 @@
                      }
                 }
                 if (enableNaturalNumber) {
-                     const maxNat = Math.floor(numPotential * maxNaturalNumberRate);
+                     const maxNat = (numPotential > 0) ? Math.floor(numPotential * maxNaturalNumberRate) : 0; // ★ Avoid NaN ★
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                           if (count >= maxNat) { break; }
@@ -1421,7 +1501,7 @@
                       }
                  }
                 if (enableHide) {
-                     const maxHide = Math.floor(numPotential * hideRateMax);
+                     const maxHide = (numPotential > 0) ? Math.floor(numPotential * hideRateMax) : 0; // ★ Avoid NaN ★
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= maxHide) { break; }
@@ -1466,7 +1546,7 @@
                  handleFlagAction(r, c);
 
              } else { // 'dig' mode
-                 if (square.isFlagged && !enableNoFlags) {
+                 if (square.isFlagged && !enableNoFlags) { // Cannot dig flagged unless no-flags mode
                      return;
 
                  }
@@ -1575,14 +1655,14 @@
             el.className = 'square';
 
             el.textContent = '';
-            el.innerHTML = ''; // Clear innerHTML as well
+            el.innerHTML = '';
 
-            el.style.fontSize = ''; // Reset font size
+            el.style.fontSize = '';
 
             if (!sq.isRevealed) {
                 el.classList.add('hidden');
 
-                if (sq.isFlagged && !enableNoFlags) { // Only show flag if flags enabled
+                if (sq.isFlagged && !enableNoFlags) {
                     el.textContent = '🚩';
 
                 }
@@ -1599,17 +1679,16 @@
                     if (sq.isDirectional) {
                         el.classList.add('directional-square');
 
-                        el.textContent = sq.directionalSymbol + sq.directionalCount; // Use T,B,L,R
+                        el.textContent = sq.directionalSymbol + sq.directionalCount;
 
                     } else if (sq.isAreaValue) {
                         el.classList.add('special-square', 'area-value-square');
 
-                        // Use innerHTML for 4~6 case to allow line break
                         if (sq.areaValue === '4~6') {
                              el.innerHTML = '4~<br>6';
 
                         } else {
-                             el.textContent = sq.areaValue; // For ~3 and 7~
+                             el.textContent = sq.areaValue;
                         }
 
                     } else if (sq.isOddEven) {
@@ -1635,10 +1714,10 @@
 
                     }
                 }
-                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added
+                 if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
 
-                    el.classList.add('flag-wrong'); // Ensure class stays
+                    el.classList.add('flag-wrong');
                  }
             }
         }
@@ -1668,7 +1747,6 @@
 
                     }
                 }
-                // If time bomb is active, still need time left
                 if (enableTimeBomb && remainingMilliseconds <= 0) {
                     return; // Don't declare win if time ran out
                 }
@@ -1683,17 +1761,16 @@
                  return;
 
              }
-             gameOver = true; // Set game over flag immediately
+             gameOver = true;
 
-             clearInterval(timerInterval); // Stop the timer
+             clearInterval(timerInterval);
 
-             // Calculate final time if game had started
              if(gameStarted) {
                  if (!enableTimeBomb) {
                      elapsedMilliseconds = Date.now() - startTime;
 
                  }
-                 updateTimerDisplay(); // Update display one last time
+                 updateTimerDisplay();
 
              }
 
@@ -1719,7 +1796,6 @@
 
                 }
             } else {
-                // Only set Game Over message if not already won
                 if (messageBox.textContent !== 'Game Clear!') {
                     if (enableTimeBomb && remainingMilliseconds <= 0) {
                          messageBox.textContent = 'Time Up!';
@@ -1728,9 +1804,9 @@
                     }
                 }
 
-                body.classList.add('game-over'); // Use class for game over red
+                body.classList.add('game-over');
 
-                revealAllMines(true); // Show results
+                revealAllMines(true);
 
             }
         }
@@ -1743,7 +1819,7 @@
                     const el = sq.element;
 
                     if (sq.isMine) {
-                        if (sq.isFlagged && !enableNoFlags) { // Keep correct flag only if flags enabled
+                        if (sq.isFlagged && !enableNoFlags) {
                             continue;
 
                         }
@@ -1897,7 +1973,7 @@
 
              // Ensure game is marked as over, even if called multiple times
              if (!gameOver) {
-                 endGame(false); // Trigger game over logic (even if already called by revealAllMines hitting a mine)
+                 endGame(false); // Trigger game over logic
 
              }
              messageBox.textContent = 'All squares revealed!';
