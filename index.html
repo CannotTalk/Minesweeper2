@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8";>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0";>
+    <meta charset="UTF-8";
+>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0";
+>
     <title>Minesweeper 2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet";>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet";
+>
     <style>
         body {
             display: flex;
@@ -386,10 +389,12 @@
                 <h4>PC操作モード</h4>
                  <p style="margin-bottom: 8px;">マウス操作（右クリックで旗🚩を立てる）か、ボタン切り替え操作（画面上部の⛏️/🚩ボタン）かを選択します。<b>この設定は即時反映されます。</b><br>※フラグなしモード有効時は右クリック/🚩ボタンは無効です。</p>
                 <label class="pc-op-mode-label">
-                    <input type="radio" name="pc-op-mode" value="mouse" checked;> マウス操作 (右クリックで🚩)
+                    <input type="radio" name="pc-op-mode" value="mouse" checked;
+> マウス操作 (右クリックで🚩)
                 </label>
                 <label class="pc-op-mode-label">
-                    <input type="radio" name="pc-op-mode" value="button";> ボタン切り替え操作 (⛏️/🚩)
+                    <input type="radio" name="pc-op-mode" value="button";
+> ボタン切り替え操作 (⛏️/🚩)
                 </label>
             </div>
              <div class="setting-section" data-rule-id="mines">
@@ -398,7 +403,8 @@
                      <span id="mine-count-display">30</span>
                      <button class="reset-rule-button" data-rule="mines">デフォルトに戻す</button>
                  </div>
-                 <input type="range" id="mine-slider" min="0" max="225" value="30";>
+                 <input type="range" id="mine-slider" min="0" max="225" value="30";
+>
                  <p style="font-size:10px; margin-top: 5px;">変更を適用するには「設定を保存」を押してください。</p>
              </div>
             <div class="setting-section" data-rule-id="noFlags">
@@ -409,7 +415,8 @@
                     <div>
                         <button class="reset-rule-button" data-rule="noFlags">デフォルト</button>
                         <label class="switch">
-                            <input type="checkbox" id="no-flags-switch";>
+                            <input type="checkbox" id="no-flags-switch";
+>
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -423,7 +430,8 @@
                     <div>
                         <button class="reset-rule-button" data-rule="timeBomb">デフォルト</button>
                         <label class="switch">
-                            <input type="checkbox" id="time-bomb-switch";>
+                            <input type="checkbox" id="time-bomb-switch";
+>
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -432,38 +440,49 @@
                      <div id="time-bomb-random-switch-label">
                          <span>ランダムな時間</span>
                          <label class="switch">
-                              <input type="checkbox" id="time-bomb-random-switch";>
+                              <input type="checkbox" id="time-bomb-random-switch";
+>
                               <span class="slider round"></span>
                          </label>
                      </div>
                      <div id="time-bomb-random-settings" class="hidden-setting">
                          <div class="time-input-group">
                              <label for="time-bomb-min-hours">最小時間:</label>
-                             <input type="number" id="time-bomb-min-hours" min="0" step="1" value="0";><span class="colon">:</span>
-                             <input type="number" id="time-bomb-min-minutes" min="0" max="59" step="1" value="3";><span class="colon">:</span>
-                             <input type="number" id="time-bomb-min-seconds" min="0" max="59" step="1" value="0";>
+                             <input type="number" id="time-bomb-min-hours" min="0" step="1" value="0";
+><span class="colon">:</span>
+                             <input type="number" id="time-bomb-min-minutes" min="0" max="59" step="1" value="3";
+><span class="colon">:</span>
+                             <input type="number" id="time-bomb-min-seconds" min="0" max="59" step="1" value="0";
+>
                          </div>
                          <div class="time-input-group">
                              <label for="time-bomb-max-hours">最大時間:</label>
-                             <input type="number" id="time-bomb-max-hours" min="0" step="1" value="0";><span class="colon">:</span>
-                             <input type="number" id="time-bomb-max-minutes" min="0" max="59" step="1" value="8";><span class="colon">:</span>
-                             <input type="number" id="time-bomb-max-seconds" min="0" max="59" step="1" value="0";>
+                             <input type="number" id="time-bomb-max-hours" min="0" step="1" value="0";
+><span class="colon">:</span>
+                             <input type="number" id="time-bomb-max-minutes" min="0" max="59" step="1" value="8";
+><span class="colon">:</span>
+                             <input type="number" id="time-bomb-max-seconds" min="0" max="59" step="1" value="0";
+>
                          </div>
                          <span class="time-setting-note">(HH:MM:SS 形式)</span>
                      </div>
                      <div id="time-bomb-fixed-settings" class="hidden-setting">
                          <div class="time-input-group">
                              <label for="time-bomb-fixed-hours">時間設定:</label>
-                             <input type="number" id="time-bomb-fixed-hours" min="0" step="1" value="0";><span class="colon">:</span>
-                             <input type="number" id="time-bomb-fixed-minutes" min="0" max="59" step="1" value="5";><span class="colon">:</span>
-                             <input type="number" id="time-bomb-fixed-seconds" min="0" max="59" step="1" value="0";>
+                             <input type="number" id="time-bomb-fixed-hours" min="0" step="1" value="0";
+><span class="colon">:</span>
+                             <input type="number" id="time-bomb-fixed-minutes" min="0" max="59" step="1" value="5";
+><span class="colon">:</span>
+                             <input type="number" id="time-bomb-fixed-seconds" min="0" max="59" step="1" value="0";
+>
                           </div>
                           <span class="time-setting-note">(HH:MM:SS 形式)</span>
                      </div>
                      <div id="game-over-on-time-only-label">
                          <span>時間切れでのみゲームオーバー</span>
                          <label class="switch">
-                              <input type="checkbox" id="game-over-on-time-only-switch";>
+                              <input type="checkbox" id="game-over-on-time-only-switch";
+>
                               <span class="slider round"></span>
                          </label>
                      </div>
@@ -483,7 +502,8 @@
                        <div>
                          <button class="reset-rule-button" data-rule="numbers">デフォルト</button>
                          <label class="switch">
-                             <input type="checkbox" id="number-switch" checked;>
+                             <input type="checkbox" id="number-switch" checked;
+>
                              <span class="slider round"></span>
                          </label>
                       </div>
@@ -501,7 +521,8 @@
                       <div>
                           <button class="reset-rule-button" data-rule="hide">デフォルト</button>
                           <label class="switch">
-                              <input type="checkbox" id="hide-switch" checked;>
+                              <input type="checkbox" id="hide-switch" checked;
+>
                               <span class="slider round"></span>
                           </label>
                       </div>
@@ -511,7 +532,8 @@
                         <span>最大割合:</span>
                         <span id="hide-rate-display">10%</span>
                     </div>
-                    <input type="range" id="hide-rate-slider" min="5" max="50" step="5" value="10";>
+                    <input type="range" id="hide-rate-slider" min="5" max="50" step="5" value="10";
+>
                 </div>
             </div>
 
@@ -524,7 +546,8 @@
                       <div>
                           <button class="reset-rule-button" data-rule="directional">デフォルト</button>
                           <label class="switch">
-                              <input type="checkbox" id="directional-switch" checked;>
+                              <input type="checkbox" id="directional-switch" checked;
+>
                               <span class="slider round"></span>
                           </label>
                       </div>
@@ -539,7 +562,8 @@
                       <div>
                           <button class="reset-rule-button" data-rule="oddEven">デフォルト</button>
                           <label class="switch">
-                              <input type="checkbox" id="odd-even-switch" checked;>
+                              <input type="checkbox" id="odd-even-switch" checked;
+>
                               <span class="slider round"></span>
                           </label>
                       </div>
@@ -554,7 +578,8 @@
                       <div>
                          <button class="reset-rule-button" data-rule="areaValue">デフォルト</button>
                          <label class="switch">
-                             <input type="checkbox" id="area-value-switch" checked;>
+                             <input type="checkbox" id="area-value-switch" checked;
+>
                              <span class="slider round"></span>
                          </label>
                      </div>
@@ -569,7 +594,8 @@
                       <div>
                          <button class="reset-rule-button" data-rule="naturalNumber">デフォルト</button>
                          <label class="switch">
-                             <input type="checkbox" id="natural-number-switch" checked;>
+                             <input type="checkbox" id="natural-number-switch" checked;
+>
                              <span class="slider round"></span>
                          </label>
                      </div>
@@ -766,6 +792,7 @@
             }
         }
 
+
         // --- Initial Setup for Sliders ---
         if (pendingSettings.numMines < 0) {
             pendingSettings.numMines = 0;
@@ -803,76 +830,101 @@
             updateModeButtonsVisibility();
         }
 
+
         function updateModeButtonsVisibility() {
             modeToggleButtonsContainer.classList.toggle('visible', isTouch || pcOperationMode === 'button');
             flagModeButton.disabled = enableNoFlags;
         }
 
+
         // --- Event Listeners ---
         resetButton.addEventListener('click', resetGame);
+
         revealNonMinesButton.addEventListener('click', revealNonMines);
+
         revealAllButton.addEventListener('click', revealAll);
+
         rulesButton.addEventListener('click', openPopup);
+
         closePopupButton.addEventListener('click', closePopup);
+
         popupOverlay.addEventListener('click', closePopup);
+
 
         // Switches -> Update pendingSettings ONLY
         numberSwitch.addEventListener('change', () => {
             pendingSettings.enableNumbers = numberSwitch.checked;
         });
+
         hideSwitch.addEventListener('change', () => {
             pendingSettings.enableHide = hideSwitch.checked;
             hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
         });
+
         directionalSwitch.addEventListener('change', () => {
             pendingSettings.enableDirectional = directionalSwitch.checked;
         });
+
         oddEvenSwitch.addEventListener('change', () => {
             pendingSettings.enableOddEven = oddEvenSwitch.checked;
         });
+
         areaValueSwitch.addEventListener('change', () => {
             pendingSettings.enableAreaValue = areaValueSwitch.checked;
         });
+
         noFlagsSwitch.addEventListener('change', () => {
             pendingSettings.enableNoFlags = noFlagsSwitch.checked;
         });
+
         naturalNumberSwitch.addEventListener('change', () => {
             pendingSettings.enableNaturalNumber = naturalNumberSwitch.checked;
         });
+
         timeBombSwitch.addEventListener('change', () => {
             pendingSettings.enableTimeBomb = timeBombSwitch.checked;
             updateTimeBombDetailsVisibility();
         });
+
         timeBombRandomSwitch.addEventListener('change', () => {
             pendingSettings.timeLimitRandom = timeBombRandomSwitch.checked;
             updateTimeBombInputVisibility();
         });
+
         gameOverOnTimeOnlySwitch.addEventListener('change', () => {
             pendingSettings.gameOverOnTimeOnly = gameOverOnTimeOnlySwitch.checked;
         });
+
 
         // Sliders -> Update pendingSettings ONLY
         mineSlider.addEventListener('input', () => {
             pendingSettings.numMines = parseInt(mineSlider.value, 10);
             mineCountDisplay.textContent = pendingSettings.numMines;
         });
+
         hideRateSlider.addEventListener('input', () => {
             pendingSettings.hideRateMax = parseInt(hideRateSlider.value, 10) / 100;
             hideRateDisplay.textContent = `${hideRateSlider.value}%`;
         });
 
+
         // Mode Buttons
         digModeButton.addEventListener('click', () => switchMode('dig'));
+
         flagModeButton.addEventListener('click', () => switchMode('flag'));
+
 
         // PC Operation Mode Radio
         pcOpModeRadios.forEach(radio => radio.addEventListener('change', handlePcOperationModeChange));
 
+
         // Save Settings Button
         saveSettingsButton.addEventListener('click', saveSettingsAndReset);
 
+
         // Reset Rule Buttons
         resetRuleButtons.forEach(button => button.addEventListener('click', handleResetRule));
+
 
         // --- Time Input Change Handlers ---
 
@@ -927,6 +979,7 @@
                 input.addEventListener('change', handleTimeInputChange);
             }
         });
+
 
         // --- Popup Functions ---
 
@@ -1189,6 +1242,7 @@
             setTimeout(createBoard, 50);
         }
 
+
         function createBoard() {
             board = [];
             gameOver = false;
@@ -1265,6 +1319,7 @@
             detectTouch();
         }
 
+
         function startTimerAnimation() {
             if (!enableTimeBomb || timeLimitMilliseconds <= 0) {
                 return;
@@ -1294,6 +1349,7 @@
             }, 1600); // 1.2s display + 0.4s animation
         }
 
+
         function plantMines() {
              let minesPlanted = 0;
              const maxPossible = gridSize * gridSize;
@@ -1321,6 +1377,7 @@
              }
         }
 
+
         function calculateAdjacentMines() {
              for (let i = 0; i < gridSize; i++) {
                   for (let j = 0; j < gridSize; j++) {
@@ -1344,6 +1401,7 @@
              }
         }
 
+
         function countMinesInDirection(r, c, dx, dy) {
              let count = 0;
              let cr = r + dx;
@@ -1355,6 +1413,7 @@
              }
              return count;
         }
+
 
         function hasNeighborOfType(r, c, key) {
              for (let x = -1; x <= 1; x++) {
@@ -1368,14 +1427,16 @@
              return false;
         }
 
+
         function calculateNaturalNumberValue(n) {
-             const p=[2,3,5,7];
-             if(p.includes(n)) return n.toString();
-             switch(n){
+             const p = [2, 3, 5, 7];
+             if (p.includes(n)) return n.toString();
+             switch (n) {
                   case 0: return "?"; case 1: return "-1"; case 4: return "±1";
                   case 6: return "±1"; case 8: return "+1"; default: return "?";
              }
         }
+
 
         function applySpecialSquares() {
             const pot = [];
@@ -1436,10 +1497,11 @@
                                 if (wasLowTime && currentRemainingAfterPenalty >= 60000) {
                                     // If it was low time but penalty pushed it above, remove yellow
                                     body.classList.remove('low-time');
-                                } else if (wasLowTime) {
-                                     // If it was low time and still is (or became lower), ensure yellow stays/appears
-                                     // updateTimerDisplay will handle the blinking class
+                                } else if (wasLowTime && currentRemainingAfterPenalty > 0) { // Check > 0 to avoid yellow at 0
+                                     // If it was low time and still is, ensure yellow stays/appears
                                      body.classList.add('low-time');
+                                } else {
+                                     body.classList.remove('low-time'); // Remove yellow if time ran out or wasn't low
                                 }
                                 updateTimerDisplay(); // Update display *after* flash clears
                             }, 150); // Duration of flash
@@ -1466,6 +1528,7 @@
             }
         }
 
+
         function startGameTimer() {
             if (gameStarted) {
                 return;
@@ -1484,6 +1547,7 @@
             timerInterval = setInterval(updateTimer, timerUpdateInterval);
             updateTimerDisplay(); // Initial display update
         }
+
 
         function handleFlagAction(r, c) {
             if (enableNoFlags || gameOver || board[r][c].isRevealed) {
@@ -1504,6 +1568,7 @@
             updateMinesLeftDisplay();
         }
 
+
         function revealMine(r, c) {
             const sq = board[r][c];
             // No need to check isRevealed here, handled in handleSquareInteraction
@@ -1512,6 +1577,7 @@
             sq.element.classList.add('revealed', 'mine', 'mine-clicked'); // Add clicked state
             sq.element.textContent = '💥'; // Show explosion
         }
+
 
         function revealSquare(r, c) {
             if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) {
@@ -1539,6 +1605,7 @@
                 }
             }
         }
+
 
         function renderSquareContent(sq) {
             const el = sq.element;
@@ -1590,16 +1657,20 @@
                         el.textContent = '';
                     }
                 }
-                if (el.classList.contains('flag-wrong')) { // Check if flag-wrong class was added
+                // Check if flag-wrong class was added externally (e.g., in revealAllMines)
+                if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
-                    el.classList.add('flag-wrong'); // Ensure class remains
+                    // Optionally keep the background redish
+                    // el.style.backgroundColor = '#fdd'; // Or use the class directly
                 }
             }
         }
 
+
         function updateMinesLeftDisplay() {
             messageBox.textContent = enableNoFlags ? '' : `Mines: ${minesLeft}`;
         }
+
 
         function checkWinCondition() {
             if (gameOver) {
@@ -1627,6 +1698,7 @@
                 }
             }
         }
+
 
         function endGame(isWin) {
             if (gameOver) {
@@ -1668,17 +1740,21 @@
                     minesLeft = 0;
                     updateMinesLeftDisplay();
                 }
-                 // --- Special Timer Display on Win with Time Bomb ---
-                 if (enableTimeBomb && gameStarted) { // Ensure game actually started
-                     const h = Math.floor(finalDisplayMillis / 3600000);
-                     const m = Math.floor((finalDisplayMillis % 3600000) / 60000);
-                     const s = Math.floor((finalDisplayMillis % 60000) / 1000);
-                     const cs = Math.floor((finalDisplayMillis % 1000) / 10);
-                     timerSpan.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
-                 } else if (gameStarted) { // For non-timed wins, show final elapsed time
-                     updateTimerDisplay(); // Call standard display update based on elapsedMilliseconds
-                 } else { // If game ended before starting, show 0
-                      timerSpan.textContent = '00:00:00.00';
+                 // --- Special Timer Display on Win ---
+                 if (gameStarted) {
+                      if (enableTimeBomb) {
+                           // Always display HH:MM:SS.cs format for timed wins
+                           const h = Math.floor(finalDisplayMillis / 3600000);
+                           const m = Math.floor((finalDisplayMillis % 3600000) / 60000);
+                           const s = Math.floor((finalDisplayMillis % 60000) / 1000);
+                           const cs = Math.floor((finalDisplayMillis % 1000) / 10);
+                           timerSpan.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+                      } else {
+                           // For non-timed wins, show final elapsed time using standard format
+                           updateTimerDisplay(); // Call standard display update based on elapsedMilliseconds
+                      }
+                 } else { // If game ended before starting
+                      timerSpan.textContent = '00:00:00.00'; // Show 0 time
                  }
                  // --- End Special Timer Display ---
 
@@ -1693,11 +1769,12 @@
                     }
                 }
                 body.classList.add('game-over');
-                revealAllMines(true);
-                // Update timer display for loss as well
-                updateTimerDisplay(); // Call standard display update
+                revealAllMines(true); // Pass true to show incorrect flags
+                // Update timer display for loss as well, using standard format
+                updateTimerDisplay();
             }
         }
+
 
         function revealAllMines(showIncorrectFlags) {
             for (let i = 0; i < gridSize; i++) {
@@ -1706,15 +1783,15 @@
                     const el = sq.element;
                     if (sq.isMine) {
                         if ((sq.isFlagged && !enableNoFlags) || el.classList.contains('mine-clicked')) {
-                            continue;
+                            continue; // Skip correct flags and already revealed mines
                         }
                         sq.isRevealed = true;
                         renderSquareContent(sq); // Render '💣'
                     } else { // Not a mine
                         if (showIncorrectFlags && sq.isFlagged && !enableNoFlags) {
-                            sq.isRevealed = true;
-                            el.classList.add('flag-wrong'); // Add class *before* rendering
-                            renderSquareContent(sq); // Render '❌'
+                            sq.isRevealed = true; // Mark revealed to show content
+                            el.classList.add('flag-wrong'); // Add wrong flag class
+                            renderSquareContent(sq); // Render will now show '❌'
                         } else if (showIncorrectFlags && !sq.isRevealed && document.activeElement === revealAllButton) {
                             // Debug reveal only if revealAll button was clicked
                             revealSquare(i, j);
@@ -1723,6 +1800,7 @@
                 }
             }
         }
+
 
         // --- Timer Functions ---
 
@@ -1756,6 +1834,7 @@
                 updateTimerDisplay();
             }
         }
+
 
         function updateTimerDisplay() {
             let formattedTime;
@@ -1801,6 +1880,7 @@
             timerSpan.textContent = formattedTime;
         }
 
+
         // --- Debug Functions ---
 
         function revealNonMines() {
@@ -1823,6 +1903,7 @@
             }
         }
 
+
         function revealAll() {
             if (gameOver) {
                 return;
@@ -1836,6 +1917,7 @@
             }
             messageBox.textContent = 'All squares revealed!';
         }
+
 
         // --- Initial Setup ---
         updateTimerDisplay();
