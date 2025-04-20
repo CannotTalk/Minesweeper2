@@ -17,6 +17,7 @@
             background-color: #f0f0f0;
             font-family: 'Press Start 2P', cursive;
             transition: background-color 0.5s ease;
+            overflow: hidden; /* Prevent scrollbars during animation */
         }
         body.game-over {
             background-color: #ff4444;
@@ -41,6 +42,7 @@
             padding: 0 5px;
             box-sizing: border-box;
             min-height: 30px;
+            position: relative; /* Context for timer animation */
         }
         #board {
             display: grid;
@@ -112,25 +114,24 @@
         }
         #active-rules-display {
             font-size: 9px;
-            color: #555; /* Default color */
+            color: #555;
             margin-top: 0px;
             margin-bottom: 8px;
             line-height: 1.3;
             text-align: center;
             min-height: 40px;
         }
-        #active-rules-display div {
-            margin-bottom: 2px;
-        }
-        /* Add specific colors for each rule type */
-        #active-rules-display .rule-display-hide { /* No specific color, uses default */ }
+        #active-rules-display div { margin-bottom: 2px; }
+        #active-rules-display .rule-display-hide {}
         #active-rules-display .rule-display-directional { color: #1a759f; }
         #active-rules-display .rule-display-oddEven { color: #0000CD; }
         #active-rules-display .rule-display-areaValue { color: #902094; }
         #active-rules-display .rule-display-naturalNumber { color: #2E8B57; }
-        #active-rules-display .rule-display-noNumbers { /* Uses default color */ }
-        #active-rules-display .rule-display-noFlags { /* Uses default color */ }
-        #active-rules-display .rule-display-standard { /* Uses default color */ }
+        #active-rules-display .rule-display-noNumbers {}
+        #active-rules-display .rule-display-noFlags {}
+        #active-rules-display .rule-display-standard {}
+        #active-rules-display .rule-display-timeBomb { color: #DC143C; } /* Crimson for time bomb */
+
 
         .timer {
             font-size: 14px;
@@ -139,6 +140,15 @@
             order: 2;
             flex-grow: 1;
             margin: 0;
+            transition: color 0.3s ease; /* Smooth color transition for blinking */
+        }
+        .timer.blinking {
+            animation: blink-red 1s infinite;
+        }
+
+        @keyframes blink-red {
+            0%, 49% { color: red; }
+            50%, 100% { color: #333; } /* Default color */
         }
 
 
@@ -154,20 +164,9 @@
 
         .special-square { font-size: 9px; }
         .odd-even-square { color: #0000CD; font-weight: bold; }
-        .area-value-square{
-            color: #902094;
-            font-weight: bold;
-            font-size: 9px;
-        }
-        .directional-square {
-            color: #1a759f;
-            font-weight: bold;
-            font-size: 9px;
-        }
-        .natural-number-square {
-            color: #2E8B57;
-            font-weight: bold;
-        }
+        .area-value-square{ color: #902094; font-weight: bold; font-size: 9px; }
+        .directional-square { color: #1a759f; font-weight: bold; font-size: 9px; }
+        .natural-number-square { color: #2E8B57; font-weight: bold; }
 
 
         #debug-buttons { display: flex; margin-top: 8px; }
@@ -175,50 +174,16 @@
         #debug-buttons button:first-child { margin-left: 0; }
 
         /* Mode Toggle Button Styles */
-        #mode-toggle-buttons {
-            display: none;
-            user-select: none;
-            order: 1;
-        }
-        #mode-toggle-buttons.visible {
-            display: flex;
-            gap: 5px;
-        }
-        .mode-button {
-            font-size: 20px;
-            padding: 3px 6px;
-            cursor: pointer;
-            border: 2px solid #888;
-            background-color: #eee;
-            border-radius: 5px;
-            line-height: 1;
-        }
-        .mode-button.active {
-            background-color: #ccc;
-            border-color: #333;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-        }
-        #flag-mode-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #eee;
-            border-color: #888;
-            box-shadow: none;
-        }
+        #mode-toggle-buttons { display: none; user-select: none; order: 1; }
+        #mode-toggle-buttons.visible { display: flex; gap: 5px; }
+        .mode-button { font-size: 20px; padding: 3px 6px; cursor: pointer; border: 2px solid #888; background-color: #eee; border-radius: 5px; line-height: 1; }
+        .mode-button.active { background-color: #ccc; border-color: #333; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+        #flag-mode-button:disabled { opacity: 0.5; cursor: not-allowed; background-color: #eee; border-color: #888; box-shadow: none; }
 
         /* --- Popup Styles --- */
-         #popup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none;
-        }
-         #rules-popup {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 500px; background-color: #fdfdfd;
-            border: 2px solid #333; border-radius: 8px; z-index: 100;
-            display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-            font-family: sans-serif; color: #333; flex-direction: column;
-        }
-        #popup-overlay.visible, #rules-popup.visible { display: flex !important; }
+         #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
+         #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #fdfdfd; border: 2px solid #333; border-radius: 8px; z-index: 100; display: none; font-size: 11px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); font-family: sans-serif; color: #333; flex-direction: column; }
+         #popup-overlay.visible, #rules-popup.visible { display: flex !important; }
          .popup-header { padding: 15px 20px 0 20px; }
          .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: 'Press Start 2P', cursive; color: #111; }
          .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
@@ -240,10 +205,7 @@
          .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Press Start 2P', cursive; margin-bottom: 5px; }
 
          /* Rule Reset Button Style */
-        .reset-rule-button {
-            font-size: 9px; padding: 2px 6px; margin-left: 10px; cursor: pointer;
-            background-color: #ddd; border: 1px solid #bbb; border-radius: 3px; font-family: sans-serif;
-        }
+        .reset-rule-button { font-size: 9px; padding: 2px 6px; margin-left: 10px; cursor: pointer; background-color: #ddd; border: 1px solid #bbb; border-radius: 3px; font-family: sans-serif; }
         .reset-rule-button:hover { background-color: #ccc; }
 
         /* Hide Rate Slider Styles */
@@ -259,6 +221,39 @@
         #pc-op-mode-section { display: block; }
         body.touch-device #pc-op-mode-section { display: none; }
         body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons { display: none; }
+
+        /* ★★★ Timer Start Animation Styles ★★★ */
+        #timer-start-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(2); /* Start larger and centered */
+            font-size: 48px; /* Large font */
+            font-family: 'Press Start 2P', cursive;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 101; /* Above popup overlay */
+            opacity: 0; /* Start hidden */
+            pointer-events: none; /* Don't block clicks */
+            transition: transform 0.8s ease-out, opacity 0.8s ease-out, top 0.8s ease-out, left 0.8s ease-out, font-size 0.8s ease-out;
+        }
+        #timer-start-display.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1); /* Fade in and normal size */
+        }
+        #timer-start-display.move-to-corner {
+            top: 25px; /* Approximate final top position */
+            left: 50%; /* Center horizontally first */
+            transform: translateX(-50%) scale(0.6); /* Move towards corner and shrink */
+            font-size: 14px; /* Final font size */
+            opacity: 0; /* Fade out */
+        }
+        .timer.hide-during-intro { /* Class to hide normal timer during intro */
+            visibility: hidden;
+        }
+
 
     </style>
 </head>
@@ -289,6 +284,9 @@
 
     </div>
 
+     <!-- ★★★ Timer Start Animation Element ★★★ -->
+    <div id="timer-start-display"></div>
+
      <!-- Popup Structure -->
     <div id="popup-overlay"></div>
     <div id="rules-popup">
@@ -301,7 +299,8 @@
             <p>クリックしてマスを開きます。数字は周囲8マスにある地雷の数を示します。<br>
                地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
                通常は、右クリック(PC)または長押し/旗モード(スマホ)で旗 (🚩) を立てられます。<br>
-               <b>「フラグなしモード」</b>が有効な場合、旗を立てることはできません。
+               <b>「フラグなしモード」</b>が有効な場合、旗を立てることはできません。<br>
+               <b>「時限爆弾モード」</b>では制限時間内にクリアする必要があります。
             </p>
 
             <!-- Settings Sections Reordered -->
@@ -334,6 +333,21 @@
                         <button class="reset-rule-button" data-rule="noFlags">デフォルト</button>
                         <label class="switch">
                             <input type="checkbox" id="no-flags-switch">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- ★★★ Time Bomb Mode Section ★★★ -->
+            <div class="setting-section" data-rule-id="timeBomb">
+                <h4>時限爆弾モード (Time Bombs Mode)</h4>
+                <p>制限時間(3分～10分)以内にクリアしないとゲームオーバーになります。</p>
+                <div class="setting-label">
+                    <span>有効</span>
+                    <div>
+                        <button class="reset-rule-button" data-rule="timeBomb">デフォルト</button>
+                        <label class="switch">
+                            <input type="checkbox" id="time-bomb-switch"> <!-- Default OFF -->
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -457,10 +471,11 @@
         const defaultSettings = {
              numMines: 30,
              enableNoFlags: false,
+             enableTimeBomb: false, // ★ Added Time Bomb default ★
              enableNumbers: true,
              enableHide: true,
              hideRateMax: 0.10,
-             enableDirectional: true, // Default ON
+             enableDirectional: true,
              enableOddEven: true,
              enableAreaValue: true,
              enableNaturalNumber: true
@@ -484,13 +499,16 @@
 
         let timerInterval;
 
+        // Use milliseconds for timer
         let elapsedMilliseconds = 0;
 
-        const timerUpdateInterval = 50;
+        let remainingMilliseconds = 0; // ★ For Time Bomb mode ★
+        let timeLimitMilliseconds = 0; // ★ Stores the initial limit ★
+        const timerUpdateInterval = 50; // Update timer logic every 50ms
 
         let gameStarted = false;
 
-        let startTime = 0;
+        let startTime = 0; // To calculate elapsed time accurately
 
         // Interaction Mode State
         let currentInteractionMode = 'dig';
@@ -510,6 +528,7 @@
         const messageBox = document.getElementById('message-box');
 
         const timerDisplay = document.getElementById('timer');
+        const timerSpan = timerDisplay.querySelector('span'); // Get the span inside timer div
 
         const body = document.body;
 
@@ -560,14 +579,20 @@
         const hideRateControl = document.getElementById('hide-rate-control');
 
         const resetRuleButtons = document.querySelectorAll('.reset-rule-button');
-
+        // Get No Flags Switch
         const noFlagsSwitch = document.getElementById('no-flags-switch');
-
+        // Get Natural Number Switch
         const naturalNumberSwitch = document.getElementById('natural-number-switch');
+        // ★ Get Time Bomb Switch ★
+        const timeBombSwitch = document.getElementById('time-bomb-switch');
+        // ★ Get Timer Start Display Element ★
+        const timerStartDisplay = document.getElementById('timer-start-display');
 
 
         // --- Settings (Current Applied) ---
         let enableNoFlags = defaultSettings.enableNoFlags;
+
+        let enableTimeBomb = defaultSettings.enableTimeBomb; // ★ Added ★
 
         let enableNumbers = defaultSettings.enableNumbers;
 
@@ -616,13 +641,13 @@
             if (isTouch) {
                 document.body.classList.add('touch-device');
 
-                pcOperationMode = 'button'; // Force button mode logic for touch
+                pcOperationMode = 'button';
             } else {
                  document.body.classList.remove('touch-device');
 
                  pcOperationMode = document.querySelector('input[name="pc-op-mode"]:checked').value;
 
-                 document.body.dataset.pcOpMode = pcOperationMode; // Set data attribute for CSS
+                 document.body.dataset.pcOpMode = pcOperationMode;
             }
              updateModeButtonsVisibility();
 
@@ -636,7 +661,6 @@
                 modeToggleButtonsContainer.classList.remove('visible');
 
             }
-            // Disable flag button if no flags mode is active
             flagModeButton.disabled = enableNoFlags;
 
         }
@@ -690,6 +714,10 @@
             pendingSettings.enableNaturalNumber = naturalNumberSwitch.checked;
 
         });
+        timeBombSwitch.addEventListener('change', () => { // ★ Listener for time bomb ★
+            pendingSettings.enableTimeBomb = timeBombSwitch.checked;
+
+        });
 
 
         // Sliders -> Update pendingSettings ONLY
@@ -734,6 +762,7 @@
             pendingSettings = {
                 numMines: numMines,
                 enableNoFlags: enableNoFlags,
+                enableTimeBomb: enableTimeBomb, // ★ Include time bomb ★
                 enableNumbers: enableNumbers,
                 enableHide: enableHide,
                 hideRateMax: hideRateMax,
@@ -748,6 +777,8 @@
             mineCountDisplay.textContent = pendingSettings.numMines;
 
             noFlagsSwitch.checked = pendingSettings.enableNoFlags;
+
+            timeBombSwitch.checked = pendingSettings.enableTimeBomb; // ★ Set switch state ★
 
             numberSwitch.checked = pendingSettings.enableNumbers;
 
@@ -794,7 +825,6 @@
 
             if (!rule) {
                 return;
-
             }
 
             switch (rule) {
@@ -811,6 +841,13 @@
                     pendingSettings.enableNoFlags = defaultSettings.enableNoFlags;
 
                     noFlagsSwitch.checked = pendingSettings.enableNoFlags;
+
+                    break;
+
+                case 'timeBomb': // ★ Added case ★
+                    pendingSettings.enableTimeBomb = defaultSettings.enableTimeBomb;
+
+                    timeBombSwitch.checked = pendingSettings.enableTimeBomb;
 
                     break;
 
@@ -873,6 +910,8 @@
             numMines = pendingSettings.numMines;
 
             enableNoFlags = pendingSettings.enableNoFlags;
+
+            enableTimeBomb = pendingSettings.enableTimeBomb; // ★ Apply time bomb ★
 
             enableNumbers = pendingSettings.enableNumbers;
 
@@ -938,6 +977,10 @@
                  rulesHtml += `<div class="rule-display-noFlags">No Flags</div>`;
 
             }
+            if (enableTimeBomb) { // ★ Add Time Bomb display ★
+                 rulesHtml += `<div class="rule-display-timeBomb">Time Bomb Mode</div>`;
+
+            }
             if (!enableNumbers) {
                 rulesHtml += `<div class="rule-display-noNumbers">No Numbers</div>`;
 
@@ -962,18 +1005,26 @@
 
             }
             // Adjust default message logic
-            if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue && !enableNaturalNumber && !enableNoFlags) {
+            if (enableNumbers && !enableHide && !enableDirectional && !enableOddEven && !enableAreaValue && !enableNaturalNumber && !enableNoFlags && !enableTimeBomb) {
                  rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
 
-            } else if (!rulesHtml && enableNumbers) {
-                rulesHtml = enableNoFlags ? '<div class="rule-display-noFlags">No Flags</div>' : '<div class="rule-display-standard">Standard Rules</div>';
+            } else if (!rulesHtml && enableNumbers) { // Handle cases where only NoFlags or TimeBomb might be on
+                 if (enableNoFlags && enableTimeBomb) rulesHtml = '<div class="rule-display-noFlags rule-display-timeBomb">No Flags, Time Bomb</div>';
+                 else if(enableNoFlags) rulesHtml = '<div class="rule-display-noFlags">No Flags</div>';
+                 else if(enableTimeBomb) rulesHtml = '<div class="rule-display-timeBomb">Time Bomb Mode</div>';
+                 else rulesHtml = '<div class="rule-display-standard">Standard Rules</div>'; // If nothing else is active
 
-            } else if (!rulesHtml && !enableNumbers){
-                 rulesHtml = enableNoFlags ? '<div class="rule-display-noFlags rule-display-noNumbers">No Numbers, No Flags</div>' : '<div class="rule-display-noNumbers">No Numbers</div>';
+            } else if (!rulesHtml && !enableNumbers){ // Handle cases with No Numbers
+                 if (enableNoFlags && enableTimeBomb) rulesHtml = '<div class="rule-display-noFlags rule-display-timeBomb rule-display-noNumbers">No Numbers, No Flags, Time Bomb</div>';
+                 else if(enableNoFlags) rulesHtml = '<div class="rule-display-noFlags rule-display-noNumbers">No Numbers, No Flags</div>';
+                 else if(enableTimeBomb) rulesHtml = '<div class="rule-display-timeBomb rule-display-noNumbers">No Numbers, Time Bomb</div>';
+                 else rulesHtml = '<div class="rule-display-noNumbers">No Numbers</div>'; // Only No Numbers
 
-            } else if (!rulesHtml) { // Fallback if only NoFlags is active
-                rulesHtml = '<div class="rule-display-noFlags">No Flags</div>';
-
+            } else if (!rulesHtml) { // Fallback if only NoFlags/Timebomb active
+                 if (enableNoFlags && enableTimeBomb) rulesHtml = '<div class="rule-display-noFlags rule-display-timeBomb">No Flags, Time Bomb</div>';
+                 else if(enableNoFlags) rulesHtml = '<div class="rule-display-noFlags">No Flags</div>';
+                 else if(enableTimeBomb) rulesHtml = '<div class="rule-display-timeBomb">Time Bomb Mode</div>';
+                 else rulesHtml = '<div>Standard Rules</div>'; // Should not happen if logic above is correct
             }
 
 
@@ -1004,6 +1055,8 @@
 
             elapsedMilliseconds = 0;
 
+            remainingMilliseconds = 0; // Reset remaining time
+            timeLimitMilliseconds = 0; // Reset time limit
             startTime = 0;
 
             gameStarted = false;
@@ -1012,7 +1065,7 @@
 
             switchMode('dig');
 
-            updateTimerDisplay();
+            updateTimerDisplay(); // Reset display to 00.00 or initial time limit
 
             messageBox.textContent = '';
 
@@ -1020,6 +1073,8 @@
             body.classList.remove('game-over');
 
             body.style.backgroundColor = '';
+            // Remove blinking class if present
+            timerSpan.classList.remove('blinking');
 
             setTimeout(createBoard, 50);
 
@@ -1035,6 +1090,18 @@
             revealedNonMineCount = 0;
 
             boardElement.innerHTML = '';
+
+            // ★ Set up time bomb if enabled ★
+            if (enableTimeBomb) {
+                // Random time between 3:00 (180000ms) and 10:00 (600000ms)
+                timeLimitMilliseconds = Math.floor(Math.random() * (600000 - 180000 + 1)) + 180000;
+
+                remainingMilliseconds = timeLimitMilliseconds;
+
+            } else {
+                elapsedMilliseconds = 0; // Ensure elapsed time starts at 0 for normal mode
+
+            }
 
             for (let i = 0; i < gridSize; i++) {
                 board[i] = [];
@@ -1105,7 +1172,40 @@
             updateNoFlagsUI();
             detectTouch();
 
+            // ★ Trigger start animation after a short delay ★
+            if (enableTimeBomb) {
+                 // Hide normal timer initially
+                 timerSpan.parentElement.classList.add('hide-during-intro');
+                 setTimeout(startTimerAnimation, 100); // Delay slightly to allow rendering
+            } else {
+                 // Ensure normal timer is visible if time bomb is off
+                 timerSpan.parentElement.classList.remove('hide-during-intro');
+                 updateTimerDisplay(); // Display initial 00.00 for normal mode
+            }
+
         }
+
+        // ★★★ Timer Start Animation Function ★★★
+        function startTimerAnimation() {
+             const minutes = Math.floor(timeLimitMilliseconds / 60000);
+             const seconds = Math.floor((timeLimitMilliseconds % 60000) / 1000);
+             timerStartDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+             timerStartDisplay.classList.add('visible'); // Make it appear
+
+             // After a short display, trigger the move animation
+             setTimeout(() => {
+                 timerStartDisplay.classList.add('move-to-corner');
+             }, 1200); // Display large timer for 1.2 seconds
+
+             // After animation duration, hide the large display and show the real timer
+             setTimeout(() => {
+                 timerStartDisplay.classList.remove('visible', 'move-to-corner');
+                 timerSpan.parentElement.classList.remove('hide-during-intro'); // Show normal timer
+                 // Timer interval will start on first interaction (handleSquareInteraction)
+                 updateTimerDisplay(); // Update display with remaining time
+             }, 1200 + 800); // 1.2s display + 0.8s animation
+        }
+
 
         function plantMines() {
              let minesPlanted = 0;
@@ -1454,11 +1554,16 @@
 
              }
 
+             // Start timer on first interaction
              if (!gameStarted) {
                  gameStarted = true;
 
                  startTime = Date.now();
 
+                 // ★ Start appropriate timer ★
+                 if (!enableTimeBomb) {
+                     elapsedMilliseconds = 0; // Reset elapsed for normal mode
+                 }
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
 
              }
@@ -1499,6 +1604,10 @@
 
                  startTime = Date.now();
 
+                 // Start appropriate timer
+                 if (!enableTimeBomb) {
+                     elapsedMilliseconds = 0;
+                 }
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
 
              }
@@ -1579,6 +1688,7 @@
             el.className = 'square';
 
             el.textContent = '';
+            el.innerHTML = ''; // Clear innerHTML as well
 
             el.style.fontSize = ''; // Reset font size
 
@@ -1647,7 +1757,6 @@
         }
 
         function updateMinesLeftDisplay() {
-             // Hide mine count display if No Flags mode is active
              messageBox.style.visibility = enableNoFlags ? 'hidden' : 'visible';
 
              if (!enableNoFlags) {
@@ -1657,9 +1766,11 @@
         }
 
         function checkWinCondition() {
+            // Win condition is met if all non-mine squares are revealed
             const totalNonMine = gridSize * gridSize - numMines;
 
             if (revealedNonMineCount >= totalNonMine) {
+                // Double check just to be sure (especially after debug buttons)
                 let allRevealed = true;
 
                 for(let i=0; i<gridSize; i++){
@@ -1676,26 +1787,38 @@
 
                     }
                 }
-                endGame(true);
+                // If time bomb is active, still need time left
+                if (enableTimeBomb && remainingMilliseconds <= 0) {
+                    // Allow win check to pass but endGame will handle time up
+                    return;
+                }
+
+                endGame(true); // Trigger win
 
             }
         }
 
         function endGame(isWin) {
-             if(gameOver) {
+             if(gameOver) { // Prevent multiple calls
                  return;
 
              }
-             gameOver = true;
+             gameOver = true; // Set game over flag immediately
 
-             clearInterval(timerInterval);
+             clearInterval(timerInterval); // Stop the timer
 
+             // Calculate final time if game had started
              if(gameStarted) {
-                 elapsedMilliseconds = Date.now() - startTime;
+                 // For normal mode, record final elapsed time
+                 // For time bomb mode, remainingMilliseconds is already set (or 0 if time ran out)
+                 if (!enableTimeBomb) {
+                     elapsedMilliseconds = Date.now() - startTime;
 
-                 updateTimerDisplay();
+                 }
+                 updateTimerDisplay(); // Update display one last time
 
              }
+
             if (isWin) {
                 messageBox.textContent = 'Game Clear!';
 
@@ -1719,11 +1842,19 @@
 
                 }
             } else {
-                messageBox.textContent = 'Game Over!';
+                // Only set Game Over message if not already won
+                if (messageBox.textContent !== 'Game Clear!') {
+                    // ★ Check if time bomb caused the game over ★
+                    if (enableTimeBomb && remainingMilliseconds <= 0) {
+                         messageBox.textContent = 'Time Up!';
+                    } else {
+                         messageBox.textContent = 'Game Over!';
+                    }
+                }
 
                 body.classList.add('game-over'); // Use class for game over red
 
-                revealAllMines(true);
+                revealAllMines(true); // Show results
 
             }
         }
@@ -1763,37 +1894,61 @@
             }
         }
 
+        // --- Timer Functions ---
         function updateTimer() {
             if (!gameStarted || gameOver) {
                 return;
 
             }
-            elapsedMilliseconds = Date.now() - startTime;
 
-            updateTimerDisplay();
+            if (enableTimeBomb) {
+                remainingMilliseconds -= timerUpdateInterval;
 
+                if (remainingMilliseconds <= 0) {
+                    remainingMilliseconds = 0; // Clamp at 0
+                    updateTimerDisplay(); // Show 00.00
+                    clearInterval(timerInterval); // Stop timer
+                    if (!gameOver) { // Prevent double game over calls
+                        endGame(false); // Time's up!
+                    }
+                } else {
+                     updateTimerDisplay();
+                }
+            } else {
+                elapsedMilliseconds = Date.now() - startTime;
+
+                updateTimerDisplay();
+
+            }
         }
 
         function updateTimerDisplay() {
             let formattedTime;
+            const timeToDisplay = enableTimeBomb ? remainingMilliseconds : elapsedMilliseconds;
+            const displayMillis = Math.max(0, timeToDisplay); // Ensure non-negative
 
-            const displayMillis = Math.max(0, elapsedMilliseconds);
+            // Blinking logic for Time Bomb mode
+            if (enableTimeBomb && displayMillis < 60000 && displayMillis > 0) { // Under 1 minute and not exactly 0
+                timerSpan.classList.add('blinking');
+            } else {
+                timerSpan.classList.remove('blinking');
+            }
 
-            if (displayMillis < 60000) {
+            if (displayMillis < 60000) { // Less than 1 minute
                 const s = Math.floor(displayMillis / 1000);
 
                 const cs = Math.floor((displayMillis % 1000) / 10);
 
                 formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
 
-            } else if (displayMillis < 3600000) {
+            } else if (displayMillis < 3600000) { // Less than 1 hour
                 const m = Math.floor(displayMillis / 60000);
 
                 const s = Math.floor((displayMillis % 60000) / 1000);
 
                 formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-            } else {
+            } else { // 1 hour or more
                 const h = Math.floor(displayMillis / 3600000);
 
                 const m = Math.floor((displayMillis % 3600000) / 60000);
@@ -1803,10 +1958,11 @@
                 formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
             }
-            timerDisplay.textContent = formattedTime;
+            timerSpan.textContent = formattedTime; // Update the span inside the timer div
 
         }
 
+        // --- Debug Functions ---
         function revealNonMines() {
             if (gameOver) {
                 return;
@@ -1816,7 +1972,7 @@
                  gameStarted = true;
 
                  startTime = Date.now();
-
+                 if (!enableTimeBomb) elapsedMilliseconds = 0;
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
 
              }
@@ -1828,14 +1984,15 @@
                     }
                 }
             }
-             checkWinCondition();
+             checkWinCondition(); // This should trigger win if successful
 
-             messageBox.textContent = 'All squares revealed!';
+             messageBox.textContent = 'All squares revealed!'; // Override message regardless
 
+             // Ensure game is ended if checkWinCondition didn't already
              if (!gameOver) {
                  endGame(true);
 
-                 messageBox.textContent = 'All squares revealed!';
+                 messageBox.textContent = 'All squares revealed!'; // Re-apply override if needed
 
              }
         }
@@ -1849,14 +2006,14 @@
                  gameStarted = true;
 
                  startTime = Date.now();
-
+                 if (!enableTimeBomb) elapsedMilliseconds = 0;
                  timerInterval = setInterval(updateTimer, timerUpdateInterval);
 
              }
              revealAllMines(true);
 
              if (!gameOver) {
-                 endGame(false);
+                 endGame(false); // Force game over state
 
              }
              messageBox.textContent = 'All squares revealed!';
