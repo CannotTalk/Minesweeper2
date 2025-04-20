@@ -226,58 +226,26 @@
 
          /* Timer Start Animation Styles */
         #timer-start-display {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(2); /* Start larger and centered */
-            font-size: 48px; /* Large font */
-            font-family: 'Press Start 2P', cursive;
-            color: #DC143C; /* Use Crimson for timer text */
-            /* background-color: rgba(255, 255, 255, 0.8); /* Removed background */
-            /* padding: 10px 20px; /* Removed padding */
-            border-radius: 5px;
-            z-index: 101; /* Above popup overlay */
-            opacity: 0; /* Start hidden */
-            pointer-events: none; /* Don't block clicks */
-             /* ★ Animation duration halved to 0.4s ★ */
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(2);
+            font-size: 48px; font-family: 'Press Start 2P', cursive; color: #DC143C;
+            /* Removed background and padding */
+            border-radius: 5px; z-index: 101; opacity: 0; pointer-events: none;
             transition: transform 0.4s ease-out, opacity 0.4s ease-out, top 0.4s ease-out, left 0.4s ease-out, font-size 0.4s ease-out, color 0.4s ease-out;
-            animation: start-blink 1s infinite; /* ★ Add blinking animation ★ */
+            animation: start-blink 1s infinite; /* Use separate animation for blink */
         }
-        #timer-start-display.visible {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1); /* Fade in and normal size */
-        }
-        #timer-start-display.move-to-corner {
-            top: 25px; /* Approximate final top position */
-            left: 50%; /* Center horizontally first */
-            transform: translateX(-50%) scale(0.6); /* Move towards corner and shrink */
-            font-size: 14px; /* Final font size */
-            opacity: 0; /* Fade out */
-            color: #333; /* Fade to normal timer color */
-            animation: none; /* Stop blinking during move */
-        }
-        .timer.hide-during-intro { /* Class to hide normal timer during intro */
-            visibility: hidden;
-        }
+        #timer-start-display.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #timer-start-display.move-to-corner { top: 25px; left: 50%; transform: translateX(-50%) scale(0.6); font-size: 14px; opacity: 0; color: #333; animation: none; }
+        .timer.hide-during-intro { visibility: hidden; }
 
-        /* ★ Keyframes for start blinking ★ */
         @keyframes start-blink {
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0.5; }
         }
 
-        /* ★ Style to disable interactions during intro ★ */
-        body.timer-intro-active * {
-            pointer-events: none !important; /* Disable clicks/taps on all elements */
-        }
-        /* Allow interaction only on the popup if it's somehow open */
+        body.timer-intro-active * { pointer-events: none !important; }
         body.timer-intro-active #rules-popup,
-        body.timer-intro-active #popup-overlay {
-            pointer-events: auto !important;
-        }
-         body.timer-intro-active #rules-popup * {
-             pointer-events: auto !important; /* Allow clicks inside popup */
-         }
+        body.timer-intro-active #popup-overlay { pointer-events: auto !important; }
+         body.timer-intro-active #rules-popup * { pointer-events: auto !important; }
 
     </style>
 </head>
@@ -366,7 +334,7 @@
             </div>
             <div class="setting-section" data-rule-id="timeBomb">
                 <h4>時限爆弾モード (Time Bombs Mode)</h4>
-                <p>制限時間(3分～8分)以内にクリアしないとゲームオーバーになります。</p> <!-- Updated time range -->
+                <p>制限時間(3分～8分)以内にクリアしないとゲームオーバーになります。</p>
                 <div class="setting-label">
                     <span>有効</span>
                     <div>
@@ -1220,7 +1188,10 @@
              const minutes = Math.floor(timeLimitMilliseconds / 60000);
              const seconds = Math.floor((timeLimitMilliseconds % 60000) / 1000);
              timerStartDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-             timerStartDisplay.classList.add('visible'); // Make it appear
+
+             // Make visible and start blinking/scaling
+             timerStartDisplay.style.animation = 'start-blink 1s infinite'; // Start blinking
+             timerStartDisplay.classList.add('visible');
              body.classList.add('timer-intro-active'); // Disable interactions
 
              // After a short display, trigger the move animation
@@ -1230,11 +1201,12 @@
 
              // After animation duration, hide the large display and show the real timer
              setTimeout(() => {
-                 timerStartDisplay.classList.remove('visible', 'move-to-corner');
+                 timerStartDisplay.classList.remove('visible', 'move-to-corner'); // Ensure removal
+                 timerStartDisplay.style.animation = 'none'; // Stop blinking animation
                  timerContainer.classList.remove('hide-during-intro'); // Show normal timer
                  body.classList.remove('timer-intro-active'); // Enable interactions
                  updateTimerDisplay(); // Update display with remaining time just in case
-             }, 1200 + 400); // 1.2s display + 0.4s animation (halved duration)
+             }, 1200 + 400); // 1.2s display + 0.4s animation
         }
 
 
