@@ -134,7 +134,7 @@
         #active-rules-display .rule-display-noFlags {}
         #active-rules-display .rule-display-standard {}
         #active-rules-display .rule-display-timeBomb { color: #DC143C; }
-        #active-rules-display .rule-display-gameOverOnTimeOnly { color: #8B4513; } /* Added style */
+        #active-rules-display .rule-display-gameOverOnTimeOnly { color: #8B4513; }
 
 
         .timer {
@@ -283,13 +283,12 @@
             font-weight: bold;
         }
         .time-input-group input[type="number"] {
-            width: 45px; /* Width for number inputs */
+            width: 40px; /* Adjusted width for number inputs */
             padding: 4px;
             font-size: 12px;
             font-family: sans-serif;
             border: 1px solid #ccc;
             border-radius: 3px;
-            margin-right: 2px; /* Space before unit */
             text-align: right;
             /* Hide spinner buttons for cleaner look */
             -moz-appearance: textfield;
@@ -300,12 +299,14 @@
             -webkit-appearance: none;
             margin: 0;
         }
-        .time-input-group .time-unit {
-            font-size: 11px;
+        /* Style for the colon separator */
+        .time-input-group span.colon {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0 3px;
             font-family: sans-serif;
-            margin-right: 8px; /* Space between units */
-            line-height: 1; /* Align unit with input */
         }
+
 
         #time-bomb-random-switch-label,
         #game-over-on-time-only-label { /* Style for labels next to switches */
@@ -321,7 +322,7 @@
             display: block; /* Ensure note appears below input */
             font-size: 10px;
             color: #666;
-            margin-top: 2px;
+            margin-top: 4px; /* Increased margin */
             font-family: sans-serif;
             text-align: center; /* Center the note */
         }
@@ -439,26 +440,26 @@
                      <div id="time-bomb-random-settings" class="hidden-setting">
                          <div class="time-input-group">
                              <label for="time-bomb-min-hours">最小時間:</label>
-                             <input type="number" id="time-bomb-min-hours" min="0" step="1" value="0";><span class="time-unit">時間</span>
-                             <input type="number" id="time-bomb-min-minutes" min="0" max="59" step="1" value="3";><span class="time-unit">分</span>
-                             <input type="number" id="time-bomb-min-seconds" min="0" max="59" step="1" value="0";><span class="time-unit">秒</span>
+                             <input type="number" id="time-bomb-min-hours" min="0" step="1" value="0";><span class="colon">:</span>
+                             <input type="number" id="time-bomb-min-minutes" min="0" max="59" step="1" value="3";><span class="colon">:</span>
+                             <input type="number" id="time-bomb-min-seconds" min="0" max="59" step="1" value="0";>
                          </div>
                          <div class="time-input-group">
                              <label for="time-bomb-max-hours">最大時間:</label>
-                             <input type="number" id="time-bomb-max-hours" min="0" step="1" value="0";><span class="time-unit">時間</span>
-                             <input type="number" id="time-bomb-max-minutes" min="0" max="59" step="1" value="8";><span class="time-unit">分</span>
-                             <input type="number" id="time-bomb-max-seconds" min="0" max="59" step="1" value="0";><span class="time-unit">秒</span>
+                             <input type="number" id="time-bomb-max-hours" min="0" step="1" value="0";><span class="colon">:</span>
+                             <input type="number" id="time-bomb-max-minutes" min="0" max="59" step="1" value="8";><span class="colon">:</span>
+                             <input type="number" id="time-bomb-max-seconds" min="0" max="59" step="1" value="0";>
                          </div>
-                         <span class="time-setting-note">(例: 0時間3分0秒 ～ 0時間8分0秒)</span>
+                         <span class="time-setting-note">(HH:MM:SS 形式)</span>
                      </div>
                      <div id="time-bomb-fixed-settings" class="hidden-setting">
                          <div class="time-input-group">
                              <label for="time-bomb-fixed-hours">時間設定:</label>
-                             <input type="number" id="time-bomb-fixed-hours" min="0" step="1" value="0";><span class="time-unit">時間</span>
-                             <input type="number" id="time-bomb-fixed-minutes" min="0" max="59" step="1" value="5";><span class="time-unit">分</span>
-                             <input type="number" id="time-bomb-fixed-seconds" min="0" max="59" step="1" value="0";><span class="time-unit">秒</span>
+                             <input type="number" id="time-bomb-fixed-hours" min="0" step="1" value="0";><span class="colon">:</span>
+                             <input type="number" id="time-bomb-fixed-minutes" min="0" max="59" step="1" value="5";><span class="colon">:</span>
+                             <input type="number" id="time-bomb-fixed-seconds" min="0" max="59" step="1" value="0";>
                           </div>
-                          <span class="time-setting-note">(例: 0時間5分0秒)</span>
+                          <span class="time-setting-note">(HH:MM:SS 形式)</span>
                      </div>
                      <div id="game-over-on-time-only-label">
                          <span>時間切れでのみゲームオーバー</span>
@@ -467,7 +468,7 @@
                               <span class="slider round"></span>
                          </label>
                      </div>
-                     <p style="font-size:10px; margin-top: 0; text-align: center;">有効時、地雷を踏むとペナルティ(10秒)が課されます。</p>
+                     <p style="font-size:10px; margin-top: 0; text-align: center;">有効時、地雷を踏むとペナルティ(15秒)が課されます。</p>
                 </div>
             </div>
 
@@ -584,7 +585,7 @@
     <script>
         // --- Constants ---
         const gridSize = 15;
-        const MINE_PENALTY_MS = 10000; // Penalty for hitting a mine (10 seconds)
+        const MINE_PENALTY_MS = 15000; // Penalty for hitting a mine (15 seconds)
 
         const defaultSettings = {
              numMines: 30,
@@ -594,7 +595,7 @@
              timeLimitMinMs: 180000, // 0:03:00
              timeLimitMaxMs: 480000, // 0:08:00
              timeLimitFixedMs: 300000, // 0:05:00
-             gameOverOnTimeOnly: false, // New setting default
+             gameOverOnTimeOnly: false,
              enableNumbers: true,
              enableHide: true,
              hideRateMax: 0.10,
@@ -734,13 +735,13 @@
             const hours = Math.floor(totalMinutes / 60);
 
             if (hoursInput) {
-                 hoursInput.value = hours;
+                hoursInput.value = hours;
             }
             if (minutesInput) {
-                 minutesInput.value = minutes;
+                minutesInput.value = minutes;
             }
             if (secondsInput) {
-                 secondsInput.value = seconds;
+                secondsInput.value = seconds;
             }
         }
 
@@ -765,10 +766,10 @@
 
         // --- Initial Setup for Sliders ---
         if (pendingSettings.numMines < 0) {
-             pendingSettings.numMines = 0;
+            pendingSettings.numMines = 0;
         }
         if (pendingSettings.numMines > 225) {
-             pendingSettings.numMines = 225;
+            pendingSettings.numMines = 225;
         }
         mineSlider.value = pendingSettings.numMines;
         mineCountDisplay.textContent = pendingSettings.numMines;
@@ -787,26 +788,23 @@
                 document.body.classList.add('touch-device');
                 pcOperationMode = 'button';
             } else {
-                 document.body.classList.remove('touch-device');
-                 const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
-                 if (currentPcOpRadio) {
-                      currentPcOpRadio.checked = true;
-                 }
-                 else {
-                      pcOperationMode = 'mouse';
-                      document.querySelector('input[name="pc-op-mode"][value="mouse"]').checked = true;
-                 }
-                 document.body.dataset.pcOpMode = pcOperationMode;
+                document.body.classList.remove('touch-device');
+                const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
+                if (currentPcOpRadio) {
+                    currentPcOpRadio.checked = true;
+                } else {
+                    pcOperationMode = 'mouse';
+                    document.querySelector('input[name="pc-op-mode"][value="mouse"]').checked = true;
+                }
+                document.body.dataset.pcOpMode = pcOperationMode;
             }
-             updateModeButtonsVisibility();
+            updateModeButtonsVisibility();
         }
-
 
         function updateModeButtonsVisibility() {
             modeToggleButtonsContainer.classList.toggle('visible', isTouch || pcOperationMode === 'button');
             flagModeButton.disabled = enableNoFlags;
         }
-
 
         // --- Event Listeners ---
         resetButton.addEventListener('click', resetGame);
@@ -818,47 +816,47 @@
 
         // Switches -> Update pendingSettings ONLY
         numberSwitch.addEventListener('change', () => {
-             pendingSettings.enableNumbers = numberSwitch.checked;
+            pendingSettings.enableNumbers = numberSwitch.checked;
         });
         hideSwitch.addEventListener('change', () => {
-             pendingSettings.enableHide = hideSwitch.checked;
-             hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
+            pendingSettings.enableHide = hideSwitch.checked;
+            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
         });
         directionalSwitch.addEventListener('change', () => {
-             pendingSettings.enableDirectional = directionalSwitch.checked;
+            pendingSettings.enableDirectional = directionalSwitch.checked;
         });
         oddEvenSwitch.addEventListener('change', () => {
-             pendingSettings.enableOddEven = oddEvenSwitch.checked;
+            pendingSettings.enableOddEven = oddEvenSwitch.checked;
         });
         areaValueSwitch.addEventListener('change', () => {
-             pendingSettings.enableAreaValue = areaValueSwitch.checked;
+            pendingSettings.enableAreaValue = areaValueSwitch.checked;
         });
         noFlagsSwitch.addEventListener('change', () => {
-             pendingSettings.enableNoFlags = noFlagsSwitch.checked;
+            pendingSettings.enableNoFlags = noFlagsSwitch.checked;
         });
         naturalNumberSwitch.addEventListener('change', () => {
-             pendingSettings.enableNaturalNumber = naturalNumberSwitch.checked;
+            pendingSettings.enableNaturalNumber = naturalNumberSwitch.checked;
         });
         timeBombSwitch.addEventListener('change', () => {
-             pendingSettings.enableTimeBomb = timeBombSwitch.checked;
-             updateTimeBombDetailsVisibility();
+            pendingSettings.enableTimeBomb = timeBombSwitch.checked;
+            updateTimeBombDetailsVisibility();
         });
         timeBombRandomSwitch.addEventListener('change', () => {
-             pendingSettings.timeLimitRandom = timeBombRandomSwitch.checked;
-             updateTimeBombInputVisibility();
+            pendingSettings.timeLimitRandom = timeBombRandomSwitch.checked;
+            updateTimeBombInputVisibility();
         });
         gameOverOnTimeOnlySwitch.addEventListener('change', () => {
-             pendingSettings.gameOverOnTimeOnly = gameOverOnTimeOnlySwitch.checked;
+            pendingSettings.gameOverOnTimeOnly = gameOverOnTimeOnlySwitch.checked;
         });
 
         // Sliders -> Update pendingSettings ONLY
         mineSlider.addEventListener('input', () => {
-             pendingSettings.numMines = parseInt(mineSlider.value, 10);
-             mineCountDisplay.textContent = pendingSettings.numMines;
+            pendingSettings.numMines = parseInt(mineSlider.value, 10);
+            mineCountDisplay.textContent = pendingSettings.numMines;
         });
         hideRateSlider.addEventListener('input', () => {
-             pendingSettings.hideRateMax = parseInt(hideRateSlider.value, 10) / 100;
-             hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+            pendingSettings.hideRateMax = parseInt(hideRateSlider.value, 10) / 100;
+            hideRateDisplay.textContent = `${hideRateSlider.value}%`;
         });
 
         // Mode Buttons
@@ -928,46 +926,42 @@
             }
         });
 
-
         // --- Popup Functions ---
 
         function updateTimeBombDetailsVisibility() {
-             const isEnabled = pendingSettings.enableTimeBomb;
-             timeBombDetails.classList.toggle('hidden-setting', !isEnabled);
-             if (isEnabled) {
-                  updateTimeBombInputVisibility(); // Also update inner visibility
-             }
+            const isEnabled = pendingSettings.enableTimeBomb;
+            timeBombDetails.classList.toggle('hidden-setting', !isEnabled);
+            if (isEnabled) {
+                updateTimeBombInputVisibility(); // Also update inner visibility
+            }
         }
-
 
         function updateTimeBombInputVisibility() {
             // This function assumes timeBombDetails is already visible
             timeBombRandomSettings.classList.toggle('hidden-setting', !pendingSettings.timeLimitRandom);
             timeBombFixedSettings.classList.toggle('hidden-setting', pendingSettings.timeLimitRandom);
-             // The "Game Over on Time Only" switch is always visible if timeBombDetails is visible
+            // The "Game Over on Time Only" switch is always visible if timeBombDetails is visible
         }
-
 
         function openPopup() {
             // Load CURRENT game settings into pendingSettings
-             pendingSettings = {
-                 numMines: numMines,
-                 enableNoFlags: enableNoFlags,
-                 enableTimeBomb: enableTimeBomb,
-                 timeLimitRandom: timeLimitRandom,
-                 timeLimitMinMs: timeLimitMinMs,
-                 timeLimitMaxMs: timeLimitMaxMs,
-                 timeLimitFixedMs: timeLimitFixedMs,
-                 gameOverOnTimeOnly: gameOverOnTimeOnly,
-                 enableNumbers: enableNumbers,
-                 enableHide: enableHide,
-                 hideRateMax: hideRateMax,
-                 enableDirectional: enableDirectional,
-                 enableOddEven: enableOddEven,
-                 enableAreaValue: enableAreaValue,
-                 enableNaturalNumber: enableNaturalNumber
-             };
-
+            pendingSettings = {
+                numMines: numMines,
+                enableNoFlags: enableNoFlags,
+                enableTimeBomb: enableTimeBomb,
+                timeLimitRandom: timeLimitRandom,
+                timeLimitMinMs: timeLimitMinMs,
+                timeLimitMaxMs: timeLimitMaxMs,
+                timeLimitFixedMs: timeLimitFixedMs,
+                gameOverOnTimeOnly: gameOverOnTimeOnly, // Load current setting
+                enableNumbers: enableNumbers,
+                enableHide: enableHide,
+                hideRateMax: hideRateMax,
+                enableDirectional: enableDirectional,
+                enableOddEven: enableOddEven,
+                enableAreaValue: enableAreaValue,
+                enableNaturalNumber: enableNaturalNumber
+            };
 
             // Update standard controls
             mineSlider.value = pendingSettings.numMines;
@@ -975,9 +969,9 @@
             noFlagsSwitch.checked = pendingSettings.enableNoFlags;
             numberSwitch.checked = pendingSettings.enableNumbers;
             hideSwitch.checked = pendingSettings.enableHide;
-            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
             hideRateSlider.value = pendingSettings.hideRateMax * 100;
             hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+            hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
             directionalSwitch.checked = pendingSettings.enableDirectional;
             oddEvenSwitch.checked = pendingSettings.enableOddEven;
             areaValueSwitch.checked = pendingSettings.enableAreaValue;
@@ -986,35 +980,35 @@
             // Update Time Bomb controls
             timeBombSwitch.checked = pendingSettings.enableTimeBomb;
             timeBombRandomSwitch.checked = pendingSettings.timeLimitRandom;
-            gameOverOnTimeOnlySwitch.checked = pendingSettings.gameOverOnTimeOnly;
-            // Populate time inputs
+            // Populate time inputs using formatMsToInputs
             formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
             formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
             formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
+            gameOverOnTimeOnlySwitch.checked = pendingSettings.gameOverOnTimeOnly; // Update new switch
 
+            // Update visibility based on pending settings
             updateTimeBombDetailsVisibility();
 
             // Update PC Op Mode Radio
             const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
             if (currentPcOpRadio) {
-                 currentPcOpRadio.checked = true;
+                currentPcOpRadio.checked = true;
             }
 
+            // Show popup
             rulesPopup.classList.add('visible');
             popupOverlay.classList.add('visible');
         }
-
 
         function closePopup() {
             rulesPopup.classList.remove('visible');
             popupOverlay.classList.remove('visible');
         }
 
-
         function handleResetRule(event) {
             const rule = event.target.dataset.rule;
             if (!rule) {
-                 return;
+                return;
             }
 
             switch (rule) {
@@ -1056,24 +1050,23 @@
                     hideRateDisplay.textContent = `${hideRateSlider.value}%`;
                     break;
                 case 'directional':
-                     pendingSettings.enableDirectional = defaultSettings.enableDirectional;
-                     directionalSwitch.checked = pendingSettings.enableDirectional;
-                     break;
+                    pendingSettings.enableDirectional = defaultSettings.enableDirectional;
+                    directionalSwitch.checked = pendingSettings.enableDirectional;
+                    break;
                 case 'oddEven':
-                     pendingSettings.enableOddEven = defaultSettings.enableOddEven;
-                     oddEvenSwitch.checked = pendingSettings.enableOddEven;
-                     break;
+                    pendingSettings.enableOddEven = defaultSettings.enableOddEven;
+                    oddEvenSwitch.checked = pendingSettings.enableOddEven;
+                    break;
                 case 'areaValue':
-                     pendingSettings.enableAreaValue = defaultSettings.enableAreaValue;
-                     areaValueSwitch.checked = pendingSettings.enableAreaValue;
-                     break;
-                case 'naturalNumber':
-                     pendingSettings.enableNaturalNumber = defaultSettings.enableNaturalNumber;
-                     naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber;
-                     break;
+                    pendingSettings.enableAreaValue = defaultSettings.enableAreaValue;
+                    areaValueSwitch.checked = pendingSettings.enableAreaValue;
+                    break;
+                 case 'naturalNumber':
+                    pendingSettings.enableNaturalNumber = defaultSettings.enableNaturalNumber;
+                    naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber;
+                    break;
             }
         }
-
 
         function saveSettingsAndReset() {
             // Re-read and validate time inputs before saving
@@ -1101,7 +1094,6 @@
             closePopup();
         }
 
-
         function handlePcOperationModeChange(event) {
              pcOperationMode = event.target.value;
              document.body.dataset.pcOpMode = pcOperationMode;
@@ -1109,65 +1101,60 @@
              switchMode('dig');
         }
 
-
         function switchMode(newMode) {
             if ((enableNoFlags && newMode === 'flag') || newMode === currentInteractionMode) {
-                 return;
+                return;
             }
             currentInteractionMode = newMode;
             digModeButton.classList.toggle('active', newMode === 'dig');
             flagModeButton.classList.toggle('active', newMode === 'flag');
         }
 
-
         function updateActiveRulesDisplay() {
             let rulesHtml = '';
             if (enableNoFlags) {
-                 rulesHtml += `<div class="rule-display-noFlags">No Flags</div>`;
+                rulesHtml += `<div class="rule-display-noFlags">No Flags</div>`;
             }
             if (enableTimeBomb) {
-                 let timeDesc = timeLimitRandom
-                     ? `${formatMsToDisplayTime(timeLimitMinMs, true)}-${formatMsToDisplayTime(timeLimitMaxMs, true)} Random`
-                     : `${formatMsToDisplayTime(timeLimitFixedMs, true)} Fixed`;
+                 // Display the actual time limit set for the current game
+                 const timeDesc = formatMsToDisplayTime(timeLimitMilliseconds, true); // Always include hours if present
                  rulesHtml += `<div class="rule-display-timeBomb">Time Bomb (${timeDesc})</div>`;
                  if (gameOverOnTimeOnly) {
-                      rulesHtml += `<div class="rule-display-gameOverOnTimeOnly">Game Over on Time Only</div>`;
+                     rulesHtml += `<div class="rule-display-gameOverOnTimeOnly">Game Over on Time Only</div>`;
                  }
             }
             if (!enableNumbers) {
-                 rulesHtml += `<div class="rule-display-noNumbers">No Numbers</div>`;
+                rulesHtml += `<div class="rule-display-noNumbers">No Numbers</div>`;
             }
             if (enableHide) {
-                 rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
+                rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
             }
             if (enableDirectional) {
-                 rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`;
+                rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`;
             }
             if (enableOddEven) {
-                 rulesHtml += `<div class="rule-display-oddEven">OddEven Squares</div>`;
+                rulesHtml += `<div class="rule-display-oddEven">OddEven Squares</div>`;
             }
             if (enableAreaValue) {
-                 rulesHtml += `<div class="rule-display-areaValue">Range Value Squares</div>`;
+                rulesHtml += `<div class="rule-display-areaValue">Range Value Squares</div>`;
             }
             if (enableNaturalNumber) {
-                 rulesHtml += `<div class="rule-display-naturalNumber">Natural Number Squares</div>`;
+                rulesHtml += `<div class="rule-display-naturalNumber">Natural Number Squares</div>`;
             }
             if (!rulesHtml) {
-                 rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
+                rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
             }
             activeRulesDisplay.innerHTML = rulesHtml;
         }
-
 
         function updateNoFlagsUI() {
             body.setAttribute('data-flags-enabled', !enableNoFlags);
             flagModeButton.disabled = enableNoFlags;
             if (enableNoFlags && currentInteractionMode === 'flag') {
-                 switchMode('dig');
+                switchMode('dig');
             }
             updateModeButtonsVisibility();
         }
-
 
         // --- Game Logic Functions ---
 
@@ -1177,7 +1164,7 @@
             timerInterval = null;
             elapsedMilliseconds = 0;
             remainingMilliseconds = 0;
-            timeLimitMilliseconds = 0;
+            timeLimitMilliseconds = 0; // Reset determined time limit
             startTime = 0;
             gameStarted = false;
             revealedNonMineCount = 0;
@@ -1194,11 +1181,13 @@
             timerStartDisplay.style.animation = 'none';
 
             updateTimerDisplay();
+            // Update active rules *after* potentially resetting timeLimitMilliseconds
+            // But createBoard will set the *actual* limit, so update again there?
+            // Let's update here first for initial view, then createBoard updates based on actual random time if needed.
             updateActiveRulesDisplay();
             updateNoFlagsUI();
             setTimeout(createBoard, 50);
         }
-
 
         function createBoard() {
             board = [];
@@ -1208,53 +1197,56 @@
             boardElement.innerHTML = '';
 
             if (enableTimeBomb) {
+                 // Set the actual time limit for this game instance
                  timeLimitMilliseconds = timeLimitRandom
-                     ? Math.floor(Math.random() * (Math.max(0, timeLimitMaxMs) - Math.max(0, timeLimitMinMs) + 1)) + Math.max(0, timeLimitMinMs) // Corrected random range logic
+                     ? Math.floor(Math.random() * (Math.max(0, timeLimitMaxMs) - Math.max(0, timeLimitMinMs) + 1)) + Math.max(0, timeLimitMinMs)
                      : Math.max(1000, timeLimitFixedMs);
                  remainingMilliseconds = timeLimitMilliseconds;
             } else {
                 timeLimitMilliseconds = 0;
                 elapsedMilliseconds = 0;
             }
+            // Update display and rules *after* timeLimitMilliseconds is determined
             updateTimerDisplay();
+            updateActiveRulesDisplay(); // Reflect the actual time limit
 
             for (let i = 0; i < gridSize; i++) {
-                 board[i] = [];
-                 for (let j = 0; j < gridSize; j++) {
-                      board[i][j] = {
-                           isMine: false, isRevealed: false, isFlagged: false, adjacentMines: 0,
-                           isHide: false, isOddEven: false, isAreaValue: false, isDirectional: false, isNaturalNumber: false,
-                           oddEvenValue: null, areaValue: null, direction: null, directionalCount: null, directionalSymbol: null, naturalNumberValue: null,
-                           element: document.createElement('div')
-                      };
-                      const sq = board[i][j];
-                      const el = sq.element;
-                      el.classList.add('square', 'hidden');
-                      el.dataset.row = i;
-                      el.dataset.col = j;
-                      el.addEventListener('click', () => handleSquareInteraction(i, j));
-                      el.addEventListener('contextmenu', (e) => {
-                           e.preventDefault();
-                           if (!isTouch && pcOperationMode === 'mouse' && !enableNoFlags && !gameOver) {
+                board[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    board[i][j] = {
+                        isMine: false, isRevealed: false, isFlagged: false, adjacentMines: 0,
+                        isHide: false, isOddEven: false, isAreaValue: false, isDirectional: false, isNaturalNumber: false,
+                        oddEvenValue: null, areaValue: null, direction: null, directionalCount: null, directionalSymbol: null, naturalNumberValue: null,
+                        element: document.createElement('div')
+                    };
+                    const sq = board[i][j];
+                    const el = sq.element;
+                    el.classList.add('square', 'hidden');
+                    el.dataset.row = i;
+                    el.dataset.col = j;
+                    el.addEventListener('click', () => handleSquareInteraction(i, j));
+                    el.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        if (!isTouch && pcOperationMode === 'mouse' && !enableNoFlags && !gameOver) {
+                            handleFlagAction(i, j);
+                        }
+                    });
+                    let pt; // pressTimer
+                    el.addEventListener('touchstart', (e) => {
+                        if (isTouch && !enableNoFlags && !gameOver) {
+                            clearTimeout(pt);
+                            pt = setTimeout(() => {
+                                e.preventDefault();
                                 handleFlagAction(i, j);
-                           }
-                      });
-                      let pt; // pressTimer
-                      el.addEventListener('touchstart', (e) => {
-                           if (isTouch && !enableNoFlags && !gameOver) {
-                                clearTimeout(pt);
-                                pt = setTimeout(() => {
-                                     e.preventDefault();
-                                     handleFlagAction(i, j);
-                                     justFlagged = true;
-                                     setTimeout(() => { justFlagged = false; }, 50);
-                                }, 500);
-                           }
-                      }, { passive: false });
-                      el.addEventListener('touchend', () => clearTimeout(pt));
-                      el.addEventListener('touchmove', () => clearTimeout(pt));
-                      boardElement.appendChild(el);
-                 }
+                                justFlagged = true;
+                                setTimeout(() => { justFlagged = false; }, 50);
+                            }, 500);
+                        }
+                    }, { passive: false });
+                    el.addEventListener('touchend', () => clearTimeout(pt));
+                    el.addEventListener('touchmove', () => clearTimeout(pt));
+                    boardElement.appendChild(el);
+                }
             }
 
             plantMines();
@@ -1263,46 +1255,43 @@
             updateMinesLeftDisplay();
 
             if (enableTimeBomb && timeLimitMilliseconds > 0) {
-                 timerContainer.classList.add('hide-during-intro');
-                 setTimeout(startTimerAnimation, 100);
-            }
-            else {
-                 timerContainer.classList.remove('hide-during-intro');
-                 updateTimerDisplay();
+                timerContainer.classList.add('hide-during-intro');
+                setTimeout(startTimerAnimation, 100);
+            } else {
+                timerContainer.classList.remove('hide-during-intro');
+                updateTimerDisplay();
             }
             detectTouch();
         }
 
-
         function startTimerAnimation() {
-             if (!enableTimeBomb || timeLimitMilliseconds <= 0) {
-                  return;
-             }
+            if (!enableTimeBomb || timeLimitMilliseconds <= 0) {
+                return;
+            }
 
-             // Format time, include hours if >= 60 mins (use true for force)
-             const includeHours = timeLimitMilliseconds >= 3600000;
-             timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, true); // Always use HH:MM:SS format for consistency here
+            // Determine display format based on duration
+            const includeHours = timeLimitMilliseconds >= 3600000; // 60 minutes
+            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours); // Pass flag
 
-             timerStartDisplay.style.animation = 'start-blink 1s infinite'; // Black blink
-             timerStartDisplay.classList.add('visible');
-             body.classList.add('timer-intro-active');
+            timerStartDisplay.style.animation = 'start-blink 1s infinite'; // Black blink
+            timerStartDisplay.classList.add('visible');
+            body.classList.add('timer-intro-active');
 
-             setTimeout(() => {
-                  if (body.classList.contains('timer-intro-active')) {
-                       timerStartDisplay.classList.add('move-to-corner');
-                  }
-             }, 1200);
-             setTimeout(() => {
-                  if (body.classList.contains('timer-intro-active')) {
-                       timerStartDisplay.classList.remove('visible', 'move-to-corner');
-                       timerStartDisplay.style.animation = 'none';
-                       timerContainer.classList.remove('hide-during-intro');
-                       body.classList.remove('timer-intro-active');
-                       updateTimerDisplay();
-                  }
-             }, 1600); // 1.2s display + 0.4s animation
+            setTimeout(() => {
+                if (body.classList.contains('timer-intro-active')) {
+                    timerStartDisplay.classList.add('move-to-corner');
+                }
+            }, 1200);
+            setTimeout(() => {
+                if (body.classList.contains('timer-intro-active')) {
+                    timerStartDisplay.classList.remove('visible', 'move-to-corner');
+                    timerStartDisplay.style.animation = 'none';
+                    timerContainer.classList.remove('hide-during-intro');
+                    body.classList.remove('timer-intro-active');
+                    updateTimerDisplay();
+                }
+            }, 1600); // 1.2s display + 0.4s animation
         }
-
 
         function plantMines() {
              let minesPlanted = 0;
@@ -1331,7 +1320,6 @@
              }
         }
 
-
         function calculateAdjacentMines() {
              for (let i = 0; i < gridSize; i++) {
                   for (let j = 0; j < gridSize; j++) {
@@ -1342,9 +1330,7 @@
                        let count = 0;
                        for (let x = -1; x <= 1; x++) {
                             for (let y = -1; y <= 1; y++) {
-                                 if (x === 0 && y === 0) {
-                                      continue;
-                                 }
+                                 if (x === 0 && y === 0) continue;
                                  const ni = i + x;
                                  const nj = j + y;
                                  if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.isMine) {
@@ -1357,329 +1343,179 @@
              }
         }
 
-
         function countMinesInDirection(r, c, dx, dy) {
              let count = 0;
              let cr = r + dx;
              let cc = c + dy;
              while (cr >= 0 && cr < gridSize && cc >= 0 && cc < gridSize) {
-                  if (board[cr][cc]?.isMine) {
-                       count++;
-                  }
+                  if (board[cr][cc]?.isMine) count++;
                   cr += dx;
                   cc += dy;
              }
              return count;
         }
 
-
         function hasNeighborOfType(r, c, key) {
              for (let x = -1; x <= 1; x++) {
                   for (let y = -1; y <= 1; y++) {
-                       if (x === 0 && y === 0) {
-                            continue;
-                       }
+                       if (x === 0 && y === 0) continue;
                        const ni = r + x;
                        const nj = c + y;
-                       if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) {
-                            return true;
-                       }
+                       if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && board[ni][nj]?.[key]) return true;
                   }
              }
              return false;
         }
 
-
         function calculateNaturalNumberValue(n) {
              const p=[2,3,5,7];
-             if(p.includes(n)) {
-                  return n.toString();
-             }
+             if(p.includes(n)) return n.toString();
              switch(n){
-                  case 0: return "?";
-                  case 1: return "-1";
-                  case 4: return "±1";
-                  case 6: return "±1";
-                  case 8: return "+1";
-                  default: return "?";
+                  case 0: return "?"; case 1: return "-1"; case 4: return "±1";
+                  case 6: return "±1"; case 8: return "+1"; default: return "?";
              }
         }
-
 
         function applySpecialSquares() {
-             const pot = [];
-             for(let i=0; i<gridSize; i++){
-                  for(let j=0; j<gridSize; j++){
-                       const s=board[i][j];
-                       s.isHide=s.isOddEven=s.isAreaValue=s.isDirectional=s.isNaturalNumber=false;
-                       s.oddEvenValue=s.areaValue=s.direction=s.directionalCount=s.directionalSymbol=s.naturalNumberValue=null;
-                       if(!s.isMine && s.adjacentMines>0) {
-                            pot.push({r:i, c:j});
-                       }
-                  }
-             }
-             pot.sort(()=>Math.random()-0.5);
-             const assigned=new Set();
-             const numPot=pot.length;
-             const baseDirs=[{dx:-1, dy:0, s:'T', n:'up'}, {dx:1, dy:0, s:'B', n:'down'}, {dx:0, dy:-1, s:'L', n:'left'}, {dx:0, dy:1, s:'R', n:'right'}];
-             function hasDirChain(r, c, dx, dy){
-                  let cr=r+dx;
-                  let cc=c+dy;
-                  while(cr>=0 && cr<gridSize && cc>=0 && cc<gridSize){
-                       if(board[cr][cc]?.isDirectional && board[cr][cc].direction?.dx===dx && board[cr][cc].direction?.dy===dy) {
-                            return true;
-                       }
-                       cr+=dx;
-                       cc+=dy;
-                  }
-                  return false;
-             }
-             function getValidDirs(r, c){
-                  return baseDirs.filter(d=>{
-                       const nr=r+d.dx;
-                       const nc=c+d.dy;
-                       return nr>=0 && nr<gridSize && nc>=0 && nc<gridSize;
-                  });
-             }
-             const order=[
-                  {t:'directional', e:enableDirectional, r:maxDirectionalRate, c:(s,r,c)=>!hasNeighborOfType(r,c,'isDirectional')},
-                  {t:'areaValue', e:enableAreaValue, r:maxAreaValueRate, c:(s,r,c)=>!hasNeighborOfType(r,c,'isAreaValue')},
-                  {t:'oddEven', e:enableOddEven, r:maxOddEvenRate, c:(s,r,c)=>s.adjacentMines>1 && !hasNeighborOfType(r,c,'isOddEven')},
-                  {t:'naturalNumber', e:enableNaturalNumber, r:maxNaturalNumberRate, c:(s,r,c)=>!hasNeighborOfType(r,c,'isNaturalNumber')},
-                  {t:'hide', e:enableHide, r:hideRateMax, c:()=>true}
-             ];
-             if(!enableNumbers){ // Numbers OFF: Apply deterministically
-                  for(const rule of order){
-                       if(rule.e && rule.t!=='hide'){
-                            for(const{r,c}of pot){
-                                 const k=`${r}-${c}`;
-                                 const s=board[r][c];
-                                 if(!assigned.has(k) && rule.c(s,r,c)){
-                                      let app=false; // applied flag
-                                      if(rule.t==='directional'){
-                                           const vDirs=getValidDirs(r,c);
-                                           if(vDirs.length>0){
-                                                const shDirs=[...vDirs].sort(()=>Math.random()-0.5);
-                                                for(const d of shDirs){
-                                                     if(!hasDirChain(r,c,d.dx,d.dy)){
-                                                          const ct=countMinesInDirection(r,c,d.dx,d.dy);
-                                                          s.isDirectional=true; s.isHide=true;
-                                                          s.direction={dx:d.dx, dy:d.dy, name:d.n};
-                                                          s.directionalCount=ct; s.directionalSymbol=d.s;
-                                                          app=true; break;
-                                                     }
-                                                }
-                                           }
-                                      } else if(rule.t==='areaValue'){
-                                           s.isAreaValue=true; s.isHide=true;
-                                           if(s.adjacentMines<=3) s.areaValue='~3';
-                                           else if(s.adjacentMines<=6) s.areaValue='4~6';
-                                           else s.areaValue='7~';
-                                           app=true;
-                                      } else if(rule.t==='oddEven'){
-                                           s.isOddEven=true; s.isHide=true;
-                                           s.oddEvenValue=s.adjacentMines%2===0 ? 'Ev' : 'Od';
-                                           app=true;
-                                      } else if(rule.t==='naturalNumber'){
-                                           s.isNaturalNumber=true; s.isHide=true;
-                                           s.naturalNumberValue=calculateNaturalNumberValue(s.adjacentMines);
-                                           app=true;
-                                      }
-                                      if(app) {
-                                           assigned.add(k);
-                                      }
-                                 }
-                            }
-                       }
-                  }
-                  // Apply hide to remaining
-                  if(enableHide || !enableNumbers){
-                       for(const{r,c}of pot){
-                            const k=`${r}-${c}`;
-                            if(!assigned.has(k)){
-                                 board[r][c].isHide=true;
-                                 assigned.add(k);
-                            }
-                       }
-                  }
-             } else { // Numbers ON: Apply probabilistically
-                  for(const rule of order){
-                       if(rule.e && numPot>0){
-                            const maxCt=Math.floor(numPot*rule.r);
-                            let curCt=0;
-                            for(const{r,c}of pot){
-                                 if(curCt>=maxCt) {
-                                      break;
-                                 }
-                                 const k=`${r}-${c}`;
-                                 const s=board[r][c];
-                                 if(!assigned.has(k) && rule.c(s,r,c)){
-                                      let app=false;
-                                      if(rule.t==='directional'){
-                                           const vDirs=getValidDirs(r,c);
-                                           if(vDirs.length>0){
-                                                const shDirs=[...vDirs].sort(()=>Math.random()-0.5);
-                                                for(const d of shDirs){
-                                                     if(!hasDirChain(r,c,d.dx,d.dy)){
-                                                          const ct=countMinesInDirection(r,c,d.dx,d.dy);
-                                                          s.isDirectional=true; s.isHide=true;
-                                                          s.direction={dx:d.dx, dy:d.dy, name:d.n};
-                                                          s.directionalCount=ct; s.directionalSymbol=d.s;
-                                                          app=true; break;
-                                                     }
-                                                }
-                                           }
-                                      } else if(rule.t==='areaValue'){
-                                           s.isAreaValue=true; s.isHide=true;
-                                           if(s.adjacentMines<=3) s.areaValue='~3';
-                                           else if(s.adjacentMines<=6) s.areaValue='4~6';
-                                           else s.areaValue='7~';
-                                           app=true;
-                                      } else if(rule.t==='oddEven'){
-                                           s.isOddEven=true; s.isHide=true;
-                                           s.oddEvenValue=s.adjacentMines%2===0 ? 'Ev' : 'Od';
-                                           app=true;
-                                      } else if(rule.t==='naturalNumber'){
-                                           s.isNaturalNumber=true; s.isHide=true;
-                                           s.naturalNumberValue=calculateNaturalNumberValue(s.adjacentMines);
-                                           app=true;
-                                      } else if(rule.t==='hide'){
-                                           s.isHide=true;
-                                           app=true;
-                                      }
-                                      if(app){
-                                           assigned.add(k);
-                                           curCt++;
-                                      }
-                                 }
-                            }
-                       }
-                  }
-             }
+            const pot = [];
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const s = board[i][j];
+                    s.isHide = s.isOddEven = s.isAreaValue = s.isDirectional = s.isNaturalNumber = false;
+                    s.oddEvenValue = s.areaValue = s.direction = s.directionalCount = s.directionalSymbol = s.naturalNumberValue = null;
+                    if (!s.isMine && s.adjacentMines > 0) pot.push({ r: i, c: j });
+                }
+            }
+            pot.sort(() => Math.random() - 0.5);
+            const assigned = new Set();
+            const numPot = pot.length;
+            const baseDirs = [{ dx: -1, dy: 0, s: 'T', n: 'up' }, { dx: 1, dy: 0, s: 'B', n: 'down' }, { dx: 0, dy: -1, s: 'L', n: 'left' }, { dx: 0, dy: 1, s: 'R', n: 'right' }];
+            function hasDirChain(r, c, dx, dy) { let cr = r + dx; let cc = c + dy; while (cr >= 0 && cr < gridSize && cc >= 0 && cc < gridSize) { if (board[cr][cc]?.isDirectional && board[cr][cc].direction?.dx === dx && board[cr][cc].direction?.dy === dy) return true; cr += dx; cc += dy; } return false; }
+            function getValidDirs(r, c) { return baseDirs.filter(d => { const nr = r + d.dx; const nc = c + d.dy; return nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize; }); }
+            const order = [{ t: 'directional', e: enableDirectional, r: maxDirectionalRate, c: (s, r, c) => !hasNeighborOfType(r, c, 'isDirectional') }, { t: 'areaValue', e: enableAreaValue, r: maxAreaValueRate, c: (s, r, c) => !hasNeighborOfType(r, c, 'isAreaValue') }, { t: 'oddEven', e: enableOddEven, r: maxOddEvenRate, c: (s, r, c) => s.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven') }, { t: 'naturalNumber', e: enableNaturalNumber, r: maxNaturalNumberRate, c: (s, r, c) => !hasNeighborOfType(r, c, 'isNaturalNumber') }, { t: 'hide', e: enableHide, r: hideRateMax, c: () => true }];
+            if (!enableNumbers) { for (const rule of order) { if (rule.e && rule.t !== 'hide') { for (const { r, c } of pot) { const k = `${r}-${c}`; const s = board[r][c]; if (!assigned.has(k) && rule.c(s, r, c)) { let app = false; if (rule.t === 'directional') { const vDirs = getValidDirs(r, c); if (vDirs.length > 0) { const shDirs = [...vDirs].sort(() => Math.random() - 0.5); for (const d of shDirs) { if (!hasDirChain(r, c, d.dx, d.dy)) { const ct = countMinesInDirection(r, c, d.dx, d.dy); s.isDirectional = true; s.isHide = true; s.direction = { dx: d.dx, dy: d.dy, name: d.n }; s.directionalCount = ct; s.directionalSymbol = d.s; app = true; break; } } } } else if (rule.t === 'areaValue') { s.isAreaValue = true; s.isHide = true; if (s.adjacentMines <= 3) s.areaValue = '~3'; else if (s.adjacentMines <= 6) s.areaValue = '4~6'; else s.areaValue = '7~'; app = true; } else if (rule.t === 'oddEven') { s.isOddEven = true; s.isHide = true; s.oddEvenValue = s.adjacentMines % 2 === 0 ? 'Ev' : 'Od'; app = true; } else if (rule.t === 'naturalNumber') { s.isNaturalNumber = true; s.isHide = true; s.naturalNumberValue = calculateNaturalNumberValue(s.adjacentMines); app = true; } if (app) assigned.add(k); } } } } if (enableHide || !enableNumbers) { for (const { r, c } of pot) { const k = `${r}-${c}`; if (!assigned.has(k)) { board[r][c].isHide = true; assigned.add(k); } } } }
+            else { for (const rule of order) { if (rule.e && numPot > 0) { const maxCt = Math.floor(numPot * rule.r); let curCt = 0; for (const { r, c } of pot) { if (curCt >= maxCt) break; const k = `${r}-${c}`; const s = board[r][c]; if (!assigned.has(k) && rule.c(s, r, c)) { let app = false; if (rule.t === 'directional') { const vDirs = getValidDirs(r, c); if (vDirs.length > 0) { const shDirs = [...vDirs].sort(() => Math.random() - 0.5); for (const d of shDirs) { if (!hasDirChain(r, c, d.dx, d.dy)) { const ct = countMinesInDirection(r, c, d.dx, d.dy); s.isDirectional = true; s.isHide = true; s.direction = { dx: d.dx, dy: d.dy, name: d.n }; s.directionalCount = ct; s.directionalSymbol = d.s; app = true; break; } } } } else if (rule.t === 'areaValue') { s.isAreaValue = true; s.isHide = true; if (s.adjacentMines <= 3) s.areaValue = '~3'; else if (s.adjacentMines <= 6) s.areaValue = '4~6'; else s.areaValue = '7~'; app = true; } else if (rule.t === 'oddEven') { s.isOddEven = true; s.isHide = true; s.oddEvenValue = s.adjacentMines % 2 === 0 ? 'Ev' : 'Od'; app = true; } else if (rule.t === 'naturalNumber') { s.isNaturalNumber = true; s.isHide = true; s.naturalNumberValue = calculateNaturalNumberValue(s.adjacentMines); app = true; } else if (rule.t === 'hide') { s.isHide = true; app = true; } if (app) { assigned.add(k); curCt++; } } } } } }
         }
-
 
         // --- Interaction and Rendering Functions ---
 
         function handleSquareInteraction(r, c) {
-             if (gameOver || board[r][c].isRevealed || justFlagged) {
-                  return;
-             }
-             if (!gameStarted) {
-                  startGameTimer();
-             }
+            if (gameOver || board[r][c].isRevealed || justFlagged) {
+                return;
+            }
+            if (!gameStarted) {
+                startGameTimer();
+            }
 
-             const square = board[r][c];
+            const square = board[r][c];
 
-             if (currentInteractionMode === 'flag') {
-                 handleFlagAction(r, c);
-             } else { // 'dig' mode
-                 if (square.isFlagged && !enableNoFlags) {
-                      return;
-                 }
-                 if (square.isMine) {
-                     // --- Mine Hit Logic ---
-                     revealMine(r, c); // Always reveal the clicked mine
+            if (currentInteractionMode === 'flag') {
+                handleFlagAction(r, c);
+            } else { // 'dig' mode
+                if (square.isFlagged && !enableNoFlags) {
+                    return;
+                }
+                if (square.isMine) {
+                    // --- Mine Hit Logic ---
+                    revealMine(r, c); // Always reveal the clicked mine
 
-                     if (enableTimeBomb && gameOverOnTimeOnly) {
-                         // Penalty Mode: Deduct time, don't end game immediately
-                         penaltyOffsetMs += MINE_PENALTY_MS; // Add penalty to offset
-                         // Visual Flash
-                         body.style.transition = 'background-color 0.1s ease-out';
-                         body.style.backgroundColor = '#ffdddd'; // Light red flash
-                         setTimeout(() => {
-                              body.style.transition = 'background-color 0.5s ease'; // Restore smooth transition
-                              body.style.backgroundColor = ''; // Remove inline style
-                              updateTimerDisplay(); // Update display *after* flash clears and background restored
-                         }, 150); // Duration of flash
+                    if (enableTimeBomb && gameOverOnTimeOnly) {
+                        // Penalty Mode
+                        penaltyOffsetMs += MINE_PENALTY_MS; // Add penalty to offset
+                        // Visual Flash
+                        const wasLowTime = body.classList.contains('low-time'); // Check before flash
+                        body.style.transition = 'background-color 0.1s ease-out';
+                        body.style.backgroundColor = '#ffdddd'; // Light red flash
+                        setTimeout(() => {
+                            body.style.transition = 'background-color 0.5s ease'; // Restore smooth transition
+                            body.style.backgroundColor = ''; // Remove inline style
+                            // Re-apply yellow background if it was low time before flash
+                            // updateTimerDisplay will handle blinking correctly based on new time
+                            if (wasLowTime) {
+                                body.classList.add('low-time'); // Ensure yellow remains if still applicable
+                            }
+                            updateTimerDisplay(); // Update display *after* flash clears
+                        }, 150); // Duration of flash
 
-                         // Check immediately if penalty causes game over
-                         // Use a slightly adjusted check to ensure timer has updated visually
-                         setTimeout(() => {
-                              const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
-                              if (currentRemaining <= 0 && !gameOver) {
-                                   endGame(false);
-                              }
-                         }, timerUpdateInterval + 10); // Check slightly after next timer tick
+                        // Check immediately if penalty causes game over
+                        setTimeout(() => {
+                            const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                            if (currentRemaining <= 0 && !gameOver) {
+                                endGame(false);
+                            }
+                        }, timerUpdateInterval + 10); // Check slightly after next timer tick
 
-                     } else {
-                         // Standard Mode: Game over immediately
-                         endGame(false);
-                     }
-                 } else {
-                     // Safe Square Clicked
-                     revealSquare(r, c);
-                     checkWinCondition();
-                 }
-             }
+                    } else {
+                        // Standard Mode: Game over immediately
+                        endGame(false);
+                    }
+                } else {
+                    // Safe Square Clicked
+                    revealSquare(r, c);
+                    checkWinCondition();
+                }
+            }
         }
-
 
         function startGameTimer() {
             if (gameStarted) {
-                 return;
+                return;
             }
             gameStarted = true;
             startTime = Date.now();
             penaltyOffsetMs = 0; // Reset penalty offset
             if (enableTimeBomb) {
-                 remainingMilliseconds = timeLimitMilliseconds; // Set initial remaining time
+                remainingMilliseconds = timeLimitMilliseconds; // Set initial remaining time
             } else {
-                 elapsedMilliseconds = 0;
+                elapsedMilliseconds = 0;
             }
             if (timerInterval) {
-                 clearInterval(timerInterval); // Clear any existing interval
+                clearInterval(timerInterval); // Clear any existing interval
             }
             timerInterval = setInterval(updateTimer, timerUpdateInterval);
             updateTimerDisplay(); // Initial display update
         }
 
-
         function handleFlagAction(r, c) {
             if (enableNoFlags || gameOver || board[r][c].isRevealed) {
-                 return;
+                return;
             }
             if (!gameStarted) {
-                 startGameTimer();
+                startGameTimer();
             }
 
             const sq = board[r][c];
             sq.isFlagged = !sq.isFlagged;
             if (sq.isFlagged) {
-                 minesLeft--;
+                minesLeft--;
             } else {
-                 minesLeft++;
+                minesLeft++;
             }
             renderSquareContent(sq);
             updateMinesLeftDisplay();
         }
 
-
-        // Reveals the content of a mine square but doesn't end the game directly
         function revealMine(r, c) {
             const sq = board[r][c];
             if (sq.isRevealed) {
-                 return; // Avoid revealing if already revealed
+                return; // Avoid revealing if already revealed
             }
-
             sq.isRevealed = true; // Mark as revealed
             sq.element.classList.remove('hidden', 'flagged');
             sq.element.classList.add('revealed', 'mine', 'mine-clicked'); // Add clicked state
             sq.element.textContent = '💥'; // Show explosion
-             // Note: Game over logic is handled in handleSquareInteraction
         }
 
-
         function revealSquare(r, c) {
-            if (r<0 || r>=gridSize || c<0 || c>=gridSize || gameOver) {
-                 return;
+            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || gameOver) {
+                return;
             }
             const sq = board[r][c];
             if (sq.isRevealed || sq.isMine || (sq.isFlagged && !enableNoFlags)) {
-                 return;
+                return;
             }
             if (sq.isFlagged && enableNoFlags) {
-                 sq.isFlagged = false;
+                sq.isFlagged = false;
             }
             sq.isRevealed = true;
             revealedNonMineCount++;
@@ -1687,195 +1523,184 @@
 
             // Flood fill only from true blank squares
             if (sq.adjacentMines === 0 && !sq.isDirectional && !sq.isAreaValue && !sq.isOddEven && !sq.isNaturalNumber && !sq.isHide) {
-                for (let x=-1; x<=1; x++) {
-                     for (let y=-1; y<=1; y++) {
-                          if (x!==0 || y!==0) {
-                               revealSquare(r+x, c+y);
-                          }
-                     }
+                for (let x = -1; x <= 1; x++) {
+                    for (let y = -1; y <= 1; y++) {
+                        if (x !== 0 || y !== 0) {
+                            revealSquare(r + x, c + y);
+                        }
+                    }
                 }
             }
         }
 
-
         function renderSquareContent(sq) {
-             const el=sq.element;
-             el.className='square';
-             el.textContent='';
-             el.innerHTML='';
-             el.style.fontSize='';
-             el.style.lineHeight='';
-             if(!sq.isRevealed){
-                  el.classList.add('hidden');
-                  if(sq.isFlagged && !enableNoFlags){
-                       el.textContent='🚩';
-                       el.classList.add('flagged');
-                  }
-             } else {
-                  el.classList.add('revealed');
-                  if(sq.isMine){
-                       el.classList.add('mine');
-                       el.textContent=el.classList.contains('mine-clicked') ? '💥' : '💣'; // Display based on click state
-                  } else if (sq.adjacentMines>=0){
-                       if(sq.isDirectional){
-                            el.classList.add('directional-square', 'special-square');
-                            el.textContent=sq.directionalSymbol+sq.directionalCount;
-                       } else if(sq.isAreaValue){
-                            el.classList.add('area-value-square', 'special-square');
-                            if(sq.areaValue==='4~6'){
-                                 el.innerHTML='4~<br>6';
-                                 el.style.lineHeight='0.9';
-                                 el.style.fontSize='9px';
-                            } else {
-                                 el.textContent=sq.areaValue;
-                            }
-                       } else if(sq.isOddEven){
-                            el.classList.add('odd-even-square', 'special-square');
-                            el.textContent=sq.oddEvenValue;
-                       } else if(sq.isNaturalNumber){
-                            el.classList.add('natural-number-square', 'special-square');
-                            if(sq.naturalNumberValue==='±1') {
-                                 el.style.fontSize='10px';
-                            }
-                            el.textContent=sq.naturalNumberValue;
-                       } else if(sq.isHide){
-                            el.classList.add('special-square');
-                            el.textContent='・';
-                       } else if(sq.adjacentMines>0){
-                            el.textContent=sq.adjacentMines;
-                            el.classList.add(`number-${sq.adjacentMines}`);
-                       } else { // Blank square
-                            el.textContent='';
-                       }
-                  }
-                  if(el.classList.contains('flag-wrong')){ // Check if flag-wrong class was added
-                       el.textContent='❌';
-                       el.classList.add('flag-wrong'); // Ensure class remains
-                  }
-             }
+            const el = sq.element;
+            el.className = 'square';
+            el.textContent = '';
+            el.innerHTML = '';
+            el.style.fontSize = '';
+            el.style.lineHeight = '';
+            if (!sq.isRevealed) {
+                el.classList.add('hidden');
+                if (sq.isFlagged && !enableNoFlags) {
+                    el.textContent = '🚩';
+                    el.classList.add('flagged');
+                }
+            } else {
+                el.classList.add('revealed');
+                if (sq.isMine) {
+                    el.classList.add('mine');
+                    el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣';
+                } else if (sq.adjacentMines >= 0) {
+                    if (sq.isDirectional) {
+                        el.classList.add('directional-square', 'special-square');
+                        el.textContent = sq.directionalSymbol + sq.directionalCount;
+                    } else if (sq.isAreaValue) {
+                        el.classList.add('area-value-square', 'special-square');
+                        if (sq.areaValue === '4~6') {
+                            el.innerHTML = '4~<br>6';
+                            el.style.lineHeight = '0.9';
+                            el.style.fontSize = '9px';
+                        } else {
+                            el.textContent = sq.areaValue;
+                        }
+                    } else if (sq.isOddEven) {
+                        el.classList.add('odd-even-square', 'special-square');
+                        el.textContent = sq.oddEvenValue;
+                    } else if (sq.isNaturalNumber) {
+                        el.classList.add('natural-number-square', 'special-square');
+                        if (sq.naturalNumberValue === '±1') {
+                            el.style.fontSize = '10px';
+                        }
+                        el.textContent = sq.naturalNumberValue;
+                    } else if (sq.isHide) {
+                        el.classList.add('special-square');
+                        el.textContent = '・';
+                    } else if (sq.adjacentMines > 0) {
+                        el.textContent = sq.adjacentMines;
+                        el.classList.add(`number-${sq.adjacentMines}`);
+                    } else { // Blank square
+                        el.textContent = '';
+                    }
+                }
+                if (el.classList.contains('flag-wrong')) { // Check if flag-wrong class was added
+                    el.textContent = '❌';
+                    el.classList.add('flag-wrong'); // Ensure class remains
+                }
+            }
         }
-
 
         function updateMinesLeftDisplay() {
-             messageBox.textContent = enableNoFlags ? '' : `Mines: ${minesLeft}`;
+            messageBox.textContent = enableNoFlags ? '' : `Mines: ${minesLeft}`;
         }
-
 
         function checkWinCondition() {
             if (gameOver) {
-                 return; // Don't check if already won/lost
+                return;
             }
-
             const totalNonMine = gridSize * gridSize - numMines;
             if (revealedNonMineCount >= totalNonMine) {
-                 let allRevealed = true;
-                 for(let i=0; i<gridSize; i++){
-                      for(let j=0; j<gridSize; j++){
-                           if(!board[i][j].isMine && !board[i][j].isRevealed){
-                                allRevealed=false;
-                                break;
-                           }
-                      }
-                      if(!allRevealed) {
-                           break;
-                      }
-                 }
-
-                 if (allRevealed) {
-                     // Check time condition only if time bomb is enabled
-                     if (enableTimeBomb && remainingMilliseconds <= 0) {
-                          return; // Time ran out simultaneously, don't win. endGame handles this.
-                     }
-                     endGame(true); // Win
-                 }
+                let allRevealed = true;
+                for (let i = 0; i < gridSize; i++) {
+                    for (let j = 0; j < gridSize; j++) {
+                        if (!board[i][j].isMine && !board[i][j].isRevealed) {
+                            allRevealed = false;
+                            break;
+                        }
+                    }
+                    if (!allRevealed) {
+                        break;
+                    }
+                }
+                if (allRevealed) {
+                    if (enableTimeBomb && remainingMilliseconds <= 0) {
+                        return; // Time ran out
+                    }
+                    endGame(true); // Win
+                }
             }
         }
 
-
         function endGame(isWin) {
-             if(gameOver) {
-                  return;
-             }
-             gameOver = true;
-             clearInterval(timerInterval);
-             timerInterval = null;
+            if (gameOver) {
+                return;
+            }
+            gameOver = true;
+            clearInterval(timerInterval);
+            timerInterval = null;
 
-             body.classList.remove('low-time');
-             timerContainer.classList.remove('blinking-black', 'blinking-red');
+            body.classList.remove('low-time');
+            timerContainer.classList.remove('blinking-black', 'blinking-red');
 
-             if(gameStarted) {
-                 if (!enableTimeBomb) {
-                      elapsedMilliseconds = Date.now() - startTime;
-                 }
-                 // Recalculate final remaining time accurately before display
-                 if (enableTimeBomb) {
-                      remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs);
-                 }
-                 updateTimerDisplay(); // Show final time (without blinking)
-             }
+            if (gameStarted) {
+                if (!enableTimeBomb) {
+                    elapsedMilliseconds = Date.now() - startTime;
+                }
+                // Recalculate final remaining time accurately
+                if (enableTimeBomb) {
+                    remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs);
+                }
+                updateTimerDisplay(); // Show final time
+            }
 
             if (isWin) {
                 messageBox.textContent = 'Game Clear!';
                 body.style.backgroundColor = '#aaffaa';
-                if(!enableNoFlags){
-                     for(let i=0; i<gridSize; i++){
-                          for(let j=0; j<gridSize; j++){
-                               if(board[i][j].isMine && !board[i][j].isFlagged){
-                                    board[i][j].isFlagged=true;
-                                    renderSquareContent(board[i][j]);
-                               }
-                          }
-                     }
-                     minesLeft=0;
-                     updateMinesLeftDisplay();
+                if (!enableNoFlags) {
+                    for (let i = 0; i < gridSize; i++) {
+                        for (let j = 0; j < gridSize; j++) {
+                            if (board[i][j].isMine && !board[i][j].isFlagged) {
+                                board[i][j].isFlagged = true;
+                                renderSquareContent(board[i][j]);
+                            }
+                        }
+                    }
+                    minesLeft = 0;
+                    updateMinesLeftDisplay();
                 }
             } else { // Game Lost
                 if (messageBox.textContent !== 'Game Clear!') {
-                     messageBox.textContent = (enableTimeBomb && remainingMilliseconds <= 0) ? 'Time Up!' : 'Game Over!';
+                    messageBox.textContent = (enableTimeBomb && remainingMilliseconds <= 0) ? 'Time Up!' : 'Game Over!';
                 }
                 body.classList.add('game-over');
-                revealAllMines(true); // Reveal remaining mines and wrong flags
+                revealAllMines(true);
             }
         }
 
-
         function revealAllMines(showIncorrectFlags) {
-             for(let i=0; i<gridSize; i++){
-                  for(let j=0; j<gridSize; j++){
-                       const sq=board[i][j];
-                       const el=sq.element;
-                       if(sq.isMine){
-                            // Skip correct flags and already revealed mines
-                            if((sq.isFlagged && !enableNoFlags) || el.classList.contains('mine-clicked')) {
-                                 continue;
-                            }
-                            sq.isRevealed=true;
-                            renderSquareContent(sq); // Render '💣'
-                       } else { // Not a mine
-                            if(showIncorrectFlags && sq.isFlagged && !enableNoFlags){
-                                 sq.isRevealed=true;
-                                 el.classList.add('flag-wrong'); // Add class *before* rendering
-                                 renderSquareContent(sq); // Render '❌'
-                            } else if (showIncorrectFlags && !sq.isRevealed && document.activeElement === revealAllButton){
-                                 // Debug reveal only if revealAll button was clicked
-                                 revealSquare(i,j);
-                            }
-                       }
-                  }
-             }
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const sq = board[i][j];
+                    const el = sq.element;
+                    if (sq.isMine) {
+                        if ((sq.isFlagged && !enableNoFlags) || el.classList.contains('mine-clicked')) {
+                            continue;
+                        }
+                        sq.isRevealed = true;
+                        renderSquareContent(sq); // Render '💣'
+                    } else { // Not a mine
+                        if (showIncorrectFlags && sq.isFlagged && !enableNoFlags) {
+                            sq.isRevealed = true;
+                            el.classList.add('flag-wrong'); // Add class *before* rendering
+                            renderSquareContent(sq); // Render '❌'
+                        } else if (showIncorrectFlags && !sq.isRevealed && document.activeElement === revealAllButton) {
+                            // Debug reveal only if revealAll button was clicked
+                            revealSquare(i, j);
+                        }
+                    }
+                }
+            }
         }
-
 
         // --- Timer Functions ---
 
         function updateTimer() {
             if (!gameStarted || gameOver) {
-                 // Ensure timer stops if game ends unexpectedly
-                 if (timerInterval && gameOver) {
-                      clearInterval(timerInterval);
-                      timerInterval = null;
-                 }
-                 return;
+                if (timerInterval && gameOver) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                return;
             }
 
             if (enableTimeBomb) {
@@ -1889,17 +1714,16 @@
                     clearInterval(timerInterval); // Stop timer precisely
                     timerInterval = null;
                     if (!gameOver) { // Prevent double game over calls
-                         endGame(false); // Trigger Time's up! loss
+                        endGame(false); // Trigger Time's up! loss
                     }
                 } else {
-                     updateTimerDisplay(); // Update display with remaining time
+                    updateTimerDisplay(); // Update display with remaining time
                 }
             } else { // Elapsed time mode
                 elapsedMilliseconds = Date.now() - startTime;
                 updateTimerDisplay();
             }
         }
-
 
         function updateTimerDisplay() {
             let formattedTime;
@@ -1911,10 +1735,8 @@
 
                 // --- Time Bomb Blinking Logic ---
                 if (gameStarted && !gameOver) {
-                    // Red blinking for < 1 minute (and not 0)
                     const isLowTime = displayMillis < 60000 && displayMillis > 0;
                     timerContainer.classList.toggle('blinking-red', isLowTime);
-                    // Black blinking if >= 1min and > 0
                     timerContainer.classList.toggle('blinking-black', !isLowTime && displayMillis > 0);
                     body.classList.toggle('low-time', isLowTime);
                 } else { // Not started or game over - remove all blinking/low time state
@@ -1922,71 +1744,66 @@
                     body.classList.remove('low-time');
                 }
             } else {
-                 // --- Normal Timer Logic ---
-                 displayMillis = elapsedMilliseconds;
-                 timerContainer.classList.remove('blinking-black', 'blinking-red');
-                 body.classList.remove('low-time');
+                // --- Normal Timer Logic ---
+                displayMillis = elapsedMilliseconds;
+                timerContainer.classList.remove('blinking-black', 'blinking-red');
+                body.classList.remove('low-time');
             }
-
 
             // Format time display (SS.cs, MM:SS, H:MM:SS)
             if (displayMillis < 60000) { // Less than 1 minute: SS.cs
-                 const s=Math.floor(displayMillis/1000);
-                 const cs=Math.floor((displayMillis%1000)/10);
-                 formattedTime=`${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+                const s = Math.floor(displayMillis / 1000);
+                const cs = Math.floor((displayMillis % 1000) / 10);
+                formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
             } else if (displayMillis < 3600000) { // Less than 1 hour: MM:SS
-                 const m=Math.floor(displayMillis/60000);
-                 const s=Math.floor((displayMillis%60000)/1000);
-                 formattedTime=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                const m = Math.floor(displayMillis / 60000);
+                const s = Math.floor((displayMillis % 60000) / 1000);
+                formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
             } else { // 1 hour or more: H:MM:SS
-                 const h=Math.floor(displayMillis/3600000);
-                 const m=Math.floor((displayMillis%3600000)/60000);
-                 const s=Math.floor((displayMillis%60000)/1000);
-                 // Use H:MM:SS format
-                 formattedTime=`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                const h = Math.floor(displayMillis / 3600000);
+                const m = Math.floor((displayMillis % 3600000) / 60000);
+                const s = Math.floor((displayMillis % 60000) / 1000);
+                formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
             }
 
             timerSpan.textContent = formattedTime;
         }
 
-
         // --- Debug Functions ---
 
         function revealNonMines() {
-             if(gameOver) {
-                  return;
-             }
-             if(!gameStarted) {
-                  startGameTimer();
-             }
-             for(let i=0; i<gridSize; i++){
-                  for(let j=0; j<gridSize; j++){
-                       if(!board[i][j].isMine && !board[i][j].isRevealed) {
-                            revealSquare(i,j);
-                       }
-                  }
-             }
-             checkWinCondition();
-             if(!gameOver) {
-                  endGame(true); // Ensure game ends if won
-             }
+            if (gameOver) {
+                return;
+            }
+            if (!gameStarted) {
+                startGameTimer();
+            }
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (!board[i][j].isMine && !board[i][j].isRevealed) {
+                        revealSquare(i, j);
+                    }
+                }
+            }
+            checkWinCondition();
+            if (!gameOver) {
+                endGame(true); // Ensure game ends if won
+            }
         }
-
 
         function revealAll() {
-             if(gameOver) {
-                  return;
-             }
-             if(!gameStarted) {
-                  startGameTimer();
-             }
-             revealAllMines(true); // Show incorrect flags as well
-             if(!gameOver) {
-                  endGame(false); // Ensure game ends (as loss)
-             }
-             messageBox.textContent='All squares revealed!';
+            if (gameOver) {
+                return;
+            }
+            if (!gameStarted) {
+                startGameTimer();
+            }
+            revealAllMines(true); // Show incorrect flags as well
+            if (!gameOver) {
+                endGame(false); // Ensure game ends (as loss)
+            }
+            messageBox.textContent = 'All squares revealed!';
         }
-
 
         // --- Initial Setup ---
         updateTimerDisplay();
