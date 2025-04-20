@@ -109,26 +109,28 @@
             margin-bottom: 2px;
             height: 14px;
             text-align: center;
-            /* visibility style removed */
         }
         #active-rules-display {
             font-size: 9px;
-            color: #555;
+            color: #555; /* Default color */
             margin-top: 0px;
             margin-bottom: 8px;
             line-height: 1.3;
             text-align: center;
             min-height: 40px;
         }
-        #active-rules-display div { margin-bottom: 2px; }
-        #active-rules-display .rule-display-hide {}
+        #active-rules-display div {
+            margin-bottom: 2px;
+        }
+        /* Add specific colors for each rule type */
+        #active-rules-display .rule-display-hide { /* No specific color, uses default */ }
         #active-rules-display .rule-display-directional { color: #1a759f; }
         #active-rules-display .rule-display-oddEven { color: #0000CD; }
         #active-rules-display .rule-display-areaValue { color: #902094; }
         #active-rules-display .rule-display-naturalNumber { color: #2E8B57; }
-        #active-rules-display .rule-display-noNumbers {}
-        #active-rules-display .rule-display-noFlags {}
-        #active-rules-display .rule-display-standard {}
+        #active-rules-display .rule-display-noNumbers { /* Uses default color */ }
+        #active-rules-display .rule-display-noFlags { /* Uses default color */ }
+        #active-rules-display .rule-display-standard { /* Uses default color */ }
 
         .timer {
             font-size: 14px;
@@ -792,6 +794,7 @@
 
             if (!rule) {
                 return;
+
             }
 
             switch (rule) {
@@ -1252,7 +1255,6 @@
 
             const numPotential = potentialNumberSquares.length;
 
-            // Directions with T/B/L/R symbols
             const baseDirections = [
                  { dx: -1, dy: 0, symbol: 'T', name: 'up' },
                  { dx: 1, dy: 0, symbol: 'B', name: 'down' },
@@ -1382,7 +1384,6 @@
                         }
                     }
                  }
-                 // ★★★ Restore probabilistic logic for others ★★★
                 if (enableAreaValue) {
                      const max = Math.floor(numPotential * maxAreaValueRate); // Use numPotential based rate
                      let count = 0;
