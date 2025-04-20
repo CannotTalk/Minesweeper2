@@ -154,7 +154,11 @@
         .area-value-square{
             color: #902094;
             font-weight: bold;
-            font-size: 9px; /* ★ Adjusted font size ★ */
+            font-size: 8px; /* Adjusted font size */
+            line-height: 0.9; /* Adjust line height */
+            text-align: center;
+            padding-top: 2px; /* Fine-tune vertical align */
+            box-sizing: border-box;
         }
         .directional-square {
             color: #1a759f;
@@ -162,7 +166,7 @@
             font-size: 9px;
         }
         .natural-number-square {
-            color: #2E8B57; /* SeaGreen */
+            color: #2E8B57;
             font-weight: bold;
         }
 
@@ -375,13 +379,13 @@
             <div class="setting-section" data-rule-id="directional">
                 <h4>ディレクションマス (Directional Squares)</h4>
                  <p>方向(<b>T</b>:上, <b>B</b>:下, <b>L</b>:左, <b>R</b>:右)とその方向にある地雷の数を表示します (例:「R4」はそのマスより右にある地雷が4個)。<br>
-                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。</p>
+                   指定された方向の地雷のみをカウントします。矢印が指す方向に最低1マス存在する場合のみ生成されます。同じ方向への連鎖はしません。</p> <!-- Removed disabled text -->
                 <div class="setting-label">
                      <span>有効</span>
                       <div>
                           <button class="reset-rule-button" data-rule="directional">デフォルト</button>
                           <label class="switch">
-                              <input type="checkbox" id="directional-switch" checked>
+                              <input type="checkbox" id="directional-switch" checked> <!-- Default ON -->
                               <span class="slider round"></span>
                           </label>
                       </div>
@@ -460,10 +464,10 @@
 
         const maxHideRate = 0.50;
         const minHideRate = 0.05;
-        const maxOddEvenRate = 0.10; // ★ Rate updated ★
-        const maxAreaValueRate = 0.05; // ★ Rate updated ★
-        const maxDirectionalRate = 0.05; // ★ Set Rate ★
-        const maxNaturalNumberRate = 0.05; // ★ Rate updated ★
+        const maxOddEvenRate = 0.10; // Updated Rate
+        const maxAreaValueRate = 0.05; // Updated Rate
+        const maxDirectionalRate = 0.05; // Updated Rate
+        const maxNaturalNumberRate = 0.05; // Updated Rate
 
         // --- Board State ---
         let board = [];
@@ -550,9 +554,9 @@
         const hideRateControl = document.getElementById('hide-rate-control');
 
         const resetRuleButtons = document.querySelectorAll('.reset-rule-button');
-        // Get No Flags Switch
+
         const noFlagsSwitch = document.getElementById('no-flags-switch');
-        // Get Natural Number Switch
+
         const naturalNumberSwitch = document.getElementById('natural-number-switch');
 
 
@@ -755,7 +759,7 @@
 
             areaValueSwitch.checked = pendingSettings.enableAreaValue;
 
-            naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber; // Set switch state
+            naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber;
 
             const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
 
@@ -935,7 +939,7 @@
                  rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
 
             }
-            if (enableDirectional) { // Display even if generation logic is commented for now
+            if (enableDirectional) {
                  rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`;
             }
             if (enableOddEven) {
@@ -1219,7 +1223,6 @@
                  for (let j = 0; j < gridSize; j++) {
                      const square = board[i][j];
 
-                     // Reset all special flags and values
                      square.isHide = false;
                      square.isOddEven = false;
                      square.isAreaValue = false;
@@ -1253,7 +1256,6 @@
                  { dx: 0, dy: 1, symbol: 'R', name: 'right' }
              ];
 
-            // Helper function to check for directional chains
             function hasDirectionalChain(startRow, startCol, dx, dy) {
                  let r = startRow + dx;
                  let c = startCol + dy;
@@ -1269,7 +1271,6 @@
 
             }
 
-            // Helper to get valid directions for a given cell
             function getValidDirections(r, c) {
                  return baseDirections.filter(dir => {
                      const nextR = r + dir.dx;
@@ -1282,7 +1283,7 @@
             if (!enableNumbers) { // Uses current global enableNumbers
                 // --- Numbers OFF: Apply deterministically ---
                 // Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide
-                if (enableDirectional) { // Directional Generation (Deterministic)
+                if (enableDirectional) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`;
                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isDirectional')) {
@@ -1306,19 +1307,19 @@
                         }
                     }
                 }
-                if (enableAreaValue) { // AreaValue (Deterministic)
+                if (enableAreaValue) {
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
                              const sq = board[r][c]; sq.isAreaValue = true; sq.isHide = true;
-                             if (sq.adjacentMines <= 3) { sq.areaValue = '~3'; } // Updated text
-                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4~6'; } // Updated text
-                             else { sq.areaValue = '7~'; } // Updated text
+                             if (sq.adjacentMines <= 3) { sq.areaValue = '~3'; }
+                             else if (sq.adjacentMines <= 6) { sq.areaValue = '4~6'; }
+                             else { sq.areaValue = '7~'; }
                              assignedSpecial.add(k);
                          }
                     }
                 }
-                if (enableOddEven) { // OddEven (Deterministic)
+                if (enableOddEven) {
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
@@ -1328,7 +1329,7 @@
                          }
                     }
                 }
-                if (enableNaturalNumber) { // NaturalNumber (Deterministic)
+                if (enableNaturalNumber) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`; const sq = board[r][c];
                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isNaturalNumber')) {
@@ -1349,8 +1350,8 @@
             } else {
                 // --- Numbers ON: Apply probabilistically ---
                  // Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide
-                 if (enableDirectional) { // Directional (Probabilistic)
-                    const maxDir = Math.floor(numPotential * maxDirectionalRate); // Use rate
+                 if (enableDirectional) {
+                    const maxDir = Math.floor(numPotential * maxDirectionalRate); // Use updated rate
                     let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
                         if (count >= maxDir) { break; }
@@ -1377,7 +1378,7 @@
                         }
                     }
                  }
-                 // ★★★ Restore other probabilistic logic ★★★
+                // ★ Restore probabilistic logic for others ★
                 if (enableAreaValue) {
                      const max = Math.floor(numPotential * maxAreaValueRate); // Use numPotential based rate
                      let count = 0;
@@ -1406,7 +1407,7 @@
                          }
                      }
                 }
-                if (enableNaturalNumber) { // NaturalNumber (Probabilistic)
+                if (enableNaturalNumber) {
                      const maxNat = Math.floor(numPotential * maxNaturalNumberRate); // Use rate
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -1420,13 +1421,13 @@
                            }
                       }
                  }
-                if (enableHide) { // Hide (Probabilistic, uses hideRateMax directly)
+                if (enableHide) {
                      const maxHide = Math.floor(numPotential * hideRateMax);
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= maxHide) { break; }
                          const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k)) { // Only hide if not already special
+                         if (!assignedSpecial.has(k)) {
                             board[r][c].isHide = true;
                             count++;
                         }
