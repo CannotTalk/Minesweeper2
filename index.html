@@ -747,7 +747,7 @@
             }
         }
 
-        // Formats milliseconds to a display string (MM:SS or HH:MM:SS) - used for display
+        // Formats milliseconds to a display string (MM:SS or H:MM:SS) - used for display
         function formatMsToDisplayTime(ms, includeHoursForce = false) {
              if (typeof ms !== 'number' || ms < 0) {
                  return '00:00';
@@ -1183,10 +1183,8 @@
             timerStartDisplay.classList.remove('visible', 'move-to-corner');
             timerStartDisplay.style.animation = 'none';
 
-            updateTimerDisplay();
-            // Update active rules *after* potentially resetting timeLimitMilliseconds
-            // createBoard will set the *actual* limit, so update again there.
-            updateActiveRulesDisplay();
+            updateTimerDisplay(); // Reset timer display
+            updateActiveRulesDisplay(); // Update displayed rules
             updateNoFlagsUI();
             setTimeout(createBoard, 50);
         }
@@ -1274,7 +1272,7 @@
 
             // Determine display format based on duration (< 60min = MM:SS, >= 60min = HH:MM:SS)
             const includeHours = timeLimitMilliseconds >= 3600000;
-            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours);
+            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours); // Pass flag
 
             timerStartDisplay.style.animation = 'start-blink 1s infinite'; // Black blink
             timerStartDisplay.classList.add('visible');
@@ -1371,9 +1369,9 @@
         }
 
         function calculateNaturalNumberValue(n) {
-             const p = [2, 3, 5, 7];
-             if (p.includes(n)) return n.toString();
-             switch (n) {
+             const p=[2,3,5,7];
+             if(p.includes(n)) return n.toString();
+             switch(n){
                   case 0: return "?"; case 1: return "-1"; case 4: return "±1";
                   case 6: return "±1"; case 8: return "+1"; default: return "?";
              }
@@ -1429,21 +1427,30 @@
                             penaltyOffsetMs += MINE_PENALTY_MS;
                             const wasLowTime = body.classList.contains('low-time');
                             body.style.transition = 'background-color 0.1s ease-out';
-                            body.style.backgroundColor = '#ffdddd';
+                            body.style.backgroundColor = '#ffdddd'; // Light red flash
                             setTimeout(() => {
                                 body.style.transition = 'background-color 0.5s ease';
-                                body.style.backgroundColor = '';
-                                if (wasLowTime) body.classList.add('low-time'); // Re-apply yellow if still needed
-                                updateTimerDisplay();
-                            }, 150);
+                                body.style.backgroundColor = ''; // Remove inline style
+                                // Re-apply yellow background if it was low time before flash
+                                if (wasLowTime) {
+                                    // Recalculate current remaining time *after* penalty
+                                    const currentRemainingAfterPenalty = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                                    if (currentRemainingAfterPenalty < 60000 && currentRemainingAfterPenalty > 0) {
+                                        body.classList.add('low-time'); // Ensure yellow remains if still applicable
+                                    } else {
+                                        body.classList.remove('low-time'); // Remove if no longer low time
+                                    }
+                                }
+                                updateTimerDisplay(); // Update display *after* flash clears
+                            }, 150); // Duration of flash
 
-                            // Check if all mines are now revealed OR if time is up
+                            // Check immediately if penalty causes game over or if all mines are hit
                             setTimeout(() => {
                                 const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
                                 if ((clickedMineCount >= numMines || currentRemaining <= 0) && !gameOver) {
                                     endGame(false);
                                 }
-                            }, timerUpdateInterval + 10);
+                            }, timerUpdateInterval + 10); // Check slightly after next timer tick
 
                         } else {
                             // Standard Mode: Game over immediately
@@ -1631,29 +1638,19 @@
             body.classList.remove('low-time');
             timerContainer.classList.remove('blinking-black', 'blinking-red');
 
+            // --- Final Time Calculation ---
+            let finalDisplayMillis = 0;
             if (gameStarted) {
                 if (!enableTimeBomb) {
                     elapsedMilliseconds = Date.now() - startTime;
-                }
-                // Recalculate final remaining time accurately
-                if (enableTimeBomb) {
-                    remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs);
-                }
-
-                // --- Special Timer Display on Win with Time Bomb ---
-                if (isWin && enableTimeBomb) {
-                    const finalSeconds = Math.floor(remainingMilliseconds / 1000);
-                    const finalCentiseconds = Math.floor((remainingMilliseconds % 1000) / 10);
-                    timerSpan.textContent = `${String(finalSeconds).padStart(2, '0')}.${String(finalCentiseconds).padStart(2, '0')}`;
+                    finalDisplayMillis = elapsedMilliseconds;
                 } else {
-                    updateTimerDisplay(); // Use standard display format otherwise
+                    // Recalculate final remaining time accurately
+                    remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs);
+                    finalDisplayMillis = remainingMilliseconds;
                 }
-                // --------------------------------------------------
-
-            } else {
-                 // If game ends before starting (e.g., debug button), ensure timer shows 0 or initial time
-                 updateTimerDisplay();
             }
+            // --- End Final Time Calculation ---
 
             if (isWin) {
                 messageBox.textContent = 'Game Clear!';
@@ -1670,19 +1667,32 @@
                     minesLeft = 0;
                     updateMinesLeftDisplay();
                 }
+                 // --- Special Timer Display on Win with Time Bomb ---
+                 if (enableTimeBomb) {
+                     const finalSeconds = Math.floor(finalDisplayMillis / 1000);
+                     const finalCentiseconds = Math.floor((finalDisplayMillis % 1000) / 10);
+                     timerSpan.textContent = `${String(finalSeconds).padStart(2, '0')}.${String(finalCentiseconds).padStart(2, '0')}`;
+                     // Don't call updateTimerDisplay() here
+                 } else {
+                     // For non-timed wins, show final elapsed time
+                     updateTimerDisplay(); // Call standard display update
+                 }
+                 // --- End Special Timer Display ---
+
             } else { // Game Lost
                 if (messageBox.textContent !== 'Game Clear!') {
-                     // Check if lost due to clicking all mines in penalty mode
-                     if (enableTimeBomb && gameOverOnTimeOnly && clickedMineCount >= numMines) {
-                          messageBox.textContent = 'All Mines Hit!';
-                     } else if (enableTimeBomb && remainingMilliseconds <= 0) {
-                          messageBox.textContent = 'Time Up!';
-                     } else {
-                          messageBox.textContent = 'Game Over!';
-                     }
+                    if (enableTimeBomb && gameOverOnTimeOnly && clickedMineCount >= numMines) {
+                        messageBox.textContent = 'All Mines Hit!';
+                    } else if (enableTimeBomb && remainingMilliseconds <= 0) {
+                        messageBox.textContent = 'Time Up!';
+                    } else {
+                        messageBox.textContent = 'Game Over!';
+                    }
                 }
                 body.classList.add('game-over');
                 revealAllMines(true);
+                // Update timer display for loss as well
+                updateTimerDisplay(); // Call standard display update
             }
         }
 
@@ -1729,7 +1739,7 @@
 
                 if (remainingMilliseconds <= 0) {
                     remainingMilliseconds = 0; // Clamp at 0
-                    updateTimerDisplay();      // Show 00.00
+                    updateTimerDisplay();      // Show final state (e.g., 00.00)
                     clearInterval(timerInterval); // Stop timer precisely
                     timerInterval = null;
                     if (!gameOver) { // Prevent double game over calls
@@ -1745,11 +1755,6 @@
         }
 
         function updateTimerDisplay() {
-             // Don't update if game won with time bomb (handled in endGame)
-             if (gameOver && isWin && enableTimeBomb) {
-                  return;
-             }
-
             let formattedTime;
             let displayMillis;
 
