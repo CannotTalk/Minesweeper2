@@ -747,7 +747,7 @@
             }
         }
 
-        // Formats milliseconds to a display string (MM:SS or H:MM:SS) - used for display
+        // Formats milliseconds to a display string (MM:SS or HH:MM:SS) - used for display
         function formatMsToDisplayTime(ms, includeHoursForce = false) {
              if (typeof ms !== 'number' || ms < 0) {
                  return '00:00';
@@ -1272,7 +1272,7 @@
 
             // Determine display format based on duration (< 60min = MM:SS, >= 60min = HH:MM:SS)
             const includeHours = timeLimitMilliseconds >= 3600000;
-            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours); // Pass flag
+            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours);
 
             timerStartDisplay.style.animation = 'start-blink 1s infinite'; // Black blink
             timerStartDisplay.classList.add('visible');
@@ -1431,15 +1431,15 @@
                             setTimeout(() => {
                                 body.style.transition = 'background-color 0.5s ease';
                                 body.style.backgroundColor = ''; // Remove inline style
-                                // Re-apply yellow background if it was low time before flash
-                                if (wasLowTime) {
-                                    // Recalculate current remaining time *after* penalty
-                                    const currentRemainingAfterPenalty = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
-                                    if (currentRemainingAfterPenalty < 60000 && currentRemainingAfterPenalty > 0) {
-                                        body.classList.add('low-time'); // Ensure yellow remains if still applicable
-                                    } else {
-                                        body.classList.remove('low-time'); // Remove if no longer low time
-                                    }
+                                // Recalculate remaining time *after* penalty for accurate background check
+                                const currentRemainingAfterPenalty = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                                if (wasLowTime && currentRemainingAfterPenalty >= 60000) {
+                                    // If it was low time but penalty pushed it above, remove yellow
+                                    body.classList.remove('low-time');
+                                } else if (wasLowTime) {
+                                     // If it was low time and still is (or became lower), ensure yellow stays/appears
+                                     // updateTimerDisplay will handle the blinking class
+                                     body.classList.add('low-time');
                                 }
                                 updateTimerDisplay(); // Update display *after* flash clears
                             }, 150); // Duration of flash
@@ -1447,6 +1447,7 @@
                             // Check immediately if penalty causes game over or if all mines are hit
                             setTimeout(() => {
                                 const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                                // Check if all mines revealed OR time is up
                                 if ((clickedMineCount >= numMines || currentRemaining <= 0) && !gameOver) {
                                     endGame(false);
                                 }
@@ -1668,14 +1669,16 @@
                     updateMinesLeftDisplay();
                 }
                  // --- Special Timer Display on Win with Time Bomb ---
-                 if (enableTimeBomb) {
-                     const finalSeconds = Math.floor(finalDisplayMillis / 1000);
-                     const finalCentiseconds = Math.floor((finalDisplayMillis % 1000) / 10);
-                     timerSpan.textContent = `${String(finalSeconds).padStart(2, '0')}.${String(finalCentiseconds).padStart(2, '0')}`;
-                     // Don't call updateTimerDisplay() here
-                 } else {
-                     // For non-timed wins, show final elapsed time
-                     updateTimerDisplay(); // Call standard display update
+                 if (enableTimeBomb && gameStarted) { // Ensure game actually started
+                     const h = Math.floor(finalDisplayMillis / 3600000);
+                     const m = Math.floor((finalDisplayMillis % 3600000) / 60000);
+                     const s = Math.floor((finalDisplayMillis % 60000) / 1000);
+                     const cs = Math.floor((finalDisplayMillis % 1000) / 10);
+                     timerSpan.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+                 } else if (gameStarted) { // For non-timed wins, show final elapsed time
+                     updateTimerDisplay(); // Call standard display update based on elapsedMilliseconds
+                 } else { // If game ended before starting, show 0
+                      timerSpan.textContent = '00:00:00.00';
                  }
                  // --- End Special Timer Display ---
 
