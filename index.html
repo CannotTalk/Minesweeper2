@@ -109,6 +109,7 @@
             margin-bottom: 2px;
             height: 14px;
             text-align: center;
+            /* visibility style removed */
         }
         #active-rules-display {
             font-size: 9px;
@@ -195,7 +196,7 @@
             border-color: #333;
             box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
         }
-        #flag-mode-button:disabled { /* Style for disabled flag button */
+        #flag-mode-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             background-color: #eee;
@@ -467,10 +468,10 @@
 
         const maxHideRate = 0.50;
         const minHideRate = 0.05;
-        const maxOddEvenRate = 0.10; // Updated Rate
-        const maxAreaValueRate = 0.05; // Updated Rate
-        const maxDirectionalRate = 0.05; // Set Rate
-        const maxNaturalNumberRate = 0.05; // Updated Rate
+        const maxOddEvenRate = 0.10;
+        const maxAreaValueRate = 0.05;
+        const maxDirectionalRate = 0.05;
+        const maxNaturalNumberRate = 0.05;
 
         // --- Board State ---
         let board = [];
@@ -762,7 +763,7 @@
 
             areaValueSwitch.checked = pendingSettings.enableAreaValue;
 
-            naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber; // Set switch state
+            naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber;
 
             const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
 
@@ -791,7 +792,6 @@
 
             if (!rule) {
                 return;
-
             }
 
             switch (rule) {
@@ -1382,6 +1382,7 @@
                         }
                     }
                  }
+                 // ★★★ Restore probabilistic logic for others ★★★
                 if (enableAreaValue) {
                      const max = Math.floor(numPotential * maxAreaValueRate); // Use numPotential based rate
                      let count = 0;
