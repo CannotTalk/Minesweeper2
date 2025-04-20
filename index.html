@@ -17,6 +17,7 @@
             background-color: #f0f0f0;
             font-family: 'Press Start 2P', cursive;
             transition: background-color 0.5s ease;
+            overflow: hidden; /* Prevent scrollbars during animation */
         }
         body.game-over {
             background-color: #ff4444;
@@ -41,6 +42,7 @@
             padding: 0 5px;
             box-sizing: border-box;
             min-height: 30px;
+            position: relative;
         }
         #board {
             display: grid;
@@ -109,21 +111,17 @@
             margin-bottom: 2px;
             height: 14px;
             text-align: center;
-            /* visibility style removed */
         }
         #active-rules-display {
             font-size: 9px;
-            color: #555; /* Default color */
+            color: #555;
             margin-top: 0px;
             margin-bottom: 8px;
             line-height: 1.3;
             text-align: center;
             min-height: 40px;
         }
-        #active-rules-display div {
-            margin-bottom: 2px;
-        }
-        /* Add specific colors for each rule type */
+        #active-rules-display div { margin-bottom: 2px; }
         #active-rules-display .rule-display-hide {}
         #active-rules-display .rule-display-directional { color: #1a759f; }
         #active-rules-display .rule-display-oddEven { color: #0000CD; }
@@ -141,15 +139,15 @@
             order: 2;
             flex-grow: 1;
             margin: 0;
-            transition: color 0.3s ease; /* Smooth color transition for blinking */
+            transition: color 0.3s ease;
         }
-        .timer.blinking {
+        .timer.blinking span { /* Apply blinking to the span inside */
             animation: blink-red 1s infinite;
         }
 
         @keyframes blink-red {
             0%, 49% { color: red; }
-            50%, 100% { color: #333; } /* Default color */
+            50%, 100% { color: #333; }
         }
 
 
@@ -239,7 +237,9 @@
                  <button id="dig-mode-button" class="mode-button active" title="掘るモード">⛏️</button>
                  <button id="flag-mode-button" class="mode-button" title="旗モード">🚩</button>
              </div>
-            <div class="timer">Time: <span id="timer">00.00</span></div>
+            <div class="timer" id="timer-container"> <!-- Container ID -->
+                Time: <span id="timer-value">00.00</span> <!-- Value Span ID -->
+            </div>
             <button id="rules-button">Rules & Settings</button>
         </div>
 
@@ -499,8 +499,8 @@
 
         const messageBox = document.getElementById('message-box');
 
-        const timerDisplay = document.getElementById('timer');
-        const timerSpan = timerDisplay.querySelector('span');
+        const timerContainer = document.getElementById('timer-container'); // Get container div
+        const timerSpan = document.getElementById('timer-value');         // Get value span
 
         const body = document.body;
 
@@ -1040,7 +1040,7 @@
 
             switchMode('dig');
 
-            updateTimerDisplay(); // Reset display to initial state (00.00 or time limit)
+            updateTimerDisplay();
 
             messageBox.textContent = '';
 
@@ -1048,9 +1048,9 @@
             body.classList.remove('game-over');
 
             body.style.backgroundColor = '';
-            timerSpan.parentElement.classList.remove('blinking');
+            timerContainer.classList.remove('blinking');
             timerStartDisplay.classList.remove('visible', 'move-to-corner');
-            timerSpan.parentElement.classList.remove('hide-during-intro');
+            timerContainer.classList.remove('hide-during-intro');
 
 
             setTimeout(createBoard, 50);
@@ -1074,10 +1074,10 @@
 
                 remainingMilliseconds = timeLimitMilliseconds;
 
-                updateTimerDisplay(); // Show initial countdown time
+                updateTimerDisplay();
             } else {
-                elapsedMilliseconds = 0; // Ensure elapsed time starts at 0 for normal mode
-                updateTimerDisplay(); // Show initial 00.00
+                elapsedMilliseconds = 0;
+                updateTimerDisplay();
             }
 
             for (let i = 0; i < gridSize; i++) {
@@ -1151,10 +1151,10 @@
 
             // Trigger start animation only if time bomb is enabled
             if (enableTimeBomb) {
-                 timerSpan.parentElement.classList.add('hide-during-intro');
+                 timerContainer.classList.add('hide-during-intro');
                  setTimeout(startTimerAnimation, 100);
             } else {
-                 timerSpan.parentElement.classList.remove('hide-during-intro');
+                 timerContainer.classList.remove('hide-during-intro');
             }
 
         }
@@ -1174,8 +1174,7 @@
              // After animation duration, hide the large display and show the real timer
              setTimeout(() => {
                  timerStartDisplay.classList.remove('visible', 'move-to-corner');
-                 timerSpan.parentElement.classList.remove('hide-during-intro'); // Show normal timer
-                 // Timer interval will start on first interaction
+                 timerContainer.classList.remove('hide-during-intro'); // Show normal timer
                  updateTimerDisplay(); // Update display with remaining time just in case
              }, 1200 + 800); // 1.2s display + 0.8s animation
         }
@@ -1431,7 +1430,7 @@
                 // --- Numbers ON: Apply probabilistically ---
                  // Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide
                  if (enableDirectional) {
-                    const maxDir = (numPotential > 0) ? Math.floor(numPotential * maxDirectionalRate) : 0; // ★ Avoid NaN if numPotential is 0 ★
+                    const maxDir = (numPotential > 0) ? Math.floor(numPotential * maxDirectionalRate) : 0;
                     let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
                         if (count >= maxDir) { break; }
@@ -1459,7 +1458,7 @@
                     }
                  }
                 if (enableAreaValue) {
-                     const max = (numPotential > 0) ? Math.floor(numPotential * maxAreaValueRate) : 0; // ★ Avoid NaN ★
+                     const max = (numPotential > 0) ? Math.floor(numPotential * maxAreaValueRate) : 0;
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) { break; }
@@ -1474,7 +1473,7 @@
                      }
                 }
                 if (enableOddEven) {
-                     const max = (numPotential > 0) ? Math.floor(numPotential * maxOddEvenRate) : 0; // ★ Avoid NaN ★
+                     const max = (numPotential > 0) ? Math.floor(numPotential * maxOddEvenRate) : 0;
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= max) { break; }
@@ -1487,7 +1486,7 @@
                      }
                 }
                 if (enableNaturalNumber) {
-                     const maxNat = (numPotential > 0) ? Math.floor(numPotential * maxNaturalNumberRate) : 0; // ★ Avoid NaN ★
+                     const maxNat = (numPotential > 0) ? Math.floor(numPotential * maxNaturalNumberRate) : 0;
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                           if (count >= maxNat) { break; }
@@ -1501,7 +1500,7 @@
                       }
                  }
                 if (enableHide) {
-                     const maxHide = (numPotential > 0) ? Math.floor(numPotential * hideRateMax) : 0; // ★ Avoid NaN ★
+                     const maxHide = (numPotential > 0) ? Math.floor(numPotential * hideRateMax) : 0;
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= maxHide) { break; }
@@ -1655,14 +1654,14 @@
             el.className = 'square';
 
             el.textContent = '';
-            el.innerHTML = '';
+            el.innerHTML = ''; // Clear innerHTML as well
 
-            el.style.fontSize = '';
+            el.style.fontSize = ''; // Reset font size
 
             if (!sq.isRevealed) {
                 el.classList.add('hidden');
 
-                if (sq.isFlagged && !enableNoFlags) {
+                if (sq.isFlagged && !enableNoFlags) { // Only show flag if flags enabled
                     el.textContent = '🚩';
 
                 }
@@ -1679,16 +1678,17 @@
                     if (sq.isDirectional) {
                         el.classList.add('directional-square');
 
-                        el.textContent = sq.directionalSymbol + sq.directionalCount;
+                        el.textContent = sq.directionalSymbol + sq.directionalCount; // Use T,B,L,R
 
                     } else if (sq.isAreaValue) {
                         el.classList.add('special-square', 'area-value-square');
 
+                        // Use innerHTML for 4~6 case to allow line break
                         if (sq.areaValue === '4~6') {
                              el.innerHTML = '4~<br>6';
 
                         } else {
-                             el.textContent = sq.areaValue;
+                             el.textContent = sq.areaValue; // For ~3 and 7~
                         }
 
                     } else if (sq.isOddEven) {
@@ -1714,15 +1714,16 @@
 
                     }
                 }
-                 if (el.classList.contains('flag-wrong')) {
+                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added
                     el.textContent = '❌';
 
-                    el.classList.add('flag-wrong');
+                    el.classList.add('flag-wrong'); // Ensure class stays
                  }
             }
         }
 
         function updateMinesLeftDisplay() {
+             // ★ Always display the message box content ★
              messageBox.textContent = `Mines: ${minesLeft}`;
 
         }
@@ -1747,6 +1748,7 @@
 
                     }
                 }
+                // If time bomb is active, still need time left
                 if (enableTimeBomb && remainingMilliseconds <= 0) {
                     return; // Don't declare win if time ran out
                 }
@@ -1761,16 +1763,17 @@
                  return;
 
              }
-             gameOver = true;
+             gameOver = true; // Set game over flag immediately
 
-             clearInterval(timerInterval);
+             clearInterval(timerInterval); // Stop the timer
 
+             // Calculate final time if game had started
              if(gameStarted) {
                  if (!enableTimeBomb) {
                      elapsedMilliseconds = Date.now() - startTime;
 
                  }
-                 updateTimerDisplay();
+                 updateTimerDisplay(); // Update display one last time
 
              }
 
@@ -1779,6 +1782,7 @@
 
                 body.style.backgroundColor = '#aaffaa';
 
+                // Auto-flag remaining mines on win (only if flags are enabled)
                 if(!enableNoFlags){
                     for (let i=0; i<gridSize; i++) {
                         for (let j=0; j<gridSize; j++) {
@@ -1790,12 +1794,13 @@
                             }
                         }
                     }
-                    minesLeft = 0;
+                    minesLeft = 0; // Set to 0 only if auto-flagged
 
                     updateMinesLeftDisplay();
 
                 }
             } else {
+                // Only set Game Over message if not already won
                 if (messageBox.textContent !== 'Game Clear!') {
                     if (enableTimeBomb && remainingMilliseconds <= 0) {
                          messageBox.textContent = 'Time Up!';
@@ -1804,9 +1809,9 @@
                     }
                 }
 
-                body.classList.add('game-over');
+                body.classList.add('game-over'); // Use class for game over red
 
-                revealAllMines(true);
+                revealAllMines(true); // Show results
 
             }
         }
@@ -1819,7 +1824,7 @@
                     const el = sq.element;
 
                     if (sq.isMine) {
-                        if (sq.isFlagged && !enableNoFlags) {
+                        if (sq.isFlagged && !enableNoFlags) { // Keep correct flag only if flags enabled
                             continue;
 
                         }
@@ -1886,10 +1891,10 @@
 
             // Blinking logic for Time Bomb mode
             if (enableTimeBomb && displayMillis < 60000 && displayMillis > 0) { // Under 1 minute and not exactly 0
-                timerSpan.parentElement.classList.add('blinking');
+                timerContainer.classList.add('blinking');
 
             } else {
-                timerSpan.parentElement.classList.remove('blinking');
+                timerContainer.classList.remove('blinking');
 
             }
 
@@ -1917,7 +1922,7 @@
                 formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
             }
-            timerSpan.textContent = formattedTime; // Update the span inside the timer div
+            timerSpan.textContent = formattedTime; // Update the span's text
 
         }
 
