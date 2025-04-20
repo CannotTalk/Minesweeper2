@@ -14,14 +14,19 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px 0;
-            background-color: #f0f0f0;
+            background-color: #f0f0f0; /* Default background */
             font-family: 'Press Start 2P', cursive;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.5s ease; /* Ensure transition includes background-color */
             overflow: hidden; /* Prevent scrollbars during animation */
         }
         body.game-over {
-            background-color: #ff4444;
+            background-color: #ff4444; /* Game Over background */
         }
+        /* Low Time Background Style */
+        body.low-time {
+            background-color: #FDBE00; /* Yamabuki-iro (Bright Golden Yellow) */
+        }
+
         #game-container {
             display: flex;
             flex-direction: column;
@@ -114,7 +119,7 @@
         }
         #active-rules-display {
             font-size: 9px;
-            color: #555;
+            color: #555; /* Default color */
             margin-top: 0px;
             margin-bottom: 8px;
             line-height: 1.3;
@@ -147,7 +152,7 @@
 
         @keyframes blink-red {
             0%, 49% { color: red; }
-            50%, 100% { color: #333; }
+            50%, 100% { color: #333; } /* Default color */
         }
 
 
@@ -237,8 +242,8 @@
                  <button id="dig-mode-button" class="mode-button active" title="掘るモード">⛏️</button>
                  <button id="flag-mode-button" class="mode-button" title="旗モード">🚩</button>
              </div>
-            <div class="timer" id="timer-container"> <!-- Container ID -->
-                Time: <span id="timer-value">00.00</span> <!-- Value Span ID -->
+            <div class="timer" id="timer-container">
+                Time: <span id="timer-value">00.00</span>
             </div>
             <button id="rules-button">Rules & Settings</button>
         </div>
@@ -314,7 +319,7 @@
             </div>
             <div class="setting-section" data-rule-id="timeBomb">
                 <h4>時限爆弾モード (Time Bombs Mode)</h4>
-                <p>制限時間(3分～10分)以内にクリアしないとゲームオーバーになります。</p>
+                <p>制限時間(2分30秒～8分)以内にクリアしないとゲームオーバーになります。</p>
                 <div class="setting-label">
                     <span>有効</span>
                     <div>
@@ -499,8 +504,8 @@
 
         const messageBox = document.getElementById('message-box');
 
-        const timerContainer = document.getElementById('timer-container'); // Get container div
-        const timerSpan = document.getElementById('timer-value');         // Get value span
+        const timerContainer = document.getElementById('timer-container'); // Get the container div
+        const timerSpan = document.getElementById('timer-value');         // Get the span holding the time value
 
         const body = document.body;
 
@@ -1040,14 +1045,15 @@
 
             switchMode('dig');
 
-            updateTimerDisplay();
+            updateTimerDisplay(); // Reset display
 
             messageBox.textContent = '';
 
             activeRulesDisplay.innerHTML = '';
             body.classList.remove('game-over');
 
-            body.style.backgroundColor = '';
+            body.classList.remove('low-time'); // Remove low-time class on reset
+            body.style.backgroundColor = ''; // Reset inline background style
             timerContainer.classList.remove('blinking');
             timerStartDisplay.classList.remove('visible', 'move-to-corner');
             timerContainer.classList.remove('hide-during-intro');
@@ -1070,14 +1076,16 @@
 
             // Set up time bomb if enabled BEFORE creating squares
             if (enableTimeBomb) {
-                timeLimitMilliseconds = Math.floor(Math.random() * (600000 - 180000 + 1)) + 180000;
+                const minTime = 150000; // 2:30
+                const maxTime = 480000; // 8:00
+                timeLimitMilliseconds = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
 
                 remainingMilliseconds = timeLimitMilliseconds;
 
-                updateTimerDisplay();
+                updateTimerDisplay(); // Show initial countdown time
             } else {
-                elapsedMilliseconds = 0;
-                updateTimerDisplay();
+                elapsedMilliseconds = 0; // Ensure elapsed time starts at 0 for normal mode
+                updateTimerDisplay(); // Show initial 00.00
             }
 
             for (let i = 0; i < gridSize; i++) {
@@ -1386,7 +1394,7 @@
                         }
                     }
                 }
-                if (enableAreaValue) {
+                if (enableAreaValue) { // ★ Restore deterministic logic ★
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
@@ -1398,7 +1406,7 @@
                          }
                     }
                 }
-                if (enableOddEven) {
+                if (enableOddEven) { // ★ Restore deterministic logic ★
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
@@ -1408,7 +1416,7 @@
                          }
                     }
                 }
-                if (enableNaturalNumber) {
+                if (enableNaturalNumber) { // ★ Restore deterministic logic ★
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`; const sq = board[r][c];
                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isNaturalNumber')) {
@@ -1419,7 +1427,7 @@
                     }
                 }
                 // Apply hide to remaining if enabled (or if numbers off and hide off)
-                if (enableHide || !enableNumbers) {
+                if (enableHide || !enableNumbers) { // ★ Restore hide logic ★
                     for (const { r, c } of potentialNumberSquares) {
                          if (!assignedSpecial.has(`${r}-${c}`)) {
                              board[r][c].isHide = true;
@@ -1457,6 +1465,7 @@
                         }
                     }
                  }
+                 // ★★★ Restore probabilistic logic for others ★★★
                 if (enableAreaValue) {
                      const max = (numPotential > 0) ? Math.floor(numPotential * maxAreaValueRate) : 0;
                      let count = 0;
@@ -1654,14 +1663,14 @@
             el.className = 'square';
 
             el.textContent = '';
-            el.innerHTML = ''; // Clear innerHTML as well
+            el.innerHTML = '';
 
-            el.style.fontSize = ''; // Reset font size
+            el.style.fontSize = '';
 
             if (!sq.isRevealed) {
                 el.classList.add('hidden');
 
-                if (sq.isFlagged && !enableNoFlags) { // Only show flag if flags enabled
+                if (sq.isFlagged && !enableNoFlags) {
                     el.textContent = '🚩';
 
                 }
@@ -1678,17 +1687,16 @@
                     if (sq.isDirectional) {
                         el.classList.add('directional-square');
 
-                        el.textContent = sq.directionalSymbol + sq.directionalCount; // Use T,B,L,R
+                        el.textContent = sq.directionalSymbol + sq.directionalCount;
 
                     } else if (sq.isAreaValue) {
                         el.classList.add('special-square', 'area-value-square');
 
-                        // Use innerHTML for 4~6 case to allow line break
                         if (sq.areaValue === '4~6') {
                              el.innerHTML = '4~<br>6';
 
                         } else {
-                             el.textContent = sq.areaValue; // For ~3 and 7~
+                             el.textContent = sq.areaValue;
                         }
 
                     } else if (sq.isOddEven) {
@@ -1714,16 +1722,15 @@
 
                     }
                 }
-                 if (el.classList.contains('flag-wrong')) { // Check if flag-wrong was added
+                 if (el.classList.contains('flag-wrong')) {
                     el.textContent = '❌';
 
-                    el.classList.add('flag-wrong'); // Ensure class stays
+                    el.classList.add('flag-wrong');
                  }
             }
         }
 
         function updateMinesLeftDisplay() {
-             // ★ Always display the message box content ★
              messageBox.textContent = `Mines: ${minesLeft}`;
 
         }
@@ -1748,9 +1755,8 @@
 
                     }
                 }
-                // If time bomb is active, still need time left
                 if (enableTimeBomb && remainingMilliseconds <= 0) {
-                    return; // Don't declare win if time ran out
+                    return;
                 }
 
                 endGame(true); // Trigger win
@@ -1763,26 +1769,27 @@
                  return;
 
              }
-             gameOver = true; // Set game over flag immediately
+             gameOver = true;
 
-             clearInterval(timerInterval); // Stop the timer
+             clearInterval(timerInterval);
 
-             // Calculate final time if game had started
+             body.classList.remove('low-time'); // Ensure low-time class is removed on game end
+             timerContainer.classList.remove('blinking');
+
+
              if(gameStarted) {
                  if (!enableTimeBomb) {
                      elapsedMilliseconds = Date.now() - startTime;
 
                  }
-                 updateTimerDisplay(); // Update display one last time
+                 updateTimerDisplay();
 
              }
-
             if (isWin) {
                 messageBox.textContent = 'Game Clear!';
 
                 body.style.backgroundColor = '#aaffaa';
 
-                // Auto-flag remaining mines on win (only if flags are enabled)
                 if(!enableNoFlags){
                     for (let i=0; i<gridSize; i++) {
                         for (let j=0; j<gridSize; j++) {
@@ -1794,13 +1801,12 @@
                             }
                         }
                     }
-                    minesLeft = 0; // Set to 0 only if auto-flagged
+                    minesLeft = 0;
 
                     updateMinesLeftDisplay();
 
                 }
             } else {
-                // Only set Game Over message if not already won
                 if (messageBox.textContent !== 'Game Clear!') {
                     if (enableTimeBomb && remainingMilliseconds <= 0) {
                          messageBox.textContent = 'Time Up!';
@@ -1809,9 +1815,9 @@
                     }
                 }
 
-                body.classList.add('game-over'); // Use class for game over red
+                body.classList.add('game-over');
 
-                revealAllMines(true); // Show results
+                revealAllMines(true);
 
             }
         }
@@ -1824,7 +1830,7 @@
                     const el = sq.element;
 
                     if (sq.isMine) {
-                        if (sq.isFlagged && !enableNoFlags) { // Keep correct flag only if flags enabled
+                        if (sq.isFlagged && !enableNoFlags) {
                             continue;
 
                         }
@@ -1889,14 +1895,23 @@
 
             const displayMillis = Math.max(0, timeToDisplay); // Ensure non-negative
 
-            // Blinking logic for Time Bomb mode
-            if (enableTimeBomb && displayMillis < 60000 && displayMillis > 0) { // Under 1 minute and not exactly 0
-                timerContainer.classList.add('blinking');
+            // Blinking and Background logic for Time Bomb mode
+            if (enableTimeBomb) {
+                if (displayMillis < 60000 && displayMillis > 0) { // Under 1 minute and not exactly 0
+                    timerContainer.classList.add('blinking');
+                    body.classList.add('low-time'); // Add low-time class
 
+                } else {
+                    timerContainer.classList.remove('blinking');
+                    body.classList.remove('low-time'); // Remove low-time class
+
+                }
             } else {
-                timerContainer.classList.remove('blinking');
-
+                 // Ensure blinking/low time class is removed if not time bomb mode
+                 timerContainer.classList.remove('blinking');
+                 body.classList.remove('low-time');
             }
+
 
             if (displayMillis < 60000) { // Less than 1 minute
                 const s = Math.floor(displayMillis / 1000);
