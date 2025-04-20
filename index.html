@@ -14,19 +14,17 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px 0;
-            background-color: #f0f0f0; /* Default background */
+            background-color: #f0f0f0;
             font-family: 'Press Start 2P', cursive;
-            transition: background-color 0.5s ease; /* Ensure transition includes background-color */
+            transition: background-color 0.5s ease;
             overflow: hidden; /* Prevent scrollbars during animation */
         }
         body.game-over {
-            background-color: #ff4444; /* Game Over background */
+            background-color: #ff4444;
         }
-        /* Low Time Background Style */
         body.low-time {
-            background-color: #FDBE00; /* Yamabuki-iro (Bright Golden Yellow) */
+            background-color: #FDBE00; /* Yamabuki-iro */
         }
-
         #game-container {
             display: flex;
             flex-direction: column;
@@ -227,10 +225,59 @@
         body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons { display: none; }
 
          /* Timer Start Animation Styles */
-        #timer-start-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(2); font-size: 48px; font-family: 'Press Start 2P', cursive; color: #333; background-color: rgba(255, 255, 255, 0.8); padding: 10px 20px; border-radius: 5px; z-index: 101; opacity: 0; pointer-events: none; transition: transform 0.8s ease-out, opacity 0.8s ease-out, top 0.8s ease-out, left 0.8s ease-out, font-size 0.8s ease-out; }
-        #timer-start-display.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #timer-start-display.move-to-corner { top: 25px; left: 50%; transform: translateX(-50%) scale(0.6); font-size: 14px; opacity: 0; }
-        .timer.hide-during-intro { visibility: hidden; }
+        #timer-start-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(2); /* Start larger and centered */
+            font-size: 48px; /* Large font */
+            font-family: 'Press Start 2P', cursive;
+            color: #DC143C; /* Use Crimson for timer text */
+            /* background-color: rgba(255, 255, 255, 0.8); /* Removed background */
+            /* padding: 10px 20px; /* Removed padding */
+            border-radius: 5px;
+            z-index: 101; /* Above popup overlay */
+            opacity: 0; /* Start hidden */
+            pointer-events: none; /* Don't block clicks */
+             /* ★ Animation duration halved to 0.4s ★ */
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out, top 0.4s ease-out, left 0.4s ease-out, font-size 0.4s ease-out, color 0.4s ease-out;
+            animation: start-blink 1s infinite; /* ★ Add blinking animation ★ */
+        }
+        #timer-start-display.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1); /* Fade in and normal size */
+        }
+        #timer-start-display.move-to-corner {
+            top: 25px; /* Approximate final top position */
+            left: 50%; /* Center horizontally first */
+            transform: translateX(-50%) scale(0.6); /* Move towards corner and shrink */
+            font-size: 14px; /* Final font size */
+            opacity: 0; /* Fade out */
+            color: #333; /* Fade to normal timer color */
+            animation: none; /* Stop blinking during move */
+        }
+        .timer.hide-during-intro { /* Class to hide normal timer during intro */
+            visibility: hidden;
+        }
+
+        /* ★ Keyframes for start blinking ★ */
+        @keyframes start-blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0.5; }
+        }
+
+        /* ★ Style to disable interactions during intro ★ */
+        body.timer-intro-active * {
+            pointer-events: none !important; /* Disable clicks/taps on all elements */
+        }
+        /* Allow interaction only on the popup if it's somehow open */
+        body.timer-intro-active #rules-popup,
+        body.timer-intro-active #popup-overlay {
+            pointer-events: auto !important;
+        }
+         body.timer-intro-active #rules-popup * {
+             pointer-events: auto !important; /* Allow clicks inside popup */
+         }
 
     </style>
 </head>
@@ -319,7 +366,7 @@
             </div>
             <div class="setting-section" data-rule-id="timeBomb">
                 <h4>時限爆弾モード (Time Bombs Mode)</h4>
-                <p>制限時間(2分30秒～8分)以内にクリアしないとゲームオーバーになります。</p>
+                <p>制限時間(3分～8分)以内にクリアしないとゲームオーバーになります。</p> <!-- Updated time range -->
                 <div class="setting-label">
                     <span>有効</span>
                     <div>
@@ -1051,8 +1098,8 @@
 
             activeRulesDisplay.innerHTML = '';
             body.classList.remove('game-over');
-
             body.classList.remove('low-time'); // Remove low-time class on reset
+
             body.style.backgroundColor = ''; // Reset inline background style
             timerContainer.classList.remove('blinking');
             timerStartDisplay.classList.remove('visible', 'move-to-corner');
@@ -1076,8 +1123,9 @@
 
             // Set up time bomb if enabled BEFORE creating squares
             if (enableTimeBomb) {
-                const minTime = 150000; // 2:30
-                const maxTime = 480000; // 8:00
+                // Updated time range: 3:00 (180000ms) to 8:00 (480000ms)
+                const minTime = 180000;
+                const maxTime = 480000;
                 timeLimitMilliseconds = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
 
                 remainingMilliseconds = timeLimitMilliseconds;
@@ -1173,6 +1221,7 @@
              const seconds = Math.floor((timeLimitMilliseconds % 60000) / 1000);
              timerStartDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
              timerStartDisplay.classList.add('visible'); // Make it appear
+             body.classList.add('timer-intro-active'); // Disable interactions
 
              // After a short display, trigger the move animation
              setTimeout(() => {
@@ -1183,8 +1232,9 @@
              setTimeout(() => {
                  timerStartDisplay.classList.remove('visible', 'move-to-corner');
                  timerContainer.classList.remove('hide-during-intro'); // Show normal timer
+                 body.classList.remove('timer-intro-active'); // Enable interactions
                  updateTimerDisplay(); // Update display with remaining time just in case
-             }, 1200 + 800); // 1.2s display + 0.8s animation
+             }, 1200 + 400); // 1.2s display + 0.4s animation (halved duration)
         }
 
 
@@ -1394,7 +1444,7 @@
                         }
                     }
                 }
-                if (enableAreaValue) { // ★ Restore deterministic logic ★
+                if (enableAreaValue) {
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`;
                          if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isAreaValue')) {
@@ -1406,7 +1456,7 @@
                          }
                     }
                 }
-                if (enableOddEven) { // ★ Restore deterministic logic ★
+                if (enableOddEven) {
                      for (const { r, c } of potentialNumberSquares) {
                          const k = `${r}-${c}`; const sq = board[r][c];
                          if (!assignedSpecial.has(k) && sq.adjacentMines > 1 && !hasNeighborOfType(r, c, 'isOddEven')) {
@@ -1416,7 +1466,7 @@
                          }
                     }
                 }
-                if (enableNaturalNumber) { // ★ Restore deterministic logic ★
+                if (enableNaturalNumber) {
                     for (const { r, c } of potentialNumberSquares) {
                         const k = `${r}-${c}`; const sq = board[r][c];
                         if (!assignedSpecial.has(k) && !hasNeighborOfType(r, c, 'isNaturalNumber')) {
@@ -1427,7 +1477,7 @@
                     }
                 }
                 // Apply hide to remaining if enabled (or if numbers off and hide off)
-                if (enableHide || !enableNumbers) { // ★ Restore hide logic ★
+                if (enableHide || !enableNumbers) {
                     for (const { r, c } of potentialNumberSquares) {
                          if (!assignedSpecial.has(`${r}-${c}`)) {
                              board[r][c].isHide = true;
@@ -1465,7 +1515,6 @@
                         }
                     }
                  }
-                 // ★★★ Restore probabilistic logic for others ★★★
                 if (enableAreaValue) {
                      const max = (numPotential > 0) ? Math.floor(numPotential * maxAreaValueRate) : 0;
                      let count = 0;
@@ -1773,7 +1822,7 @@
 
              clearInterval(timerInterval);
 
-             body.classList.remove('low-time'); // Ensure low-time class is removed on game end
+             body.classList.remove('low-time');
              timerContainer.classList.remove('blinking');
 
 
