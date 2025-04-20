@@ -307,7 +307,6 @@
             font-family: sans-serif;
         }
 
-
         #time-bomb-random-switch-label,
         #game-over-on-time-only-label { /* Style for labels next to switches */
             display: flex;
@@ -468,7 +467,9 @@
                               <span class="slider round"></span>
                          </label>
                      </div>
-                     <p style="font-size:10px; margin-top: 0; text-align: center;">有効時、地雷を踏むとペナルティ(15秒)が課されます。</p>
+                     <p style="font-size:10px; margin-top: 0; text-align: center;">
+                        有効時、地雷を踏むとペナルティ(15秒)が課されます。<br>ただし、全ての地雷を踏んだ場合もゲームオーバーになります。
+                     </p>
                 </div>
             </div>
 
@@ -618,6 +619,7 @@
         let board = [];
         let minesLeft = numMines;
         let revealedNonMineCount = 0;
+        let clickedMineCount = 0; // Count how many mines have been clicked in penalty mode
         let gameOver = false;
         let timerInterval = null; // Initialize as null
         let elapsedMilliseconds = 0;
@@ -745,7 +747,7 @@
             }
         }
 
-        // Formats milliseconds to a display string (MM:SS or H:MM:SS) - used for display
+        // Formats milliseconds to a display string (MM:SS or HH:MM:SS) - used for display
         function formatMsToDisplayTime(ms, includeHoursForce = false) {
              if (typeof ms !== 'number' || ms < 0) {
                  return '00:00';
@@ -1168,6 +1170,7 @@
             startTime = 0;
             gameStarted = false;
             revealedNonMineCount = 0;
+            clickedMineCount = 0; // Reset clicked mine count
             penaltyOffsetMs = 0; // Reset penalty offset
 
             minesLeft = numMines;
@@ -1182,8 +1185,7 @@
 
             updateTimerDisplay();
             // Update active rules *after* potentially resetting timeLimitMilliseconds
-            // But createBoard will set the *actual* limit, so update again there?
-            // Let's update here first for initial view, then createBoard updates based on actual random time if needed.
+            // createBoard will set the *actual* limit, so update again there.
             updateActiveRulesDisplay();
             updateNoFlagsUI();
             setTimeout(createBoard, 50);
@@ -1193,6 +1195,7 @@
             board = [];
             gameOver = false;
             revealedNonMineCount = 0;
+            clickedMineCount = 0; // Reset clicked mine count
             penaltyOffsetMs = 0; // Reset penalty on new board
             boardElement.innerHTML = '';
 
@@ -1269,9 +1272,9 @@
                 return;
             }
 
-            // Determine display format based on duration
-            const includeHours = timeLimitMilliseconds >= 3600000; // 60 minutes
-            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours); // Pass flag
+            // Determine display format based on duration (< 60min = MM:SS, >= 60min = HH:MM:SS)
+            const includeHours = timeLimitMilliseconds >= 3600000;
+            timerStartDisplay.textContent = formatMsToDisplayTime(timeLimitMilliseconds, includeHours);
 
             timerStartDisplay.style.animation = 'start-blink 1s infinite'; // Black blink
             timerStartDisplay.classList.add('visible');
@@ -1368,9 +1371,9 @@
         }
 
         function calculateNaturalNumberValue(n) {
-             const p=[2,3,5,7];
-             if(p.includes(n)) return n.toString();
-             switch(n){
+             const p = [2, 3, 5, 7];
+             if (p.includes(n)) return n.toString();
+             switch (n) {
                   case 0: return "?"; case 1: return "-1"; case 4: return "±1";
                   case 6: return "±1"; case 8: return "+1"; default: return "?";
              }
@@ -1417,37 +1420,35 @@
                 }
                 if (square.isMine) {
                     // --- Mine Hit Logic ---
-                    revealMine(r, c); // Always reveal the clicked mine
+                    if (!square.isRevealed) { // Only penalize/check on first reveal of this mine
+                        revealMine(r, c);
+                        clickedMineCount++; // Increment count of revealed mines
 
-                    if (enableTimeBomb && gameOverOnTimeOnly) {
-                        // Penalty Mode
-                        penaltyOffsetMs += MINE_PENALTY_MS; // Add penalty to offset
-                        // Visual Flash
-                        const wasLowTime = body.classList.contains('low-time'); // Check before flash
-                        body.style.transition = 'background-color 0.1s ease-out';
-                        body.style.backgroundColor = '#ffdddd'; // Light red flash
-                        setTimeout(() => {
-                            body.style.transition = 'background-color 0.5s ease'; // Restore smooth transition
-                            body.style.backgroundColor = ''; // Remove inline style
-                            // Re-apply yellow background if it was low time before flash
-                            // updateTimerDisplay will handle blinking correctly based on new time
-                            if (wasLowTime) {
-                                body.classList.add('low-time'); // Ensure yellow remains if still applicable
-                            }
-                            updateTimerDisplay(); // Update display *after* flash clears
-                        }, 150); // Duration of flash
+                        if (enableTimeBomb && gameOverOnTimeOnly) {
+                            // Penalty Mode
+                            penaltyOffsetMs += MINE_PENALTY_MS;
+                            const wasLowTime = body.classList.contains('low-time');
+                            body.style.transition = 'background-color 0.1s ease-out';
+                            body.style.backgroundColor = '#ffdddd';
+                            setTimeout(() => {
+                                body.style.transition = 'background-color 0.5s ease';
+                                body.style.backgroundColor = '';
+                                if (wasLowTime) body.classList.add('low-time'); // Re-apply yellow if still needed
+                                updateTimerDisplay();
+                            }, 150);
 
-                        // Check immediately if penalty causes game over
-                        setTimeout(() => {
-                            const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
-                            if (currentRemaining <= 0 && !gameOver) {
-                                endGame(false);
-                            }
-                        }, timerUpdateInterval + 10); // Check slightly after next timer tick
+                            // Check if all mines are now revealed OR if time is up
+                            setTimeout(() => {
+                                const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                                if ((clickedMineCount >= numMines || currentRemaining <= 0) && !gameOver) {
+                                    endGame(false);
+                                }
+                            }, timerUpdateInterval + 10);
 
-                    } else {
-                        // Standard Mode: Game over immediately
-                        endGame(false);
+                        } else {
+                            // Standard Mode: Game over immediately
+                            endGame(false);
+                        }
                     }
                 } else {
                     // Safe Square Clicked
@@ -1497,9 +1498,7 @@
 
         function revealMine(r, c) {
             const sq = board[r][c];
-            if (sq.isRevealed) {
-                return; // Avoid revealing if already revealed
-            }
+            // No need to check isRevealed here, handled in handleSquareInteraction
             sq.isRevealed = true; // Mark as revealed
             sq.element.classList.remove('hidden', 'flagged');
             sq.element.classList.add('revealed', 'mine', 'mine-clicked'); // Add clicked state
@@ -1640,7 +1639,20 @@
                 if (enableTimeBomb) {
                     remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs);
                 }
-                updateTimerDisplay(); // Show final time
+
+                // --- Special Timer Display on Win with Time Bomb ---
+                if (isWin && enableTimeBomb) {
+                    const finalSeconds = Math.floor(remainingMilliseconds / 1000);
+                    const finalCentiseconds = Math.floor((remainingMilliseconds % 1000) / 10);
+                    timerSpan.textContent = `${String(finalSeconds).padStart(2, '0')}.${String(finalCentiseconds).padStart(2, '0')}`;
+                } else {
+                    updateTimerDisplay(); // Use standard display format otherwise
+                }
+                // --------------------------------------------------
+
+            } else {
+                 // If game ends before starting (e.g., debug button), ensure timer shows 0 or initial time
+                 updateTimerDisplay();
             }
 
             if (isWin) {
@@ -1660,7 +1672,14 @@
                 }
             } else { // Game Lost
                 if (messageBox.textContent !== 'Game Clear!') {
-                    messageBox.textContent = (enableTimeBomb && remainingMilliseconds <= 0) ? 'Time Up!' : 'Game Over!';
+                     // Check if lost due to clicking all mines in penalty mode
+                     if (enableTimeBomb && gameOverOnTimeOnly && clickedMineCount >= numMines) {
+                          messageBox.textContent = 'All Mines Hit!';
+                     } else if (enableTimeBomb && remainingMilliseconds <= 0) {
+                          messageBox.textContent = 'Time Up!';
+                     } else {
+                          messageBox.textContent = 'Game Over!';
+                     }
                 }
                 body.classList.add('game-over');
                 revealAllMines(true);
@@ -1726,6 +1745,11 @@
         }
 
         function updateTimerDisplay() {
+             // Don't update if game won with time bomb (handled in endGame)
+             if (gameOver && isWin && enableTimeBomb) {
+                  return;
+             }
+
             let formattedTime;
             let displayMillis;
 
