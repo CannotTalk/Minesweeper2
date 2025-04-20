@@ -154,10 +154,7 @@
         .area-value-square{
             color: #902094;
             font-weight: bold;
-            font-size: 9px; /* Reset font size to standard special size */
-            /* line-height: 0.9; */ /* Reset line height */
-            /* padding-top: 2px; */ /* Reset padding */
-            /* box-sizing: border-box; */ /* Reset box-sizing */
+            font-size: 9px; /* Reset font size */
         }
         .directional-square {
             color: #1a759f;
@@ -1349,7 +1346,7 @@
                 // --- Numbers ON: Apply probabilistically ---
                  // Order: Directional -> AreaValue -> OddEven -> NaturalNumber -> Hide
                  if (enableDirectional) {
-                    const maxDir = Math.floor(numPotential * maxDirectionalRate); // Use rate
+                    const maxDir = Math.floor(numPotential * maxDirectionalRate); // Use updated rate
                     let count = 0;
                     for (const { r, c } of potentialNumberSquares) {
                         if (count >= maxDir) { break; }
@@ -1376,7 +1373,7 @@
                         }
                     }
                  }
-                if (enableAreaValue) { // ★ Restore probabilistic logic ★
+                if (enableAreaValue) {
                      const max = Math.floor(numPotential * maxAreaValueRate); // Use numPotential based rate
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -1391,7 +1388,7 @@
                          }
                      }
                 }
-                if (enableOddEven) { // ★ Restore probabilistic logic ★
+                if (enableOddEven) {
                      const max = Math.floor(numPotential * maxOddEvenRate); // Use numPotential based rate
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -1404,7 +1401,7 @@
                          }
                      }
                 }
-                if (enableNaturalNumber) { // ★ Restore probabilistic logic ★
+                if (enableNaturalNumber) {
                      const maxNat = Math.floor(numPotential * maxNaturalNumberRate); // Use rate
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
@@ -1418,13 +1415,13 @@
                            }
                       }
                  }
-                if (enableHide) { // ★ Restore probabilistic logic ★
+                if (enableHide) {
                      const maxHide = Math.floor(numPotential * hideRateMax);
                      let count = 0;
                      for (const { r, c } of potentialNumberSquares) {
                          if (count >= maxHide) { break; }
                          const k = `${r}-${c}`;
-                         if (!assignedSpecial.has(k)) {
+                         if (!assignedSpecial.has(k)) { // Only hide if not already special
                             board[r][c].isHide = true;
                             count++;
                         }
@@ -1599,8 +1596,12 @@
                     } else if (sq.isAreaValue) {
                         el.classList.add('special-square', 'area-value-square');
 
-                        // Updated Area Value text display
-                        el.textContent = sq.areaValue; // Use the stored value directly
+                        // Use innerHTML for 4~6 case to allow line break
+                        if (sq.areaValue === '4~6') {
+                             el.innerHTML = '4~<br>6';
+                        } else {
+                             el.textContent = sq.areaValue; // For ~3 and 7~
+                        }
 
                     } else if (sq.isOddEven) {
                         el.classList.add('special-square', 'odd-even-square');
@@ -1608,7 +1609,7 @@
                         el.textContent = sq.oddEvenValue;
 
                     } else if (sq.isNaturalNumber) {
-                         el.classList.add('natural-number-square');
+                         el.classList.add('natural-number-square', 'special-square');
                          if (sq.naturalNumberValue === '±1') { el.style.fontSize = '10px'; }
                          el.textContent = sq.naturalNumberValue;
 
