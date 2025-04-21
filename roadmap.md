@@ -17,4 +17,6 @@
   1. Basketball
   2. Big is better than small
   3. Culling by special rule squares
+  4. Perfect infection control
+  5. Torras
 </details>
