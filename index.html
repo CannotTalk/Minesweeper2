@@ -172,7 +172,7 @@
         #active-rules-display .rule-display-noFlags {}
         #active-rules-display .rule-display-standard {}
         #active-rules-display .rule-display-timeBomb { color: #DC143C; }
-        #active-rules-display .rule-display-gameOverOnTimeOnly { color: #8B4513; }
+        #active-rules-display .rule-display-gameOverOnTimeOnly { color: #8B13; }
         #active-rules-display .rule-display-blind { color: #8B0000; font-weight: bold; }
 
 
@@ -239,7 +239,7 @@
          #rules-popup .switch { margin-left: 8px; }
          .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid #ccc; background-color: #f9f9f9; margin-top: auto; }
          #save-settings-button { padding: 6px 12px; font-size: 12px; font-family: 'Press Start 2P', cursive; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px; }
-         #save-settings-button:hover { background-color: #45a049; }
+         #save-settings-button:hover { background-color: #a049; }
 
          #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
          #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px;}
@@ -564,17 +564,31 @@
         const BASKETBALL_INTERVAL_MS = 10000;
 
         const defaultSettings = {
-             numMines: 30, enableNoFlags: false, enableTimeBomb: false, timeLimitRandom: true,
-             timeLimitMinMs: 180000, timeLimitMaxMs: 480000, timeLimitFixedMs: 300000,
-             gameOverOnTimeOnly: false, enableNumbers: true, enableHide: true, hideRateMax: 0.10,
-             enableDirectional: true, enableOddEven: true, enableAreaValue: true, enableNaturalNumber: true,
-             enableBlind: false
+            numMines: 30, 
+            enableNoFlags: false, 
+            enableTimeBomb: false, 
+            timeLimitRandom: true,
+            timeLimitMinMs: 180000, 
+            timeLimitMaxMs: 480000, 
+            timeLimitFixedMs: 300000,
+            gameOverOnTimeOnly: false, 
+            enableNumbers: true, 
+            enableHide: true,
+            hideRateMax: 0.10,
+            enableDirectional: true, 
+            enableOddEven: true,
+            enableAreaValue: true, 
+            enableNaturalNumber: true,
+            enableBlind: false
         };
 
         // Blind Mode Constants
-        const BLIND_MINE_MIN = 40; const BLIND_MINE_MAX = 50;
-        const BLIND_HIDE_RATE = 0.20; const BLIND_DIRECTIONAL_RATE = 0.10;
-        const BLIND_ODDEVEN_RATE = 0.10; const BLIND_AREAVALUE_RATE = 0.05;
+        const BLIND_MINE_MIN = 30; 
+        const BLIND_MINE_MAX = 40;
+        const BLIND_HIDE_RATE = 0.20; 
+        const BLIND_DIRECTIONAL_RATE = 0.10;
+        const BLIND_ODDEVEN_RATE = 0.10; 
+        const BLIND_AREAVALUE_RATE = 0.05;
         const BLIND_NATURALNUMBER_RATE = 0.05;
         const MIN_ERROR_RATE = 0.10;
 
@@ -592,22 +606,39 @@
 
         let numMines = defaultSettings.numMines;
         let currentMaxHideRate = defaultSettings.hideRateMax;
-        let currentMaxOddEvenRate = 0.10; let currentMaxAreaValueRate = 0.03;
-        let currentMaxDirectionalRate = 0.05; let currentMaxNaturalNumberRate = 0.05;
+        let currentMaxOddEvenRate = 0.10; 
+        let currentMaxAreaValueRate = 0.03;
+        let currentMaxDirectionalRate = 0.05;
+        let currentMaxNaturalNumberRate = 0.05;
 
         // --- Board State ---
-        let board = []; let minesLeft = numMines; let revealedNonMineCount = 0;
-        let clickedMineCount = 0; let gameOver = false; let timerInterval = null;
-        let elapsedMilliseconds = 0; let remainingMilliseconds = 0; let timeLimitMilliseconds = 0;
-        const timerUpdateInterval = 50; let gameStarted = false; let startTime = 0; let penaltyOffsetMs = 0;
+        let board = []; 
+        let minesLeft = numMines; 
+        let revealedNonMineCount = 0;
+        let clickedMineCount = 0; 
+        let gameOver = false; 
+        let timerInterval = null;
+        let elapsedMilliseconds = 0;
+        let remainingMilliseconds = 0;
+        let timeLimitMilliseconds = 0;
+        const timerUpdateInterval = 50; 
+        let gameStarted = false; 
+        let startTime = 0; 
+        let penaltyOffsetMs = 0;
 
         // Interaction Mode State
-        let currentInteractionMode = 'dig'; let pcOperationMode = 'mouse'; let isTouch = false; let justFlagged = false;
+        let currentInteractionMode = 'dig';
+        let pcOperationMode = 'mouse'; 
+        let isTouch = false; 
+        let justFlagged = false;
 
         // Blind Mode State
-        let activeBlindRule = null; let basketballTimerInterval = null;
-        let basketballRemainingMs = BASKETBALL_INTERVAL_MS; let basketballStartTime = 0;
-        let anomalyTargetType = null; let currentAnomalyRate = 0;
+        let activeBlindRule = null;
+        let basketballTimerInterval = null;
+        let basketballRemainingMs = BASKETBALL_INTERVAL_MS;
+        let basketballStartTime = 0;
+        let anomalyTargetType = null;
+        let currentAnomalyRate = 0;
 
         // --- Get DOM Elements ---
         const boardElement = document.getElementById('board');
@@ -694,31 +725,49 @@
             const h = parseInt(hoursInput?.value, 10) || 0;
             const m = parseInt(minutesInput?.value, 10) || 0;
             const s = parseInt(secondsInput?.value, 10) || 0;
-            if (h < 0 || m < 0 || m > 59 || s < 0 || s > 59) { console.warn("Invalid time input values:", h, m, s); return null; }
+            if (h < 0 || m < 0 || m > 59 || s < 0 || s > 59) { 
+                console.warn("Invalid time input values:", h, m, s); 
+                return null; 
+            }
             return (h * 3600 + m * 60 + s) * 1000;
         }
 
         function formatMsToInputs(ms, hoursInput, minutesInput, secondsInput) {
             if (typeof ms !== 'number' || ms < 0) { ms = 0; }
-            const totalSeconds = Math.floor(ms / 1000); const seconds = totalSeconds % 60;
-            const totalMinutes = Math.floor(totalSeconds / 60); const minutes = totalMinutes % 60;
+            const totalSeconds = Math.floor(ms / 1000); 
+            const seconds = totalSeconds % 60;
+            const totalMinutes = Math.floor(totalSeconds / 60); 
+            const minutes = totalMinutes % 60;
             const hours = Math.floor(totalMinutes / 60);
-            if (hoursInput) { hoursInput.value = hours; } if (minutesInput) { minutesInput.value = minutes; } if (secondsInput) { secondsInput.value = seconds; }
+            if (hoursInput) { hoursInput.value = hours; } 
+            if (minutesInput) { minutesInput.value = minutes; } 
+            if (secondsInput) { secondsInput.value = seconds; }
         }
 
         function formatMsToDisplayTime(ms, includeHoursForce = false) {
-            if (typeof ms !== 'number' || ms < 0) { return '00:00'; }
-            const totalSeconds = Math.floor(ms / 1000); const seconds = String(totalSeconds % 60).padStart(2, '0');
-            const totalMinutes = Math.floor(totalSeconds / 60); const minutes = String(totalMinutes % 60).padStart(2, '0');
+            if (typeof ms !== 'number' || ms < 0) {
+                return '00:00'; 
+            }
+            const totalSeconds = Math.floor(ms / 1000); 
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            const totalMinutes = Math.floor(totalSeconds / 60); 
+            const minutes = String(totalMinutes % 60).padStart(2, '0');
             const hours = Math.floor(totalMinutes / 60);
-            if (includeHoursForce || hours > 0) { return `${String(hours).padStart(2, '0')}:${minutes}:${seconds}`; }
-            else { return `${minutes}:${seconds}`; }
+            if (includeHoursForce || hours > 0) {
+                return `${String(hours).padStart(2, '0')}:${minutes}:${seconds}`; 
+            }
+            else {
+                return `${minutes}:${seconds}`; 
+            }
         }
 
         function initializeSliders() {
-            if (pendingSettings.numMines < 0) { pendingSettings.numMines = 0; } if (pendingSettings.numMines > 225) { pendingSettings.numMines = 225; }
-            mineSlider.value = pendingSettings.numMines; mineCountDisplay.textContent = pendingSettings.numMines;
-            hideRateSlider.value = pendingSettings.hideRateMax * 100; hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+            if (pendingSettings.numMines < 0) { pendingSettings.numMines = 0; } 
+            if (pendingSettings.numMines > 225) { pendingSettings.numMines = 225; }
+            mineSlider.value = pendingSettings.numMines;
+            mineCountDisplay.textContent = pendingSettings.numMines;
+            hideRateSlider.value = pendingSettings.hideRateMax * 100; 
+            hideRateDisplay.textContent = `${hideRateSlider.value}%`;
             hideRateControl.classList.toggle('enabled', pendingSettings.enableHide);
         }
         initializeSliders();
@@ -726,12 +775,18 @@
         // --- Device Detection and UI Initialization ---
         function detectTouch() {
             isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            if (isTouch) { document.body.classList.add('touch-device'); pcOperationMode = 'button'; }
+            if (isTouch) {
+                document.body.classList.add('touch-device');
+                pcOperationMode = 'button';
+            }
             else {
                 document.body.classList.remove('touch-device');
                 const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
                 if (currentPcOpRadio) { currentPcOpRadio.checked = true; }
-                else { pcOperationMode = 'mouse'; document.querySelector('input[name="pc-op-mode"][value="mouse"]').checked = true; }
+                else {
+                    pcOperationMode = 'mouse';
+                    document.querySelector('input[name="pc-op-mode"][value="mouse"]').checked = true;
+                }
                 document.body.dataset.pcOpMode = pcOperationMode;
             }
             updateModeButtonsVisibility();
@@ -772,12 +827,33 @@
              let minMs = parseInputsToMs(timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
              let maxMs = parseInputsToMs(timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
              let fixedMs = parseInputsToMs(timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
-             if (minMs !== null) { if (maxMs !== null && minMs > maxMs) { maxMs = minMs; formatMsToInputs(maxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput); } pendingSettings.timeLimitMinMs = minMs; }
-             else { formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput); }
-             if (maxMs !== null) { if (minMs !== null && maxMs < minMs) { minMs = maxMs; formatMsToInputs(minMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput); pendingSettings.timeLimitMinMs = minMs; } pendingSettings.timeLimitMaxMs = maxMs; }
-             else { formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput); }
-             if (fixedMs !== null) { if (fixedMs <= 0) { fixedMs = defaultSettings.timeLimitFixedMs; formatMsToInputs(fixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput); } pendingSettings.timeLimitFixedMs = fixedMs; }
-             else { formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput); }
+             if (minMs !== null) {
+                 if (maxMs !== null && minMs > maxMs) {
+                     maxMs = minMs; 
+                     formatMsToInputs(maxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
+                 } pendingSettings.timeLimitMinMs = minMs;
+             }
+             else {
+                 formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput); 
+             }
+             if (maxMs !== null) { 
+                 if (minMs !== null && maxMs < minMs) {
+                     minMs = maxMs; formatMsToInputs(minMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
+                     pendingSettings.timeLimitMinMs = minMs;
+                 } pendingSettings.timeLimitMaxMs = maxMs;
+             }else {
+                 formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput); 
+             }
+             if (fixedMs !== null) {
+                 if (fixedMs <= 0) { 
+                     fixedMs = defaultSettings.timeLimitFixedMs; 
+                     formatMsToInputs(fixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
+                 } 
+                 pendingSettings.timeLimitFixedMs = fixedMs;
+             }
+             else { 
+                 formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
+             }
         }
         [timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput].forEach(input => { if (input) { input.addEventListener('change', handleTimeInputChange); } });
 
@@ -815,16 +891,37 @@
 
         function openPopup() {
              pendingSettings = {
-                numMines: numMines, enableNoFlags: enableNoFlags, enableTimeBomb: enableTimeBomb, timeLimitRandom: timeLimitRandom,
-                timeLimitMinMs: timeLimitMinMs, timeLimitMaxMs: timeLimitMaxMs, timeLimitFixedMs: timeLimitFixedMs, gameOverOnTimeOnly: gameOverOnTimeOnly,
-                enableNumbers: enableNumbers, enableHide: enableHide, hideRateMax: hideRateMax, enableDirectional: enableDirectional,
-                enableOddEven: enableOddEven, enableAreaValue: enableAreaValue, enableNaturalNumber: enableNaturalNumber, enableBlind: enableBlind
+                numMines: numMines, 
+                enableNoFlags: enableNoFlags, 
+                enableTimeBomb: enableTimeBomb,
+                timeLimitRandom: timeLimitRandom,
+                timeLimitMinMs: timeLimitMinMs, 
+                timeLimitMaxMs: timeLimitMaxMs,
+                timeLimitFixedMs: timeLimitFixedMs, 
+                gameOverOnTimeOnly: gameOverOnTimeOnly,
+                enableNumbers: enableNumbers, 
+                enableHide: enableHide, 
+                hideRateMax: hideRateMax, 
+                enableDirectional: enableDirectional,
+                enableOddEven: enableOddEven, 
+                enableAreaValue: enableAreaValue, 
+                enableNaturalNumber: enableNaturalNumber, 
+                enableBlind: enableBlind
             };
-            mineSlider.value = pendingSettings.numMines; mineCountDisplay.textContent = pendingSettings.numMines; noFlagsSwitch.checked = pendingSettings.enableNoFlags;
-            numberSwitch.checked = pendingSettings.enableNumbers; hideSwitch.checked = pendingSettings.enableHide; hideRateSlider.value = pendingSettings.hideRateMax * 100;
-            hideRateDisplay.textContent = `${hideRateSlider.value}%`; directionalSwitch.checked = pendingSettings.enableDirectional; oddEvenSwitch.checked = pendingSettings.enableOddEven;
-            areaValueSwitch.checked = pendingSettings.enableAreaValue; naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber; blindSwitch.checked = pendingSettings.enableBlind;
-            timeBombSwitch.checked = pendingSettings.enableTimeBomb; timeBombRandomSwitch.checked = pendingSettings.timeLimitRandom;
+            mineSlider.value = pendingSettings.numMines;
+            mineCountDisplay.textContent = pendingSettings.numMines;
+            noFlagsSwitch.checked = pendingSettings.enableNoFlags;
+            numberSwitch.checked = pendingSettings.enableNumbers;
+            hideSwitch.checked = pendingSettings.enableHide;
+            hideRateSlider.value = pendingSettings.hideRateMax * 100;
+            hideRateDisplay.textContent = `${hideRateSlider.value}%`; 
+            directionalSwitch.checked = pendingSettings.enableDirectional; 
+            oddEvenSwitch.checked = pendingSettings.enableOddEven;
+            areaValueSwitch.checked = pendingSettings.enableAreaValue;
+            naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber;
+            blindSwitch.checked = pendingSettings.enableBlind;
+            timeBombSwitch.checked = pendingSettings.enableTimeBomb; 
+            timeBombRandomSwitch.checked = pendingSettings.timeLimitRandom;
             formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
             formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
             formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
@@ -840,16 +937,60 @@
         function handleResetRule(event) {
             const rule = event.target.dataset.rule; if (!rule) { return; }
             switch (rule) {
-                case 'mines': pendingSettings.numMines = defaultSettings.numMines; mineSlider.value = pendingSettings.numMines; mineCountDisplay.textContent = pendingSettings.numMines; break;
-                case 'noFlags': pendingSettings.enableNoFlags = defaultSettings.enableNoFlags; noFlagsSwitch.checked = pendingSettings.enableNoFlags; break;
-                case 'timeBomb': pendingSettings.enableTimeBomb = defaultSettings.enableTimeBomb; pendingSettings.timeLimitRandom = defaultSettings.timeLimitRandom; pendingSettings.timeLimitMinMs = defaultSettings.timeLimitMinMs; pendingSettings.timeLimitMaxMs = defaultSettings.timeLimitMaxMs; pendingSettings.timeLimitFixedMs = defaultSettings.timeLimitFixedMs; pendingSettings.gameOverOnTimeOnly = defaultSettings.gameOverOnTimeOnly; timeBombSwitch.checked = pendingSettings.enableTimeBomb; timeBombRandomSwitch.checked = pendingSettings.timeLimitRandom; gameOverOnTimeOnlySwitch.checked = pendingSettings.gameOverOnTimeOnly; formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput); formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput); formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput); break;
-                case 'numbers': pendingSettings.enableNumbers = defaultSettings.enableNumbers; numberSwitch.checked = pendingSettings.enableNumbers; break;
-                case 'hide': pendingSettings.enableHide = defaultSettings.enableHide; pendingSettings.hideRateMax = defaultSettings.hideRateMax; hideSwitch.checked = pendingSettings.enableHide; hideRateSlider.value = pendingSettings.hideRateMax * 100; hideRateDisplay.textContent = `${hideRateSlider.value}%`; break;
-                case 'directional': pendingSettings.enableDirectional = defaultSettings.enableDirectional; directionalSwitch.checked = pendingSettings.enableDirectional; break;
-                case 'oddEven': pendingSettings.enableOddEven = defaultSettings.enableOddEven; oddEvenSwitch.checked = pendingSettings.enableOddEven; break;
-                case 'areaValue': pendingSettings.enableAreaValue = defaultSettings.enableAreaValue; areaValueSwitch.checked = pendingSettings.enableAreaValue; break;
-                case 'naturalNumber': pendingSettings.enableNaturalNumber = defaultSettings.enableNaturalNumber; naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber; break;
-                case 'blind': pendingSettings.enableBlind = defaultSettings.enableBlind; blindSwitch.checked = pendingSettings.enableBlind; break;
+                case 'mines': 
+                    pendingSettings.numMines = defaultSettings.numMines; 
+                    mineSlider.value = pendingSettings.numMines; 
+                    mineCountDisplay.textContent = pendingSettings.numMines; 
+                    break;
+                case 'noFlags': 
+                    pendingSettings.enableNoFlags = defaultSettings.enableNoFlags; 
+                    noFlagsSwitch.checked = pendingSettings.enableNoFlags; 
+                    break;
+                case 'timeBomb':
+                    pendingSettings.enableTimeBomb = defaultSettings.enableTimeBomb;
+                    pendingSettings.timeLimitRandom = defaultSettings.timeLimitRandom; 
+                    pendingSettings.timeLimitMinMs = defaultSettings.timeLimitMinMs;
+                    pendingSettings.timeLimitMaxMs = defaultSettings.timeLimitMaxMs;
+                    pendingSettings.timeLimitFixedMs = defaultSettings.timeLimitFixedMs; 
+                    pendingSettings.gameOverOnTimeOnly = defaultSettings.gameOverOnTimeOnly;
+                    timeBombSwitch.checked = pendingSettings.enableTimeBomb;
+                    timeBombRandomSwitch.checked = pendingSettings.timeLimitRandom; 
+                    gameOverOnTimeOnlySwitch.checked = pendingSettings.gameOverOnTimeOnly; 
+                    formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
+                    formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
+                    formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
+                    break;
+                case 'numbers':
+                    pendingSettings.enableNumbers = defaultSettings.enableNumbers; 
+                    numberSwitch.checked = pendingSettings.enableNumbers;
+                    break;
+                case 'hide': 
+                    pendingSettings.enableHide = defaultSettings.enableHide;
+                    pendingSettings.hideRateMax = defaultSettings.hideRateMax; 
+                    hideSwitch.checked = pendingSettings.enableHide; 
+                    hideRateSlider.value = pendingSettings.hideRateMax * 100;
+                    hideRateDisplay.textContent = `${hideRateSlider.value}%`;
+                    break;
+                case 'directional':
+                    pendingSettings.enableDirectional = defaultSettings.enableDirectional;
+                    directionalSwitch.checked = pendingSettings.enableDirectional; 
+                    break;
+                case 'oddEven':
+                    pendingSettings.enableOddEven = defaultSettings.enableOddEven;
+                    oddEvenSwitch.checked = pendingSettings.enableOddEven;
+                    break;
+                case 'areaValue':
+                    pendingSettings.enableAreaValue = defaultSettings.enableAreaValue;
+                    areaValueSwitch.checked = pendingSettings.enableAreaValue; 
+                    break;
+                case 'naturalNumber': 
+                    pendingSettings.enableNaturalNumber = defaultSettings.enableNaturalNumber; 
+                    naturalNumberSwitch.checked = pendingSettings.enableNaturalNumber; 
+                    break;
+                case 'blind': 
+                    pendingSettings.enableBlind = defaultSettings.enableBlind; 
+                    blindSwitch.checked = pendingSettings.enableBlind; 
+                    break;
             }
             updateSettingsUI(pendingSettings);
         }
@@ -887,7 +1028,13 @@
              if (enableBlind) { rulesHtml += `<div class="rule-display-blind">Blind Mode Active!</div>`; }
              if (!enableBlind) {
                  if (enableNoFlags) { rulesHtml += `<div class="rule-display-noFlags">No Flags</div>`; }
-                 if (enableTimeBomb) { const timeDesc = formatMsToDisplayTime(timeLimitMilliseconds, true); rulesHtml += `<div class="rule-display-timeBomb">Time Bomb (${timeDesc})</div>`; if (gameOverOnTimeOnly) { rulesHtml += `<div class="rule-display-gameOverOnTimeOnly">Game Over on Time Only</div>`; } }
+                 if (enableTimeBomb) {
+                     const timeDesc = formatMsToDisplayTime(timeLimitMilliseconds, true);
+                     rulesHtml += `<div class="rule-display-timeBomb">Time Bomb (${timeDesc})</div>`; 
+                     if (gameOverOnTimeOnly) { 
+                         rulesHtml += `<div class="rule-display-gameOverOnTimeOnly">Game Over on Time Only</div>`; 
+                     } 
+                 }
                  if (!enableNumbers) { rulesHtml += `<div class="rule-display-noNumbers">No Numbers</div>`; }
                  if (enableHide) { rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`; }
                  if (enableDirectional) { rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`; }
@@ -926,32 +1073,58 @@
 
         // --- Game Logic Functions ---
         function resetGame() {
-            gameOver = true; clearInterval(timerInterval); timerInterval = null; clearInterval(basketballTimerInterval); basketballTimerInterval = null;
-            elapsedMilliseconds = 0; remainingMilliseconds = 0; timeLimitMilliseconds = 0; basketballRemainingMs = BASKETBALL_INTERVAL_MS;
-            startTime = 0; basketballStartTime = 0; gameStarted = false; revealedNonMineCount = 0; clickedMineCount = 0; penaltyOffsetMs = 0;
-            minesLeft = numMines; switchMode('dig'); activeBlindRule = null; anomalyTargetType = null; currentAnomalyRate = 0;
-            messageBox.textContent = ''; body.classList.remove('game-over', 'low-time', 'timer-intro-active'); body.style.backgroundColor = '';
+            gameOver = true;
+            clearInterval(timerInterval); timerInterval = null; 
+            clearInterval(basketballTimerInterval); basketballTimerInterval = null;
+            elapsedMilliseconds = 0; 
+            remainingMilliseconds = 0; 
+            timeLimitMilliseconds = 0; 
+            basketballRemainingMs = BASKETBALL_INTERVAL_MS;
+            startTime = 0; 
+            basketballStartTime = 0; 
+            gameStarted = false;
+            revealedNonMineCount = 0; 
+            clickedMineCount = 0; 
+            penaltyOffsetMs = 0;
+            minesLeft = numMines; 
+            switchMode('dig');
+            activeBlindRule = null; 
+            anomalyTargetType = null; currentAnomalyRate = 0;
+            messageBox.textContent = '';
+            body.classList.remove('game-over', 'low-time', 'timer-intro-active');
+            body.style.backgroundColor = '';
             timerContainer.classList.remove('blinking-black', 'blinking-red', 'blinking-basketball', 'hide-during-intro');
             timerStartDisplay.classList.remove('visible', 'move-to-corner'); timerStartDisplay.style.animation = 'none';
-            updateBlindRuleDisplay(); updateTimerDisplay(); updateActiveRulesDisplay(); updateNoFlagsUI();
+            updateBlindRuleDisplay();
+            updateTimerDisplay(); 
+            updateActiveRulesDisplay(); 
+            updateNoFlagsUI();
             setTimeout(createBoard, 50);
          }
 
         function createBoard() {
-            board = []; gameOver = false; revealedNonMineCount = 0; clickedMineCount = 0; penaltyOffsetMs = 0; boardElement.innerHTML = '';
-            activeBlindRule = null; anomalyTargetType = null; currentAnomalyRate = 0;
+            board = []; gameOver = false; 
+            revealedNonMineCount = 0;
+            clickedMineCount = 0;
+            penaltyOffsetMs = 0;
+            boardElement.innerHTML = '';
+            activeBlindRule = null; 
+            anomalyTargetType = null;
+            currentAnomalyRate = 0;
 
             if (enableBlind) {
-                 activeBlindRule = blindRules[Math.floor(Math.random() * blindRules.length)];
-                 numMines = Math.floor(Math.random() * (BLIND_MINE_MAX - BLIND_MINE_MIN + 1)) + BLIND_MINE_MIN;
-                 minesLeft = numMines;
-                 currentMaxHideRate = BLIND_HIDE_RATE; currentMaxDirectionalRate = BLIND_DIRECTIONAL_RATE;
-                 currentMaxOddEvenRate = BLIND_ODDEVEN_RATE; currentMaxAreaValueRate = BLIND_AREAVALUE_RATE;
-                 currentMaxNaturalNumberRate = BLIND_NATURALNUMBER_RATE;
-                 if (activeBlindRule.id === 'anomaly') {
-                     anomalyTargetType = specialSquareTypes[Math.floor(Math.random() * specialSquareTypes.length)];
-                     currentAnomalyRate = Math.random() * (0.75 - 0.50) + 0.50; // 50% - 75%
-                     console.log(`Anomaly Target: ${anomalyTargetType}, Rate: ${currentAnomalyRate}`);
+                activeBlindRule = blindRules[Math.floor(Math.random() * blindRules.length)];
+                numMines = Math.floor(Math.random() * (BLIND_MINE_MAX - BLIND_MINE_MIN + 1)) + BLIND_MINE_MIN;
+                minesLeft = numMines;
+                currentMaxHideRate = BLIND_HIDE_RATE;
+                currentMaxDirectionalRate = BLIND_DIRECTIONAL_RATE;
+                currentMaxOddEvenRate = BLIND_ODDEVEN_RATE; 
+                currentMaxAreaValueRate = BLIND_AREAVALUE_RATE;
+                currentMaxNaturalNumberRate = BLIND_NATURALNUMBER_RATE;
+                if (activeBlindRule.id === 'anomaly') {
+                    anomalyTargetType = specialSquareTypes[Math.floor(Math.random() * specialSquareTypes.length)];
+                    currentAnomalyRate = Math.random() * (0.75 - 0.50) + 0.50; // 50% - 75%
+                    console.log(`Anomaly Target: ${anomalyTargetType}, Rate: ${currentAnomalyRate}`);
                  }
                  enableNoFlags = false; enableTimeBomb = false; timeLimitMilliseconds = 0; elapsedMilliseconds = 0;
                  updateBlindRuleDisplay();
@@ -962,7 +1135,10 @@
                  if (enableTimeBomb) {
                      timeLimitMilliseconds = timeLimitRandom ? Math.floor(Math.random() * (Math.max(0, timeLimitMaxMs) - Math.max(0, timeLimitMinMs) + 1)) + Math.max(0, timeLimitMinMs) : Math.max(1000, timeLimitFixedMs);
                      remainingMilliseconds = timeLimitMilliseconds;
-                 } else { timeLimitMilliseconds = 0; elapsedMilliseconds = 0; }
+                 } else {
+                     timeLimitMilliseconds = 0;
+                     elapsedMilliseconds = 0;
+                 }
             }
             updateTimerDisplay(); updateActiveRulesDisplay(); updateNoFlagsUI();
 
@@ -970,24 +1146,62 @@
                 board[i] = [];
                 for (let j = 0; j < gridSize; j++) {
                     board[i][j] = {
-                        isMine: false, isRevealed: false, isFlagged: false, adjacentMines: 0, originalAdjacentMines: 0, adjacentSafe: 0,
-                        isHide: false, isOddEven: false, isAreaValue: false, isDirectional: false, isNaturalNumber: false,
-                        oddEvenValue: null, areaValue: null, direction: null, directionalCount: null, directionalSymbol: null, naturalNumberValue: null,
-                        isAdjusted: false, element: document.createElement('div')
+                        isMine: false, 
+                        isRevealed: false,
+                        isFlagged: false,
+                        adjacentMines: 0, 
+                        originalAdjacentMines: 0,
+                        adjacentSafe: 0,
+                        isHide: false,
+                        isOddEven: false,
+                        isAreaValue: false,
+                        isDirectional: false,
+                        isNaturalNumber: false,
+                        oddEvenValue: null,
+                        areaValue: null,
+                        direction: null,
+                        directionalCount: null,
+                        directionalSymbol: null,
+                        naturalNumberValue: null,
+                        isAdjusted: false,
+                        element: document.createElement('div')
                     };
                     const sq = board[i][j]; const el = sq.element;
-                    el.classList.add('square', 'hidden'); el.dataset.row = i; el.dataset.col = j;
+                    el.classList.add('square', 'hidden');
+                    el.dataset.row = i; el.dataset.col = j;
                     el.addEventListener('click', () => handleSquareInteraction(i, j));
-                    el.addEventListener('contextmenu', (e) => { e.preventDefault(); if (!isTouch && pcOperationMode === 'mouse' && !enableNoFlags && !gameOver) { handleFlagAction(i, j); } });
+                    el.addEventListener('contextmenu', (e) => { e.preventDefault();
+                    if (!isTouch && pcOperationMode === 'mouse' && !enableNoFlags && !gameOver) { handleFlagAction(i, j); } });
                     let pt;
-                    el.addEventListener('touchstart', (e) => { if (isTouch && !enableNoFlags && !gameOver) { clearTimeout(pt); pt = setTimeout(() => { e.preventDefault(); handleFlagAction(i, j); justFlagged = true; setTimeout(() => { justFlagged = false; }, 50); }, 500); } }, { passive: false });
-                    el.addEventListener('touchend', () => clearTimeout(pt)); el.addEventListener('touchmove', () => clearTimeout(pt));
+                    el.addEventListener('touchstart', (e) => {
+                        if (isTouch && !enableNoFlags && !gameOver) {
+                            clearTimeout(pt); pt = setTimeout(() => { 
+                                e.preventDefault(); 
+                                handleFlagAction(i, j); 
+                                justFlagged = true; 
+                                setTimeout(() => { 
+                                    justFlagged = false; 
+                                }, 50);
+                            }, 500);
+                        } }, {
+                        passive: false 
+                    });
+                    el.addEventListener('touchend', () => clearTimeout(pt)); 
+                    el.addEventListener('touchmove', () => clearTimeout(pt));
                     boardElement.appendChild(el);
                 }
             }
-            plantMines(); calculateAdjacentMines(); applySpecialSquares(); updateMinesLeftDisplay();
-            if (enableTimeBomb && !enableBlind && timeLimitMilliseconds > 0) { timerContainer.classList.add('hide-during-intro'); setTimeout(startTimerAnimation, 100); }
-            else { timerContainer.classList.remove('hide-during-intro'); updateTimerDisplay(); }
+            plantMines(); 
+            calculateAdjacentMines();
+            applySpecialSquares(); 
+            updateMinesLeftDisplay();
+            if (enableTimeBomb && !enableBlind && timeLimitMilliseconds > 0) { 
+                timerContainer.classList.add('hide-during-intro'); 
+                setTimeout(startTimerAnimation, 100);
+            }else {
+                timerContainer.classList.remove('hide-during-intro');
+                updateTimerDisplay(); 
+            }
             detectTouch();
         }
 
@@ -1011,13 +1225,33 @@
         }
 
         function plantMines() {
-             let minesPlanted = 0; const maxPossible = gridSize * gridSize; let currentNumMines = numMines;
-             if (currentNumMines >= maxPossible) { currentNumMines = maxPossible - 1; console.warn(`Mine count capped at ${currentNumMines}`); if (!enableBlind) { mineSlider.value = currentNumMines; mineCountDisplay.textContent = currentNumMines; pendingSettings.numMines = currentNumMines; } numMines = currentNumMines; }
-             if (currentNumMines < 0) { currentNumMines = 0; if (!enableBlind) { mineSlider.value = currentNumMines; mineCountDisplay.textContent = currentNumMines; pendingSettings.numMines = currentNumMines; } numMines = currentNumMines; }
+            let minesPlanted = 0;
+            const maxPossible = gridSize * gridSize; 
+            let currentNumMines = numMines;
+             if (currentNumMines >= maxPossible) {
+                 currentNumMines = maxPossible - 1;
+                 console.warn(`Mine count capped at ${currentNumMines}`);
+                 if (!enableBlind) { 
+                     mineSlider.value = currentNumMines;
+                     mineCountDisplay.textContent = currentNumMines;
+                     pendingSettings.numMines = currentNumMines; 
+                 } 
+                 numMines = currentNumMines;
+             }
+             if (currentNumMines < 0) { 
+                 currentNumMines = 0;
+                 if (!enableBlind) {
+                     mineSlider.value = currentNumMines;
+                     mineCountDisplay.textContent = currentNumMines;
+                     pendingSettings.numMines = currentNumMines;
+                 } 
+                 numMines = currentNumMines;
+             }
              minesLeft = currentNumMines;
              while (minesPlanted < currentNumMines) {
-                  const r = Math.floor(Math.random() * gridSize); const c = Math.floor(Math.random() * gridSize);
-                  if (!board[r][c].isMine) { board[r][c].isMine = true; minesPlanted++; }
+                 const r = Math.floor(Math.random() * gridSize); 
+                 const c = Math.floor(Math.random() * gridSize);
+                if (!board[r][c].isMine) { board[r][c].isMine = true; minesPlanted++; }
              }
         }
 
@@ -1025,15 +1259,31 @@
              const isTorus = enableBlind && activeBlindRule?.id === 'torus';
              for (let i = 0; i < gridSize; i++) {
                   for (let j = 0; j < gridSize; j++) {
-                       if (board[i][j].isMine) { board[i][j].adjacentMines = -1; board[i][j].originalAdjacentMines = -1; board[i][j].adjacentSafe = -1; continue; }
+                       if (board[i][j].isMine) { 
+                           board[i][j].adjacentMines = -1; 
+                           board[i][j].originalAdjacentMines = -1; 
+                           board[i][j].adjacentSafe = -1; 
+                           continue;
+                       }
                        let mineCount = 0; let safeCount = 0;
                        for (let x = -1; x <= 1; x++) {
                             for (let y = -1; y <= 1; y++) {
                                  if (x === 0 && y === 0) continue;
                                  let ni = i + x; let nj = j + y; let isValidNeighbor = false;
-                                 if (isTorus) { ni = (ni + gridSize) % gridSize; nj = (nj + gridSize) % gridSize; isValidNeighbor = true; }
-                                 else { isValidNeighbor = ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize; }
-                                 if (isValidNeighbor) { if (board[ni][nj]?.isMine) { mineCount++; } else { safeCount++; } }
+                                 if (isTorus) {
+                                     ni = (ni + gridSize) % gridSize;
+                                     nj = (nj + gridSize) % gridSize;
+                                     isValidNeighbor = true; 
+                                 }else {
+                                     isValidNeighbor = ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize;
+                                 }
+                                 if (isValidNeighbor) { 
+                                     if (board[ni][nj]?.isMine) { 
+                                         mineCount++; 
+                                     } else { 
+                                         safeCount++; 
+                                     } 
+                                 }
                             }
                        }
                        board[i][j].originalAdjacentMines = mineCount;
@@ -1045,31 +1295,58 @@
         }
 
         function countSafeInDirection(r, c, dx, dy) {
-             const isTorus = enableBlind && activeBlindRule?.id === 'torus'; let count = 0; let cr = r + dx; let cc = c + dy;
-             let steps = 0; const maxSteps = gridSize * 2;
-             while (steps < maxSteps) {
-                 let checkR = cr; let checkC = cc; let inBounds = false;
-                 if (isTorus) { checkR = (cr + gridSize) % gridSize; checkC = (cc + gridSize) % gridSize; if (steps > 0 && checkR === r && checkC === c) break; inBounds = true; }
-                 else { inBounds = checkR >= 0 && checkR < gridSize && checkC >= 0 && checkC < gridSize; }
-                 if (!inBounds) break;
-                 if (!board[checkR][checkC]?.isMine) count++;
-                 cr += dx; cc += dy; steps++;
-             }
-             return count;
+            const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+            let count = 0; 
+            let cr = r + dx; 
+            let cc = c + dy;
+            let steps = 0; const maxSteps = gridSize * 2;
+            while (steps < maxSteps) {
+                let checkR = cr; 
+                let checkC = cc;
+                let inBounds = false;
+                if (isTorus) { 
+                    checkR = (cr + gridSize) % gridSize; 
+                    checkC = (cc + gridSize) % gridSize;
+                    if (steps > 0 && checkR === r && checkC === c) break; 
+                    inBounds = true; 
+                }else{ 
+                    inBounds = checkR >= 0 && checkR < gridSize && checkC >= 0 && checkC < gridSize;
+                }
+                if (!inBounds) break;
+                if (!board[checkR][checkC]?.isMine) count++;
+                cr += dx; 
+                cc += dy; 
+                steps++;
+            }
+            return count;
         }
 
         function countMinesInDirection(r, c, dx, dy) {
-             const isTorus = enableBlind && activeBlindRule?.id === 'torus'; let count = 0; let cr = r + dx; let cc = c + dy;
-             let steps = 0; const maxSteps = gridSize * 2;
-             while (steps < maxSteps) {
-                 let checkR = cr; let checkC = cc; let inBounds = false;
-                 if (isTorus) { checkR = (cr + gridSize) % gridSize; checkC = (cc + gridSize) % gridSize; if (steps > 0 && checkR === r && checkC === c) break; inBounds = true; }
-                 else { inBounds = checkR >= 0 && checkR < gridSize && checkC >= 0 && checkC < gridSize; }
-                 if (!inBounds) break;
-                 if (board[checkR][checkC]?.isMine) count++;
-                 cr += dx; cc += dy; steps++;
-             }
-             return count;
+            const isTorus = enableBlind && activeBlindRule?.id === 'torus'; 
+            let count = 0;
+            let cr = r + dx; 
+            let cc = c + dy;
+            let steps = 0; 
+            const maxSteps = gridSize * 2;
+            while (steps < maxSteps) {
+                let checkR = cr; 
+                let checkC = cc; 
+                let inBounds = false;
+                if (isTorus) { 
+                    checkR = (cr + gridSize) % gridSize; 
+                    checkC = (cc + gridSize) % gridSize; 
+                    if (steps > 0 && checkR === r && checkC === c) break; 
+                    inBounds = true;
+                }else{
+                    inBounds = checkR >= 0 && checkR < gridSize && checkC >= 0 && checkC < gridSize; 
+                }
+                if (!inBounds) break;
+                if (board[checkR][checkC]?.isMine) count++;
+                cr += dx; 
+                cc += dy;
+                steps++;
+            }
+            return count;
         }
 
         function hasNeighborOfType(r, c, key) {
@@ -1094,14 +1371,28 @@
         }
 
         function calculateNaturalNumberValue(n) {
-             if (n < 0) n = 0; const p = [2, 3, 5, 7]; if (p.includes(n)) return n.toString();
-             switch (n) {
-                  case 0: return "?"; case 1: return "-1"; case 4: return "±1"; case 6: return "±1"; case 8: return "+1"; default: return "?";
-             }
+            if (n < 0) n = 0; const p = [2, 3, 5, 7];
+            if (p.includes(n)) return n.toString();
+            switch (n) {
+                case 0:
+                    return "?";
+                case 1:
+                    return "-1"; 
+                case 4: 
+                    return "±1"; 
+                case 6:
+                    return "±1"; 
+                case 8:
+                    return "+1"; 
+                default:
+                    return "?";
+            }
         }
 
         function applySpecialSquares() {
-            const potentialSquares = []; const errorTargetSquares = []; const isAbekobe = enableBlind && activeBlindRule?.id === 'abekobe';
+            const potentialSquares = []; 
+            const errorTargetSquares = []; 
+            const isAbekobe = enableBlind && activeBlindRule?.id === 'abekobe';
 
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
@@ -1113,28 +1404,63 @@
                     square.adjacentMines = isAbekobe ? square.adjacentSafe : square.originalAdjacentMines;
                     const relevantCount = square.adjacentMines;
 
-                    if (!square.isMine && relevantCount > 0) { potentialSquares.push({ r: i, c: j }); }
-                    if (!square.isMine && square.originalAdjacentMines > 0) { errorTargetSquares.push({ r: i, c: j}); }
+                    if (!square.isMine && relevantCount > 0) {
+                        potentialSquares.push({ r: i, c: j }); 
+                    }
+                    if (!square.isMine && square.originalAdjacentMines > 0) {
+                        errorTargetSquares.push({ r: i, c: j}); 
+                    }
                 }
             }
             potentialSquares.sort(() => Math.random() - 0.5); errorTargetSquares.sort(() => Math.random() - 0.5);
 
-            const assignedCoordinates = new Set(); const numPotential = potentialSquares.length;
+            const assignedCoordinates = new Set();
+            const numPotential = potentialSquares.length;
             const isBlindAnomaly = enableBlind && activeBlindRule?.id === 'anomaly';
 
-             let rateHide = currentMaxHideRate; let rateDirectional = currentMaxDirectionalRate; let rateOddEven = currentMaxOddEvenRate;
-             let rateAreaValue = currentMaxAreaValueRate; let rateNaturalNumber = currentMaxNaturalNumberRate;
-             if (isBlindAnomaly && anomalyTargetType) {
-                 switch(anomalyTargetType) {
-                     case 'hide': rateHide = currentAnomalyRate; break; case 'directional': rateDirectional = currentAnomalyRate; break;
-                     case 'oddEven': rateOddEven = currentAnomalyRate; break; case 'areaValue': rateAreaValue = currentAnomalyRate; break;
-                     case 'naturalNumber': rateNaturalNumber = currentAnomalyRate; break;
-                 }
-             }
+            let rateHide = currentMaxHideRate;
+            let rateDirectional = currentMaxDirectionalRate;
+            let rateOddEven = currentMaxOddEvenRate;
+            let rateAreaValue = currentMaxAreaValueRate; 
+            let rateNaturalNumber = currentMaxNaturalNumberRate;
+            if (isBlindAnomaly && anomalyTargetType) {
+                switch(anomalyTargetType) {
+                    case 'hide':
+                        rateHide = currentAnomalyRate;
+                        break; 
+                    case 'directional':
+                        rateDirectional = currentAnomalyRate;
+                        break;
+                    case 'oddEven':
+                        rateOddEven = currentAnomalyRate;
+                        break; 
+                    case 'areaValue':
+                        rateAreaValue = currentAnomalyRate; 
+                        break;
+                    case 'naturalNumber':
+                        rateNaturalNumber = currentAnomalyRate; 
+                        break;
+                }
+            }
 
-            const baseDirections = [ { dx: -1, dy: 0, s: 'T', n: 'up' }, { dx: 1, dy: 0, s: 'B', n: 'down' }, { dx: 0, dy: -1, s: 'L', n: 'left' }, { dx: 0, dy: 1, s: 'R', n: 'right' } ];
-            function hasDirChain(r, c, dx, dy) { /* ... */ } // Implementation unchanged
-            function getValidDirs(r, c) { return baseDirections.filter(dir => { const nr = r + dir.dx; const nc = c + dir.dy; const isTorus = enableBlind && activeBlindRule?.id === 'torus'; if(isTorus) return true; return nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize; }); }
+            const baseDirections = [
+                { dx: -1, dy: 0, s: 'T', n: 'up' }, 
+                { dx: 1, dy: 0, s: 'B', n: 'down' },
+                { dx: 0, dy: -1, s: 'L', n: 'left' }, 
+                { dx: 0, dy: 1, s: 'R', n: 'right' }
+            ];
+            function hasDirChain(r, c, dx, dy) {
+                
+            } // Implementation unchanged
+            function getValidDirs(r, c) {
+                return baseDirections.filter(dir => { 
+                    const nr = r + dir.dx;
+                    const nc = c + dir.dy;
+                    const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+                    if(isTorus) return true; 
+                    return nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize; 
+                });
+            }
 
             const ruleOrder = [
                 { t: 'areaValue', e: enableAreaValue, r: rateAreaValue, c: (s, r, c) => !hasNeighborOfType(r, c, 'isAreaValue') },
@@ -1168,14 +1494,21 @@
                                          const skipChainCheck = enableBlind && activeBlindRule?.id === 'torus';
                                          if (skipChainCheck || !hasDirChain(r, c, dir.dx, dir.dy)) {
                                              const dirCount = isAbekobe ? countSafeInDirection(r, c, dir.dx, dir.dy) : countMinesInDirection(r, c, dir.dx, dir.dy);
-                                             square.isDirectional = true; square.isHide = true; square.direction = { dx: dir.dx, dy: dir.dy, name: dir.n };
-                                             square.directionalCount = dirCount; square.directionalSymbol = dir.s; applied = true; break;
+                                             square.isDirectional = true;
+                                             square.isHide = true; 
+                                             square.direction = { dx: dir.dx, dy: dir.dy, name: dir.n };
+                                             square.directionalCount = dirCount;
+                                             square.directionalSymbol = dir.s; 
+                                             applied = true; 
+                                             break;
                                          }
                                      }
                                  }
                             } else if (rule.t === 'areaValue') {
                                 square.isAreaValue = true; square.isHide = true;
-                                if (countForCalc <= 3) square.areaValue = '~3'; else if (countForCalc <= 6) square.areaValue = '4~6'; else square.areaValue = '7~';
+                                if (countForCalc <= 3) square.areaValue = '~3';
+                                else if (countForCalc <= 6) square.areaValue = '4~6'; 
+                                else square.areaValue = '7~';
                                 applied = true;
                             } else if (rule.t === 'oddEven') {
                                 square.isOddEven = true; square.isHide = true;
@@ -1185,8 +1518,13 @@
                                 square.isNaturalNumber = true; square.isHide = true;
                                 square.naturalNumberValue = calculateNaturalNumberValue(countForCalc);
                                 applied = true;
-                            } else if (rule.t === 'hide') { square.isHide = true; applied = true; }
-                            if (applied) { assignedCoordinates.add(coordKey); currentCount++; }
+                            } else if (rule.t === 'hide') {
+                                square.isHide = true; applied = true; 
+                            }
+                            if (applied) { 
+                                assignedCoordinates.add(coordKey);
+                                currentCount++;
+                            }
                         }
                     }
                 }
@@ -1194,22 +1532,38 @@
 
             // --- Apply 'Error' Rule ---
             if (enableBlind && activeBlindRule?.id === 'error') {
-                 const numErrorTargets = errorTargetSquares.length; const minAffectedCount = Math.ceil(numErrorTargets * MIN_ERROR_RATE); let affectedCount = 0;
-                 for(let i = 0; i < numErrorTargets && affectedCount < minAffectedCount; i++) {
-                     const { r, c } = errorTargetSquares[i]; const square = board[r][c]; const coordKey = `${r}-${c}`;
+                const numErrorTargets = errorTargetSquares.length; 
+                const minAffectedCount = Math.ceil(numErrorTargets * MIN_ERROR_RATE); 
+                let affectedCount = 0;
+                for(let i = 0; i < numErrorTargets && affectedCount < minAffectedCount; i++) {
+                    const { r, c } = errorTargetSquares[i];
+                    const square = board[r][c];
+                    const coordKey = `${r}-${c}`;
+                    if (!assignedCoordinates.has(coordKey) && !square.isAdjusted) {
+                        const adjustUp = Math.random() < 0.5;
+                        if (adjustUp) { 
+                            square.adjacentMines++; 
+                        }else{ 
+                            square.adjacentMines = Math.max(0, square.adjacentMines - 1);
+                        }
+                        square.isAdjusted = true; affectedCount++;
+                    }
+                }
+                for(let i = affectedCount; i < numErrorTargets; i++) {
+                    const { r, c } = errorTargetSquares[i]; 
+                    const square = board[r][c]; 
+                    const coordKey = `${r}-${c}`;
                      if (!assignedCoordinates.has(coordKey) && !square.isAdjusted) {
-                         const adjustUp = Math.random() < 0.5; if (adjustUp) { square.adjacentMines++; } else { square.adjacentMines = Math.max(0, square.adjacentMines - 1); }
-                         square.isAdjusted = true; affectedCount++;
-                     }
-                 }
-                 for(let i = affectedCount; i < numErrorTargets; i++) {
-                     const { r, c } = errorTargetSquares[i]; const square = board[r][c]; const coordKey = `${r}-${c}`;
-                      if (!assignedCoordinates.has(coordKey) && !square.isAdjusted) {
-                         const rand = Math.random();
-                         if (rand < 0.25) { square.adjacentMines++; square.isAdjusted = true; }
-                         else if (rand < 0.50) { square.adjacentMines = Math.max(0, square.adjacentMines - 1); square.isAdjusted = true; }
-                     }
-                 }
+                        const rand = Math.random();
+                        if (rand < 0.25) { 
+                            square.adjacentMines++; 
+                            square.isAdjusted = true;
+                        }else if (rand < 0.50) { 
+                            square.adjacentMines = Math.max(0, square.adjacentMines - 1); 
+                            square.isAdjusted = true; 
+                        }
+                    }
+                }
             }
         }
 
@@ -1226,34 +1580,64 @@
                     if (!square.isRevealed) {
                         revealMine(r, c); clickedMineCount++;
                          if (enableTimeBomb && !enableBlind && gameOverOnTimeOnly) {
-                            penaltyOffsetMs += MINE_PENALTY_MS; const wasLowTime = body.classList.contains('low-time');
-                             body.style.transition = 'background-color 0.1s ease-out'; body.style.backgroundColor = '#ffdddd';
-                             setTimeout(() => { body.style.transition = 'background-color 0.5s ease'; body.style.backgroundColor = ''; const currentRemainingAfterPenalty = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs; body.classList.toggle('low-time', currentRemainingAfterPenalty < 60000 && currentRemainingAfterPenalty > 0); updateTimerDisplay(); }, 150);
-                             setTimeout(() => { const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs; if ((clickedMineCount >= numMines || currentRemaining <= 0) && !gameOver) { endGame(false); } }, timerUpdateInterval + 10);
-                        } else { endGame(false); }
+                            penaltyOffsetMs += MINE_PENALTY_MS; 
+                             const wasLowTime = body.classList.contains('low-time');
+                             body.style.transition = 'background-color 0.1s ease-out'; 
+                             body.style.backgroundColor = '#ffdddd';
+                             setTimeout(() => { 
+                                 body.style.transition = 'background-color 0.5s ease'; 
+                                 body.style.backgroundColor = ''; 
+                                 const currentRemainingAfterPenalty = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                                 body.classList.toggle('low-time', currentRemainingAfterPenalty < 60000 && currentRemainingAfterPenalty > 0);
+                                 updateTimerDisplay(); 
+                             }, 150);
+                             setTimeout(() => {
+                                 const currentRemaining = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
+                                 if ((clickedMineCount >= numMines || currentRemaining <= 0) && !gameOver) {
+                                     endGame(false); 
+                                 } 
+                             }, timerUpdateInterval + 10);
+                        } else {
+                            endGame(false);
+                        }
                     }
-                } else { revealSquare(r, c); checkWinCondition(); }
+                } else { 
+                    revealSquare(r, c); 
+                    checkWinCondition(); 
+                }
             }
         }
 
         function startGameTimer() {
             if (gameStarted) { return; }
             gameStarted = true; startTime = Date.now(); penaltyOffsetMs = 0;
-            if (enableTimeBomb && !enableBlind) { remainingMilliseconds = timeLimitMilliseconds; } else { elapsedMilliseconds = 0; }
-            if (timerInterval) { clearInterval(timerInterval); } timerInterval = setInterval(updateTimer, timerUpdateInterval);
-             if (enableBlind && activeBlindRule?.id === 'basketball') {
-                 basketballStartTime = Date.now(); basketballRemainingMs = BASKETBALL_INTERVAL_MS;
-                 if (basketballTimerInterval) { clearInterval(basketballTimerInterval); }
-                 basketballTimerInterval = setInterval(updateBasketballTimer, timerUpdateInterval);
-                 timerContainer.classList.add('blinking-basketball');
-             }
+            if (enableTimeBomb && !enableBlind) {
+                remainingMilliseconds = timeLimitMilliseconds;
+            }else{
+                elapsedMilliseconds = 0;
+            }
+            if (timerInterval) {
+                clearInterval(timerInterval); 
+            } 
+            timerInterval = setInterval(updateTimer, timerUpdateInterval);
+            if (enableBlind && activeBlindRule?.id === 'basketball') {
+                basketballStartTime = Date.now(); 
+                basketballRemainingMs = BASKETBALL_INTERVAL_MS;
+                if (basketballTimerInterval) {
+                    clearInterval(basketballTimerInterval); 
+                }
+                basketballTimerInterval = setInterval(updateBasketballTimer, timerUpdateInterval);
+                timerContainer.classList.add('blinking-basketball');
+            }
             updateTimerDisplay();
         }
 
          function resetBasketballTimer() {
              if (enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver) {
-                 basketballStartTime = Date.now(); basketballRemainingMs = BASKETBALL_INTERVAL_MS;
-                 timerContainer.classList.add('blinking-basketball'); updateTimerDisplay();
+                 basketballStartTime = Date.now(); 
+                 basketballRemainingMs = BASKETBALL_INTERVAL_MS;
+                 timerContainer.classList.add('blinking-basketball');
+                 updateTimerDisplay();
              }
          }
 
@@ -1262,23 +1646,36 @@
             if (!gameStarted) { startGameTimer(); }
             // Flagging does not reset basketball timer
             const sq = board[r][c]; sq.isFlagged = !sq.isFlagged;
-            if (sq.isFlagged) { minesLeft--; } else { minesLeft++; }
-            renderSquareContent(sq); updateMinesLeftDisplay();
+            if (sq.isFlagged) { 
+                minesLeft--; 
+            } else { 
+                minesLeft++;
+            }
+            renderSquareContent(sq); 
+            updateMinesLeftDisplay();
         }
 
         function revealMine(r, c) {
-            const sq = board[r][c]; sq.isRevealed = true;
-            sq.element.classList.add('mine-clicked'); renderSquareContent(sq);
+            const sq = board[r][c];
+            sq.isRevealed = true;
+            sq.element.classList.add('mine-clicked');
+            renderSquareContent(sq);
         }
 
         function revealSquare(r, c) {
-             const isTorus = enableBlind && activeBlindRule?.id === 'torus'; let checkR = r; let checkC = c;
-             if (isTorus) { checkR = (r + gridSize) % gridSize; checkC = (c + gridSize) % gridSize; }
-             if (checkR < 0 || checkR >= gridSize || checkC < 0 || checkC >= gridSize || gameOver) { return; }
+            const isTorus = enableBlind && activeBlindRule?.id === 'torus'; 
+            let checkR = r;
+            let checkC = c;
+            if (isTorus) {
+                checkR = (r + gridSize) % gridSize; 
+                checkC = (c + gridSize) % gridSize;
+            }
+            if (checkR < 0 || checkR >= gridSize || checkC < 0 || checkC >= gridSize || gameOver) { return; }
             const sq = board[checkR][checkC];
             if (sq.isRevealed || sq.isMine || (sq.isFlagged && !enableNoFlags)) { return; }
 
-            sq.isRevealed = true; revealedNonMineCount++;
+            sq.isRevealed = true; 
+            revealedNonMineCount++;
             resetBasketballTimer(); // Reset timer ONLY when revealing a safe square
             renderSquareContent(sq);
 
@@ -1289,28 +1686,63 @@
         }
 
         function renderSquareContent(sq) {
-            const el = sq.element; const keepClasses = ['mine-clicked', 'flag-wrong'].filter(cls => el.classList.contains(cls));
-            el.className = 'square'; keepClasses.forEach(cls => el.classList.add(cls));
-            el.textContent = ''; el.innerHTML = ''; el.style.fontSize = ''; el.style.lineHeight = ''; el.classList.remove('number-adjusted');
+            const el = sq.element; 
+            const keepClasses = ['mine-clicked', 'flag-wrong'].filter(cls => el.classList.contains(cls));
+            el.className = 'square'; 
+            keepClasses.forEach(cls => el.classList.add(cls));
+            el.textContent = ''; 
+            el.innerHTML = ''; 
+            el.style.fontSize = ''; 
+            el.style.lineHeight = '';
+            el.classList.remove('number-adjusted');
 
             if (!sq.isRevealed) {
-                el.classList.add('hidden'); const flagsAllowed = !enableNoFlags;
-                if (sq.isFlagged && flagsAllowed) { el.textContent = '🚩'; el.classList.add('flagged'); }
+                el.classList.add('hidden'); 
+                const flagsAllowed = !enableNoFlags;
+                if (sq.isFlagged && flagsAllowed) {
+                    el.textContent = '🚩'; 
+                    el.classList.add('flagged'); 
+                }
             } else {
                 el.classList.add('revealed');
-                if (sq.isMine) { el.classList.add('mine'); el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣'; }
+                if (sq.isMine) { 
+                    el.classList.add('mine'); 
+                    el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣'; }
                 else {
-                    if (el.classList.contains('flag-wrong')) { el.textContent = '❌'; }
-                    else if (sq.isDirectional) { el.classList.add('directional-square', 'special-square'); el.textContent = sq.directionalSymbol + sq.directionalCount; }
-                    else if (sq.isAreaValue) { el.classList.add('area-value-square', 'special-square'); if (sq.areaValue === '4~6') { el.innerHTML = '4~<br>6'; el.style.lineHeight = '0.9'; el.style.fontSize = '9px'; } else { el.textContent = sq.areaValue; } }
-                    else if (sq.isOddEven) { el.classList.add('odd-even-square', 'special-square'); el.textContent = sq.oddEvenValue; }
-                    else if (sq.isNaturalNumber) { el.classList.add('natural-number-square', 'special-square'); if (sq.naturalNumberValue === '±1') { el.style.fontSize = '10px'; } el.textContent = sq.naturalNumberValue; }
-                    else if (sq.isHide) { el.classList.add('special-square'); el.textContent = '・'; }
-                    else if (sq.adjacentMines >= 0) {
+                    if (el.classList.contains('flag-wrong')) { 
+                        el.textContent = '❌';
+                    }else if (sq.isDirectional) {
+                        el.classList.add('directional-square', 'special-square');
+                        el.textContent = sq.directionalSymbol + sq.directionalCount;
+                    }else if (sq.isAreaValue) { 
+                        el.classList.add('area-value-square', 'special-square');
+                        if (sq.areaValue === '4~6') {
+                            el.innerHTML = '4~<br>6'; 
+                            el.style.lineHeight = '0.9';
+                            el.style.fontSize = '9px'; 
+                        } else { 
+                            el.textContent = sq.areaValue; 
+                        } 
+                    }else if (sq.isOddEven) {
+                        el.classList.add('odd-even-square', 'special-square');
+                        el.textContent = sq.oddEvenValue;
+                    }else if (sq.isNaturalNumber) {
+                        el.classList.add('natural-number-square', 'special-square');
+                        if (sq.naturalNumberValue === '±1') {
+                            el.style.fontSize = '10px'; 
+                        } 
+                        el.textContent = sq.naturalNumberValue;
+                    } else if (sq.isHide) {
+                        el.classList.add('special-square');
+                        el.textContent = '・';
+                    }else if (sq.adjacentMines >= 0) {
                         el.textContent = sq.adjacentMines > 0 ? sq.adjacentMines : '';
                         if (sq.adjacentMines > 0) { el.classList.add(`number-${sq.adjacentMines}`); }
                         if (sq.isAdjusted && activeBlindRule?.id === 'error') { el.classList.add('number-adjusted'); }
-                    } else { el.textContent = ''; el.classList.add('revealed'); }
+                    } else {
+                        el.textContent = ''; 
+                        el.classList.add('revealed'); 
+                    }
                 }
             }
         }
@@ -1326,7 +1758,14 @@
             const totalNonMineSquares = gridSize * gridSize - numMines;
             if (revealedNonMineCount >= totalNonMineSquares) {
                 let allSafeRevealed = true;
-                for (let i = 0; i < gridSize; i++) { for (let j = 0; j < gridSize; j++) { if (!board[i][j].isMine && !board[i][j].isRevealed) { allSafeRevealed = false; break; } } if (!allSafeRevealed) break; }
+                for (let i = 0; i < gridSize; i++) { 
+                    for (let j = 0; j < gridSize; j++) {
+                        if (!board[i][j].isMine && !board[i][j].isRevealed) {
+                            allSafeRevealed = false; 
+                            break; 
+                        } 
+                    } if (!allSafeRevealed) break;
+                }
                 if (allSafeRevealed) {
                      if (enableTimeBomb && !enableBlind && remainingMilliseconds <= 0 && gameStarted) { return; }
                      if (enableBlind && activeBlindRule?.id === 'basketball' && basketballRemainingMs <= 0 && gameStarted) { return; }
@@ -1336,101 +1775,233 @@
         }
 
         function endGame(isWin) {
-            if (gameOver) { return; } gameOver = true; clearInterval(timerInterval); timerInterval = null; clearInterval(basketballTimerInterval); basketballTimerInterval = null;
-            body.classList.remove('low-time', 'timer-intro-active'); timerContainer.classList.remove('blinking-black', 'blinking-red', 'blinking-basketball');
+            if (gameOver) { return; } 
+            gameOver = true;
+            clearInterval(timerInterval);
+            timerInterval = null;
+            clearInterval(basketballTimerInterval); 
+            basketballTimerInterval = null;
+            body.classList.remove('low-time', 'timer-intro-active');
+            timerContainer.classList.remove('blinking-black', 'blinking-red', 'blinking-basketball');
             let finalDisplayMillis = 0;
-            if (gameStarted) { if (enableBlind || !enableTimeBomb) { elapsedMilliseconds = Date.now() - startTime; finalDisplayMillis = elapsedMilliseconds; } else { remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs); finalDisplayMillis = remainingMilliseconds; } }
+            if (gameStarted) {
+                if (enableBlind || !enableTimeBomb) {
+                    elapsedMilliseconds = Date.now() - startTime; 
+                    finalDisplayMillis = elapsedMilliseconds;
+                } else { 
+                    remainingMilliseconds = Math.max(0, timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs); 
+                    finalDisplayMillis = remainingMilliseconds;
+                } 
+            }
 
             if (isWin) {
-                messageBox.textContent = 'Game Clear!'; body.style.backgroundColor = '#aaffaa';
+                messageBox.textContent = 'Game Clear!'; 
+                body.style.backgroundColor = '#aaffaa';
                 const flagsAllowed = !enableNoFlags;
-                if (flagsAllowed) { for (let i = 0; i < gridSize; i++) { for (let j = 0; j < gridSize; j++) { if (board[i][j].isMine && !board[i][j].isFlagged) { board[i][j].isFlagged = true; renderSquareContent(board[i][j]); } } } minesLeft = 0; updateMinesLeftDisplay(); }
+                if (flagsAllowed) { 
+                    for (let i = 0; i < gridSize; i++) {
+                        for (let j = 0; j < gridSize; j++) {
+                            if (board[i][j].isMine && !board[i][j].isFlagged) {
+                                board[i][j].isFlagged = true; renderSquareContent(board[i][j]);
+                            }
+                        }
+                    }
+                    minesLeft = 0; updateMinesLeftDisplay();
+                }
                  if (gameStarted) {
                        if (enableTimeBomb && !enableBlind) {
-                           const h = Math.floor(finalDisplayMillis / 3600000); const m = Math.floor((finalDisplayMillis % 3600000) / 60000); const s = Math.floor((finalDisplayMillis % 60000) / 1000); const cs = Math.floor((finalDisplayMillis % 1000) / 10);
-                           if (finalDisplayMillis < 3600000) { timerSpan.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`; }
-                           else { timerSpan.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
-                      } else { updateTimerDisplay(); }
-                 } else { timerSpan.textContent = (enableTimeBomb && !enableBlind) ? formatMsToDisplayTime(timeLimitMilliseconds, true) : '00.00'; }
+                           const h = Math.floor(finalDisplayMillis / 3600000);
+                           const m = Math.floor((finalDisplayMillis % 3600000) / 60000);
+                           const s = Math.floor((finalDisplayMillis % 60000) / 1000);
+                           const cs = Math.floor((finalDisplayMillis % 1000) / 10);
+                           if (finalDisplayMillis < 3600000) { 
+                               timerSpan.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+                           } else {
+                               timerSpan.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                           }
+                      } else { 
+                           updateTimerDisplay(); 
+                       }
+                 } else { 
+                     timerSpan.textContent = (enableTimeBomb && !enableBlind) ? formatMsToDisplayTime(timeLimitMilliseconds, true) : '00.00';
+                 }
             } else {
                 if (messageBox.textContent !== 'Game Clear!') {
-                    if (enableBlind && activeBlindRule?.id === 'basketball' && basketballRemainingMs <= 0 && gameStarted) { messageBox.textContent = 'Time Up!'; }
-                    else if (enableTimeBomb && !enableBlind && gameOverOnTimeOnly && clickedMineCount >= numMines) { messageBox.textContent = 'All Mines Hit!'; }
-                    else if (enableTimeBomb && !enableBlind && remainingMilliseconds <= 0 && gameStarted) { messageBox.textContent = 'Time Up!'; }
-                    else { messageBox.textContent = 'Game Over!'; }
+                    if (enableBlind && activeBlindRule?.id === 'basketball' && basketballRemainingMs <= 0 && gameStarted) {
+                        messageBox.textContent = 'Time Up!';
+                    } else if (enableTimeBomb && !enableBlind && gameOverOnTimeOnly && clickedMineCount >= numMines) {
+                        messageBox.textContent = 'All Mines Hit!'; 
+                    } else if (enableTimeBomb && !enableBlind && remainingMilliseconds <= 0 && gameStarted) {
+                        messageBox.textContent = 'Time Up!';
+                    } else {
+                        messageBox.textContent = 'Game Over!'; 
+                    }
                 }
-                body.classList.add('game-over'); revealAllMines(true); updateTimerDisplay();
+                body.classList.add('game-over');
+                revealAllMines(true);
+                updateTimerDisplay();
             }
         }
 
         function revealAllMines(showIncorrectFlags) {
-             const flagsAllowed = !enableNoFlags;
+            const flagsAllowed = !enableNoFlags;
             for (let i = 0; i < gridSize; i++) {
                 for (let j = 0; j < gridSize; j++) {
-                    const sq = board[i][j]; const el = sq.element;
-                    if (sq.isMine) { if ((sq.isFlagged && flagsAllowed) || el.classList.contains('mine-clicked')) { continue; } sq.isRevealed = true; renderSquareContent(sq); }
-                    else { if (showIncorrectFlags && sq.isFlagged && flagsAllowed) { sq.isRevealed = true; el.className = 'square revealed flag-wrong'; el.textContent = '❌'; } else if (showIncorrectFlags && !sq.isRevealed && document.activeElement === revealAllButton) { revealSquare(i, j); } }
+                    const sq = board[i][j]; 
+                    const el = sq.element;
+                    if (sq.isMine) {
+                        if ((sq.isFlagged && flagsAllowed) || el.classList.contains('mine-clicked')) { continue; }
+                        sq.isRevealed = true;
+                        renderSquareContent(sq); 
+                    } else { 
+                        if (showIncorrectFlags && sq.isFlagged && flagsAllowed) { 
+                            sq.isRevealed = true; 
+                            el.className = 'square revealed flag-wrong';
+                            el.textContent = '❌'; 
+                        } else if (showIncorrectFlags && !sq.isRevealed && document.activeElement === revealAllButton) {
+                            revealSquare(i, j); 
+                        } 
+                    }
                 }
             }
         }
 
         // --- Timer Functions ---
         function updateTimer() {
-            if (!gameStarted || gameOver) { if (timerInterval && gameOver) { clearInterval(timerInterval); timerInterval = null; } return; }
+            if (!gameStarted || gameOver) {
+                if (timerInterval && gameOver) { 
+                    clearInterval(timerInterval); 
+                    timerInterval = null; 
+                } return; 
+            }
             if (enableTimeBomb && !enableBlind) {
-                const elapsed = Date.now() - startTime; remainingMilliseconds = timeLimitMilliseconds - elapsed - penaltyOffsetMs;
-                if (remainingMilliseconds <= 0) { remainingMilliseconds = 0; updateTimerDisplay(); clearInterval(timerInterval); timerInterval = null; if (!gameOver) { endGame(false); } }
-                else { updateTimerDisplay(); }
-            } else { elapsedMilliseconds = Date.now() - startTime; updateTimerDisplay(); }
+                const elapsed = Date.now() - startTime; 
+                remainingMilliseconds = timeLimitMilliseconds - elapsed - penaltyOffsetMs;
+                if (remainingMilliseconds <= 0) {
+                    remainingMilliseconds = 0;
+                    updateTimerDisplay(); 
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    if (!gameOver) { endGame(false); }
+                } else { 
+                    updateTimerDisplay();
+                }
+            } else { 
+                elapsedMilliseconds = Date.now() - startTime; 
+                updateTimerDisplay(); 
+            }
         }
 
          function updateBasketballTimer() {
-             if (!gameStarted || gameOver || !enableBlind || activeBlindRule?.id !== 'basketball') { if (basketballTimerInterval) { clearInterval(basketballTimerInterval); basketballTimerInterval = null; } return; }
-             const elapsedBasketball = Date.now() - basketballStartTime; basketballRemainingMs = BASKETBALL_INTERVAL_MS - elapsedBasketball;
-             if (basketballRemainingMs <= 0) { basketballRemainingMs = 0; updateTimerDisplay(); clearInterval(basketballTimerInterval); basketballTimerInterval = null; if (!gameOver) { endGame(false); } }
-             else { updateTimerDisplay(); timerContainer.classList.toggle('blinking-basketball', basketballRemainingMs <= 3000); }
+             if (!gameStarted || gameOver || !enableBlind || activeBlindRule?.id !== 'basketball') { 
+                 if (basketballTimerInterval) { 
+                     clearInterval(basketballTimerInterval); 
+                     basketballTimerInterval = null;
+                 } 
+                 return;
+             }
+             const elapsedBasketball = Date.now() - basketballStartTime;
+             basketballRemainingMs = BASKETBALL_INTERVAL_MS - elapsedBasketball;
+             if (basketballRemainingMs <= 0) {
+                 basketballRemainingMs = 0;
+                 updateTimerDisplay(); 
+                 clearInterval(basketballTimerInterval);
+                 basketballTimerInterval = null; 
+                 if (!gameOver) { endGame(false); } 
+             } else {
+                 updateTimerDisplay(); 
+                 timerContainer.classList.toggle('blinking-basketball', basketballRemainingMs <= 3000);
+             }
          }
 
         function updateTimerDisplay() {
             if (gameOver && enableTimeBomb && !enableBlind && messageBox.textContent === 'Game Clear!') { return; }
-            let formattedTime; let displayMillis;
+            let formattedTime; 
+            let displayMillis;
 
-            if (enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver) { displayMillis = basketballRemainingMs; timerContainer.classList.remove('blinking-black', 'blinking-red'); }
+            if (enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver) {
+                displayMillis = basketballRemainingMs;
+                timerContainer.classList.remove('blinking-black', 'blinking-red');
+            }
             else if (enableTimeBomb && !enableBlind) {
-                displayMillis = remainingMilliseconds; timerContainer.classList.remove('blinking-basketball');
-                if (gameStarted && !gameOver) { const isLowTime = displayMillis < 60000 && displayMillis > 0; timerContainer.classList.toggle('blinking-red', isLowTime); timerContainer.classList.toggle('blinking-black', !isLowTime && displayMillis > 0); body.classList.toggle('low-time', isLowTime); }
-                else { timerContainer.classList.remove('blinking-red', 'blinking-black'); body.classList.remove('low-time'); }
+                displayMillis = remainingMilliseconds;
+                timerContainer.classList.remove('blinking-basketball');
+                if (gameStarted && !gameOver) {
+                    const isLowTime = displayMillis < 60000 && displayMillis > 0; 
+                    timerContainer.classList.toggle('blinking-red', isLowTime); 
+                    timerContainer.classList.toggle('blinking-black', !isLowTime && displayMillis > 0);
+                    body.classList.toggle('low-time', isLowTime); 
+                } else {
+                    timerContainer.classList.remove('blinking-red', 'blinking-black');
+                    body.classList.remove('low-time'); 
+                }
             } else {
                  displayMillis = elapsedMilliseconds;
-                 if (gameOver && messageBox.textContent !== 'Game Clear!') { if (enableTimeBomb && !enableBlind) { displayMillis = remainingMilliseconds; } else { displayMillis = elapsedMilliseconds; } }
-                 else if (gameOver && messageBox.textContent === 'Game Clear!' && (enableBlind || !enableTimeBomb)) { displayMillis = elapsedMilliseconds; }
-                 timerContainer.classList.remove('blinking-red', 'blinking-black', 'blinking-basketball'); body.classList.remove('low-time');
+                 if (gameOver && messageBox.textContent !== 'Game Clear!') { 
+                     if (enableTimeBomb && !enableBlind) {
+                         displayMillis = remainingMilliseconds;
+                     } else {
+                         displayMillis = elapsedMilliseconds; 
+                     }
+                 } else if (gameOver && messageBox.textContent === 'Game Clear!' && (enableBlind || !enableTimeBomb)) { 
+                     displayMillis = elapsedMilliseconds;
+                 }
+                 timerContainer.classList.remove('blinking-red', 'blinking-black', 'blinking-basketball');
+                body.classList.remove('low-time');
             }
             const safeMillis = Math.max(0, displayMillis);
 
-             if (enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver) { const s = Math.floor(safeMillis / 1000); const cs = Math.floor((safeMillis % 1000) / 10); formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`; }
-             else if (safeMillis < 60000) { const s = Math.floor(safeMillis / 1000); const cs = Math.floor((safeMillis % 1000) / 10); formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`; }
-             else if (safeMillis < 3600000) { const m = Math.floor(safeMillis / 60000); const s = Math.floor((safeMillis % 60000) / 1000); formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }
-             else { const h = Math.floor(safeMillis / 3600000); const m = Math.floor((safeMillis % 3600000) / 60000); const s = Math.floor((safeMillis % 60000) / 1000); formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }
+             if (enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver) { 
+                 const s = Math.floor(safeMillis / 1000); 
+                 const cs = Math.floor((safeMillis % 1000) / 10);
+                 formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+             } else if (safeMillis < 60000) { 
+                 const s = Math.floor(safeMillis / 1000); 
+                 const cs = Math.floor((safeMillis % 1000) / 10);
+                 formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+             } else if (safeMillis < 3600000) {
+                 const m = Math.floor(safeMillis / 60000); 
+                 const s = Math.floor((safeMillis % 60000) / 1000);
+                 formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; 
+             } else { 
+                 const h = Math.floor(safeMillis / 3600000); 
+                 const m = Math.floor((safeMillis % 3600000) / 60000); 
+                 const s = Math.floor((safeMillis % 60000) / 1000); 
+                 formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; 
+             }
             timerSpan.textContent = formattedTime;
         }
 
         // --- Debug Functions ---
         function revealNonMines() {
-            if (gameOver) { return; } if (!gameStarted) { startGameTimer(); }
-            for (let i = 0; i < gridSize; i++) { for (let j = 0; j < gridSize; j++) { if (!board[i][j].isMine && !board[i][j].isRevealed) { revealSquare(i, j); } } }
-            checkWinCondition(); if (!gameOver) { endGame(true); }
+            if (gameOver) { return; } 
+            if (!gameStarted) { startGameTimer(); }
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (!board[i][j].isMine && !board[i][j].isRevealed) { 
+                        revealSquare(i, j); 
+                    }
+                } 
+            }
+            checkWinCondition();
+            if (!gameOver) { endGame(true); }
             messageBox.textContent = 'All non-mines revealed!';
         }
 
         function revealAll() {
-            if (gameOver) { return; } if (!gameStarted) { startGameTimer(); }
-            revealAllMines(true); if (!gameOver) { endGame(false); }
+            if (gameOver) { return; }
+            if (!gameStarted) { startGameTimer(); }
+            revealAllMines(true); 
+            if (!gameOver) { endGame(false); }
             messageBox.textContent = 'All squares revealed!';
         }
 
         // --- Initial Setup ---
-        updateTimerDisplay(); updateActiveRulesDisplay(); updateNoFlagsUI(); detectTouch(); createBoard();
+        updateTimerDisplay(); 
+        updateActiveRulesDisplay();
+        updateNoFlagsUI(); 
+        detectTouch();
+        createBoard();
 
     </script>
 </body>
