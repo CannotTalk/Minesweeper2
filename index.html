@@ -51,6 +51,9 @@
             --rule-timebomb-color: #DC143C;
             --rule-gameovertime-color: #A0522D;
             --rule-blind-color: #8B0000;
+            --rule-tenkomori-color: #ff00ff;
+            --square-closing-bg: #aaa; /* For Ghost rule */
+            --square-blackhole-border: #555; /* For Black Hole indication? */
         }
 
         body[data-theme="dark"] {
@@ -96,6 +99,9 @@
             --rule-timebomb-color: #ff7f50;
             --rule-gameovertime-color: #deb887;
             --rule-blind-color: #ff8080;
+            --rule-tenkomori-color: #ff80ff;
+            --square-closing-bg: #777; /* For Ghost rule */
+            --square-blackhole-border: #aaa; /* For Black Hole indication? */
         }
 
         body {
@@ -113,13 +119,8 @@
             overflow-x: hidden;
         }
 
-        body.game-over {
-            background-color: var(--game-over-bg);
-        }
-
-        body.low-time {
-            background-color: var(--low-time-bg);
-        }
+        body.game-over { background-color: var(--game-over-bg); }
+        body.low-time { background-color: var(--low-time-bg); }
 
         #game-container {
             display: flex;
@@ -129,11 +130,9 @@
             position: relative;
             width: 95%;
             max-width: 420px;
-            /* Back to 420px for 20x20px board */
             background-color: var(--container-bg);
             padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease;
         }
 
@@ -146,7 +145,6 @@
             min-height: 35px;
             width: 100%;
             max-width: 412px;
-            /* Adjusted for board size */
             padding: 5px 8px;
             box-sizing: border-box;
             border: 2px solid var(--blind-rule-border);
@@ -154,62 +152,26 @@
             display: none;
             transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
+        #blind-rule-display.visible { display: block; }
+        #blind-rule-display strong { font-size: 14px; display: block; margin-bottom: 3px; font-weight: bold; text-align: left; font-family: 'Press Start 2P', cursive; }
+        #blind-rule-display span { display: block; text-align: center; }
+        #blind-rule-display.tenkomori { border-color: var(--rule-tenkomori-color); background-color: color-mix(in srgb, var(--blind-rule-bg) 80%, var(--rule-tenkomori-color) 20%); }
+        #blind-rule-display.tenkomori strong { color: var(--rule-tenkomori-color); }
+        body[data-theme="dark"] #blind-rule-display.tenkomori { border-color: var(--rule-tenkomori-color); background-color: color-mix(in srgb, var(--blind-rule-bg) 80%, var(--rule-tenkomori-color) 20%); }
+        body[data-theme="dark"] #blind-rule-display.tenkomori strong { color: var(--rule-tenkomori-color); }
 
-        #blind-rule-display.visible {
-            display: block;
-        }
-
-        #blind-rule-display strong {
-            font-size: 14px;
-            display: block;
-            margin-bottom: 3px;
-            font-weight: bold;
-            text-align: left;
-            font-family: 'Press Start 2P', cursive;
-        }
-
-        #blind-rule-display span {
-            display: block;
-            text-align: center;
-        }
-
-        #game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 412px;
-            /* Adjusted */
-            margin-bottom: 5px;
-            padding: 0 5px;
-            box-sizing: border-box;
-            min-height: 30px;
-            position: relative;
-        }
-
-        #board {
-            display: grid;
-            grid-template-columns: repeat(20, 20px);
-            /* Back to 20px */
-            border: 2px solid var(--board-border);
-            background-color: var(--board-bg);
-            padding: 4px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+        #game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 412px; margin-bottom: 5px; padding: 0 5px; box-sizing: border-box; min-height: 30px; position: relative; }
+        #board { display: grid; grid-template-columns: repeat(20, 20px); border: 2px solid var(--board-border); background-color: var(--board-bg); padding: 4px; margin-top: 5px; margin-bottom: 10px; transition: background-color 0.3s, border-color 0.3s; }
 
         .square {
             width: 20px;
             height: 20px;
-            /* Back to 20px */
             border: 1px solid var(--square-border);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             font-size: 11px;
-            /* Back to 11px */
             user-select: none;
             background-color: var(--square-hidden-bg);
             line-height: 1;
@@ -218,792 +180,134 @@
             color: var(--square-text-color);
             transition: background-color 0.1s, border-color 0.1s, color 0.1s;
         }
-
-        .hidden {
-            background-color: var(--square-hidden-bg);
-        }
-
-        .revealed {
-            background-color: var(--square-revealed-bg);
-        }
-
-        .mine {
-            background-color: var(--mine-bg);
-            font-size: 12px;
-            /* Back to 12px */
-        }
-
-        .mine-clicked {
-            background-color: var(--mine-clicked-bg);
-            color: var(--mine-clicked-text);
-            font-size: 14px;
-            /* Back to 14px */
-        }
-
-        .flag-wrong {
-            background-color: var(--flag-wrong-bg) !important;
-            color: var(--flag-wrong-text);
-            font-weight: bold;
-            font-size: 14px;
-            /* Back to 14px */
-        }
+        .hidden { background-color: var(--square-hidden-bg); }
+        .revealed { background-color: var(--square-revealed-bg); }
+        .mine { background-color: var(--mine-bg); font-size: 12px; }
+        .mine-clicked { background-color: var(--mine-clicked-bg); color: var(--mine-clicked-text); font-size: 14px; }
+        .flag-wrong { background-color: var(--flag-wrong-bg) !important; color: var(--flag-wrong-text); font-weight: bold; font-size: 14px; }
+        .closing { background-color: var(--square-closing-bg); animation: closing-anim 0.5s ease-out; } /* Ghost animation */
+        @keyframes closing-anim { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         /* Buttons */
-        #reset-button,
-        #rules-button,
-        #debug-buttons button,
-        #save-settings-button,
-        #reset-all-settings-button,
-        .reset-rule-button {
-            padding: 6px 12px;
-            /* Back to original */
-            font-size: 12px;
-            /* Back to original */
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            background-color: var(--button-bg);
-            border: 1px solid var(--button-border);
-            color: var(--button-text);
-            border-radius: 3px;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
+        #reset-button, #rules-button, #debug-buttons button, #save-settings-button, #reset-all-settings-button, .reset-rule-button { padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: 'Press Start 2P', cursive; background-color: var(--button-bg); border: 1px solid var(--button-border); color: var(--button-text); border-radius: 3px; transition: background-color 0.2s, border-color 0.2s; }
+        #reset-button { margin-top: 8px; }
+        #rules-button { font-size: 10px; padding: 5px 8px; margin-top: 0; order: 3; }
+        #reset-button:hover, #rules-button:hover, #debug-buttons button:hover, #save-settings-button:hover, #reset-all-settings-button:hover, .reset-rule-button:hover { background-color: var(--button-hover-bg); }
+        #save-settings-button { background-color: #4CAF50; color: white; margin-top: 0; font-family: sans-serif; }
+        body[data-theme="dark"] #save-settings-button { background-color: #388E3C; }
+        #save-settings-button:hover { background-color: #45a049; }
+        body[data-theme="dark"] #save-settings-button:hover { background-color: #2E7D32; }
+        #reset-all-settings-button { background-color: #f44336; color: white; margin-top: 0; margin-right: 10px; font-family: sans-serif; }
+        body[data-theme="dark"] #reset-all-settings-button { background-color: #c62828; }
+        #reset-all-settings-button:hover { background-color: #e53935; }
+        body[data-theme="dark"] #reset-all-settings-button:hover { background-color: #b71c1c; }
+        .reset-rule-button { font-size: 9px; padding: 2px 6px; margin-left: 10px; font-family: sans-serif; }
 
-        #reset-button {
-            margin-top: 8px;
-        }
+        #info-controls { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 412px; }
+        #message-box { font-size: 12px; color: var(--text-color); margin-bottom: 2px; height: 14px; text-align: center; transition: color 0.3s; }
+        #active-rules-display { font-size: 9px; color: var(--text-color); opacity: 0.8; margin-top: 0px; margin-bottom: 8px; line-height: 1.3; text-align: center; min-height: 40px; transition: color 0.3s; }
+        #active-rules-display div { margin-bottom: 2px; }
+        /* Keep rule specific colors if needed */
+        #active-rules-display .rule-display-blind { color: var(--rule-blind-color); font-weight: bold; }
+        #active-rules-display .rule-display-tenkomori { color: var(--rule-tenkomori-color); font-weight: bold; font-size: 10px; }
 
-        #rules-button {
-            font-size: 10px;
-            padding: 5px 8px;
-            margin-top: 0;
-            order: 3;
-        }
+        .timer { font-size: 14px; color: var(--text-color); text-align: center; order: 2; flex-grow: 1; margin: 0; transition: color 0.3s ease; }
+        .timer.blinking-black span { animation: blink-black-anim 1s infinite; }
+        .timer.blinking-red span { animation: blink-red-anim 1s infinite; }
+        .timer.blinking-basketball span { animation: blink-basketball-anim 0.8s infinite; }
+        @keyframes blink-black-anim { 0%, 49% { color: var(--square-text-color); } 50%, 100% { color: var(--text-color); } }
+        @keyframes blink-red-anim { 0%, 49% { color: red; } 50%, 100% { color: var(--text-color); } }
+        @keyframes blink-basketball-anim { 0%, 49% { color: #ff0000; } 50%, 100% { color: var(--square-text-color); } }
 
-        #reset-button:hover,
-        #rules-button:hover,
-        #debug-buttons button:hover,
-        #save-settings-button:hover,
-        #reset-all-settings-button:hover,
-        .reset-rule-button:hover {
-            background-color: var(--button-hover-bg);
-        }
+        .switch { position: relative; display: inline-block; width: 40px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--slider-bg); transition: .4s; border-radius: 18px; }
+        .slider:before { position: absolute; content: ""; height: 10px; width: 10px; left: 4px; bottom: 4px; background-color: var(--switch-thumb-bg); transition: .4s; border-radius: 50%; }
+        input:checked+.slider { background-color: var(--slider-checked-bg); }
+        input:focus+.slider { box-shadow: 0 0 1px var(--slider-checked-bg); }
+        input:checked+.slider:before { transform: translateX(22px); }
+        .slider.round { border-radius: 18px; }
+        .slider.round:before { border-radius: 50%; }
 
-        #save-settings-button {
-            background-color: #4CAF50;
-            color: white;
-            margin-top: 0;
-        }
+        .special-square { font-size: 9px; }
+        .odd-even-square { color: var(--rule-oddeven-color); font-weight: bold; }
+        .area-value-square { color: var(--rule-areavalue-color); font-weight: bold; font-size: 9px; }
+        .directional-square { color: var(--rule-directional-color); font-weight: bold; font-size: 9px; }
+        .natural-number-square { color: var(--rule-natural-color); font-weight: bold; }
 
-        body[data-theme="dark"] #save-settings-button {
-            background-color: #388E3C;
-        }
+        #debug-buttons { display: none; margin-top: 8px; }
+        #debug-buttons.visible { display: flex; gap: 4px; }
+        #debug-buttons button { margin-left: 0; padding: 6px 10px; font-size: 10px; }
 
-        #save-settings-button:hover {
-            background-color: #45a049;
-        }
-
-        body[data-theme="dark"] #save-settings-button:hover {
-            background-color: #2E7D32;
-        }
-
-        #reset-all-settings-button {
-            background-color: #f44336;
-            color: white;
-            margin-top: 0;
-            margin-right: 10px;
-        }
-
-        body[data-theme="dark"] #reset-all-settings-button {
-            background-color: #c62828;
-        }
-
-        #reset-all-settings-button:hover {
-            background-color: #e53935;
-        }
-
-        body[data-theme="dark"] #reset-all-settings-button:hover {
-            background-color: #b71c1c;
-        }
-
-        .reset-rule-button {
-            font-size: 9px;
-            padding: 2px 6px;
-            margin-left: 10px;
-            font-family: sans-serif;
-        }
-
-        #info-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 412px;
-            /* Adjusted */
-        }
-
-        #message-box {
-            font-size: 12px;
-            /* Back */
-            color: var(--text-color);
-            margin-bottom: 2px;
-            height: 14px;
-            text-align: center;
-            transition: color 0.3s;
-        }
-
-        #active-rules-display {
-            font-size: 9px;
-            /* Back */
-            color: var(--text-color);
-            opacity: 0.8;
-            margin-top: 0px;
-            margin-bottom: 8px;
-            line-height: 1.3;
-            text-align: center;
-            min-height: 40px;
-            /* Back */
-            transition: color 0.3s;
-        }
-
-        #active-rules-display div {
-            margin-bottom: 2px;
-        }
-
-        #active-rules-display .rule-display-directional {
-            color: var(--rule-directional-color);
-        }
-
-        #active-rules-display .rule-display-oddEven {
-            color: var(--rule-oddeven-color);
-        }
-
-        #active-rules-display .rule-display-areaValue {
-            color: var(--rule-areavalue-color);
-        }
-
-        #active-rules-display .rule-display-naturalNumber {
-            color: var(--rule-natural-color);
-        }
-
-        #active-rules-display .rule-display-timeBomb {
-            color: var(--rule-timebomb-color);
-        }
-
-        #active-rules-display .rule-display-gameOverOnTimeOnly {
-            color: var(--rule-gameovertime-color);
-        }
-
-        #active-rules-display .rule-display-blind {
-            color: var(--rule-blind-color);
-            font-weight: bold;
-        }
-
-        .timer {
-            font-size: 14px;
-            /* Back */
-            color: var(--text-color);
-            text-align: center;
-            order: 2;
-            flex-grow: 1;
-            margin: 0;
-            transition: color 0.3s ease;
-        }
-
-        .timer.blinking-black span {
-            animation: blink-black-anim 1s infinite;
-        }
-
-        .timer.blinking-red span {
-            animation: blink-red-anim 1s infinite;
-        }
-
-        .timer.blinking-basketball span {
-            animation: blink-basketball-anim 0.8s infinite;
-        }
-
-        @keyframes blink-black-anim {
-            0%, 49% { color: var(--square-text-color); }
-            50%, 100% { color: var(--text-color); }
-        }
-
-        @keyframes blink-red-anim {
-            0%, 49% { color: red; }
-            50%, 100% { color: var(--text-color); }
-        }
-
-        @keyframes blink-basketball-anim {
-            0%, 49% { color: #ff0000; }
-            50%, 100% { color: var(--square-text-color); }
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 18px;
-            /* Back */
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--slider-bg);
-            transition: .4s;
-            border-radius: 18px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 10px;
-            width: 10px;
-            left: 4px;
-            bottom: 4px;
-            background-color: var(--switch-thumb-bg);
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked+.slider {
-            background-color: var(--slider-checked-bg);
-        }
-
-        input:focus+.slider {
-            box-shadow: 0 0 1px var(--slider-checked-bg);
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(22px);
-            /* Back */
-        }
-
-        .slider.round {
-            border-radius: 18px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-        .special-square {
-            font-size: 9px;
-            /* Back */
-        }
-
-        .odd-even-square {
-            color: var(--rule-oddeven-color);
-            font-weight: bold;
-        }
-
-        .area-value-square {
-            color: var(--rule-areavalue-color);
-            font-weight: bold;
-            font-size: 9px;
-            /* Back */
-        }
-
-        .directional-square {
-            color: var(--rule-directional-color);
-            font-weight: bold;
-            font-size: 9px;
-            /* Back */
-        }
-
-        .natural-number-square {
-            color: var(--rule-natural-color);
-            font-weight: bold;
-        }
-
-        /* Standard number colors inherit --square-text-color set by theme */
-
-        #debug-buttons {
-            display: none;
-            margin-top: 8px;
-        }
-
-        #debug-buttons.visible {
-            display: flex;
-            gap: 4px;
-        }
-
-        #debug-buttons button {
-            margin-left: 0;
-            padding: 6px 10px;
-            /* Back */
-            font-size: 10px;
-            /* Back */
-        }
-
-        #mode-toggle-buttons {
-            display: none;
-            user-select: none;
-            order: 1;
-        }
-
-        #mode-toggle-buttons.visible {
-            display: flex;
-            gap: 5px;
-        }
-
-        .mode-button {
-            font-size: 20px;
-            /* Back */
-            padding: 3px 6px;
-            /* Back */
-            cursor: pointer;
-            border: 2px solid var(--button-border);
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border-radius: 5px;
-            line-height: 1;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .mode-button.active {
-            background-color: var(--button-hover-bg);
-            border-color: var(--text-color);
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        body[data-theme="dark"] .mode-button.active {
-            border-color: var(--text-color);
-            box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.2);
-        }
-
-        #flag-mode-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: var(--button-bg);
-            border-color: var(--button-border);
-            box-shadow: none;
-        }
+        #mode-toggle-buttons { display: none; user-select: none; order: 1; }
+        #mode-toggle-buttons.visible { display: flex; gap: 5px; }
+        .mode-button { font-size: 20px; padding: 3px 6px; cursor: pointer; border: 2px solid var(--button-border); background-color: var(--button-bg); color: var(--button-text); border-radius: 5px; line-height: 1; transition: background-color 0.2s, border-color 0.2s; }
+        .mode-button.active { background-color: var(--button-hover-bg); border-color: var(--text-color); box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); }
+        body[data-theme="dark"] .mode-button.active { border-color: var(--text-color); box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.2); }
+        #flag-mode-button:disabled { opacity: 0.5; cursor: not-allowed; background-color: var(--button-bg); border-color: var(--button-border); box-shadow: none; }
 
         /* --- Popup Styles --- */
-        #popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 99;
-            display: none;
-        }
+        #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; display: none; }
+        #rules-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: var(--popup-bg); border: 2px solid var(--popup-border); color: var(--popup-text); border-radius: 8px; z-index: 100; display: none; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25); font-family: sans-serif; font-size: 12px; flex-direction: column; transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+        #popup-overlay.visible, #rules-popup.visible { display: flex !important; }
+        .popup-header { padding: 15px 20px 0 20px; }
+        .popup-header h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; text-align: center; font-family: inherit; font-weight: bold; color: var(--popup-header-text); }
+        .rules-content { max-height: 65vh; overflow-y: auto; padding: 0 20px 10px 20px; }
+        #rules-popup h3 { font-size: 15px; margin-bottom: 10px; margin-top: 18px; border-bottom: 1px solid var(--popup-footer-border); padding-bottom: 4px; font-weight: bold; font-family: inherit; }
+        #rules-popup h4 { font-size: 14px; margin-bottom: 6px; margin-top: 12px; font-weight: bold; color: var(--text-color); opacity: 0.9; font-family: inherit; }
+        #rules-popup p { margin-bottom: 12px; line-height: 1.5; font-size: 12px; font-family: inherit; }
+        #close-popup-button { position: absolute; top: 8px; right: 8px; background: none; border: 1px solid transparent; font-size: 26px; font-weight: bold; color: #777; cursor: pointer; font-family: sans-serif; line-height: 1; padding: 0 6px; transition: color 0.2s, border-color 0.2s; }
+        body[data-theme="dark"] #close-popup-button { color: #aaa; }
+        #close-popup-button:hover, #close-popup-button:focus { color: var(--text-color); border-color: #ccc; outline: none; }
+        #rules-popup .setting-section { background-color: var(--popup-setting-bg); padding: 10px 15px; border-radius: 4px; margin-bottom: 12px; border: 1px solid var(--popup-setting-border); transition: background-color 0.3s, border-color 0.3s; }
+        #rules-popup .setting-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; font-size: 13px; margin-top: 8px; font-weight: bold; font-family: inherit; }
+        #rules-popup .setting-label.sub-setting { font-size: 12px; font-weight: normal; margin-top: 10px; font-family: inherit; }
+        #rules-popup .switch { margin-left: 8px; }
+        .popup-footer { padding: 10px 20px; text-align: right; border-top: 1px solid var(--popup-footer-border); background-color: var(--popup-footer-bg); margin-top: auto; display: flex; justify-content: flex-end; align-items: center; transition: background-color 0.3s, border-color 0.3s; }
+        #mine-slider { width: 100%; cursor: pointer; margin-top: 5px; }
+        #mine-count-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 13px; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-family: inherit; font-weight: bold; margin-bottom: 5px; }
+        #hide-rate-control { margin-top: 10px; }
+        #hide-rate-slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 3px; font-weight: normal; font-family: inherit; }
+        #hide-rate-display { font-weight: bold; margin-left: 5px; font-family: sans-serif; font-size: 12px; }
+        #hide-rate-slider { width: 100%; cursor: pointer; }
+        .setting-section[data-rule-id="hide"] > #hide-rate-control:not(.enabled) { opacity: 0.5; pointer-events: none; }
+        .pc-op-mode-label { display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer; font-family: inherit; }
+        .pc-op-mode-label input[type="radio"] { margin-right: 5px; }
+        #pc-op-mode-section { display: block; }
+        body.touch-device #pc-op-mode-section { display: none; }
+        body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons { display: none; }
+        #timer-start-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(2); font-size: 48px; font-family: 'Press Start 2P', cursive; color: var(--text-color); border-radius: 5px; z-index: 101; opacity: 0; pointer-events: none; transition: transform 0.4s ease-out, opacity 0.4s ease-out, top 0.4s ease-out, left 0.4s ease-out, font-size 0.4s ease-out, color 0.4s ease-out; animation: start-blink 1s infinite; }
+        #timer-start-display.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #timer-start-display.move-to-corner { top: 25px; left: 50%; transform: translateX(-50%) scale(0.6); font-size: 14px; opacity: 0; color: var(--text-color); animation: none; }
+        .timer.hide-during-intro { visibility: hidden; }
+        @keyframes start-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0.5; } }
+        body.timer-intro-active * { pointer-events: none !important; }
+        body.timer-intro-active #rules-popup, body.timer-intro-active #popup-overlay { pointer-events: auto !important; }
+        body.timer-intro-active #rules-popup * { pointer-events: auto !important; }
+        #time-bomb-details { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--popup-footer-border); }
+        #time-bomb-details>div { margin-bottom: 10px; }
+        .time-input-group { display: flex; align-items: center; margin-bottom: 6px; }
+        .time-input-group label { display: inline-block; width: 65px; text-align: right; margin-right: 5px; font-size: 11px; font-family: sans-serif; font-weight: bold; color: var(--popup-text); }
+        .time-input-group input[type="number"] { width: 40px; padding: 4px; font-size: 12px; font-family: sans-serif; border: 1px solid var(--popup-setting-border); background-color: var(--bg-color); color: var(--text-color); border-radius: 3px; text-align: right; -moz-appearance: textfield; appearance: textfield; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        .time-input-group input[type="number"]::-webkit-outer-spin-button, .time-input-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .time-input-group span.colon { font-size: 14px; font-weight: bold; margin: 0 3px; font-family: sans-serif; color: var(--popup-text); }
+        #time-bomb-random-switch-label, #game-over-on-time-only-label { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: normal; font-family: inherit; margin-bottom: 5px; }
+        .time-setting-note { display: block; font-size: 10px; color: #666; margin-top: 4px; font-family: sans-serif; text-align: center; }
+        body[data-theme="dark"] .time-setting-note { color: #aaa; }
+        .hidden-setting { display: none !important; }
+        .disabled-setting { opacity: 0.5; pointer-events: none; }
+        .disabled-setting input, .disabled-setting button, .disabled-setting .switch { cursor: not-allowed !important; }
 
-        #rules-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 500px;
-            background-color: var(--popup-bg);
-            border: 2px solid var(--popup-border);
-            color: var(--popup-text);
-            border-radius: 8px;
-            z-index: 100;
-            display: none;
-            font-size: 11px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-            font-family: sans-serif;
-            flex-direction: column;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-        }
+        /* Blind Mode Section Styling */
+        #rules-popup .setting-section[data-rule-id="blind"] { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--popup-setting-border); position: relative; }
+        #megamori-setting-section { margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--popup-setting-border); }
+        #megamori-setting-section.disabled-setting { opacity: 0.5; pointer-events: none; }
+        #megamori-setting-section.disabled-setting input, #megamori-setting-section.disabled-setting .switch { cursor: not-allowed !important; }
 
-        #popup-overlay.visible,
-        #rules-popup.visible {
-            display: flex !important;
-        }
-
-        .popup-header {
-            padding: 15px 20px 0 20px;
-        }
-
-        .popup-header h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 18px;
-            text-align: center;
-            font-family: 'Press Start 2P', cursive;
-            color: var(--popup-header-text);
-        }
-
-        .rules-content {
-            max-height: 65vh;
-            overflow-y: auto;
-            padding: 0 20px 10px 20px;
-        }
-
-        #rules-popup h3 {
-            font-size: 14px;
-            margin-bottom: 10px;
-            margin-top: 18px;
-            border-bottom: 1px solid var(--popup-footer-border);
-            padding-bottom: 4px;
-            font-weight: bold;
-        }
-
-        #rules-popup h4 {
-            font-size: 13px;
-            margin-bottom: 6px;
-            margin-top: 12px;
-            font-weight: bold;
-            color: var(--text-color);
-            opacity: 0.9;
-        }
-
-        #rules-popup p {
-            margin-bottom: 12px;
-            line-height: 1.5;
-            font-size: 12px;
-        }
-
-        #close-popup-button {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: 1px solid transparent;
-            font-size: 26px;
-            font-weight: bold;
-            color: #777;
-            cursor: pointer;
-            font-family: sans-serif;
-            line-height: 1;
-            padding: 0 6px;
-            transition: color 0.2s, border-color 0.2s;
-        }
-
-        body[data-theme="dark"] #close-popup-button {
-            color: #aaa;
-        }
-
-        #close-popup-button:hover,
-        #close-popup-button:focus {
-            color: var(--text-color);
-            border-color: #ccc;
-            outline: none;
-        }
-
-        #rules-popup .setting-section {
-            background-color: var(--popup-setting-bg);
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            border: 1px solid var(--popup-setting-border);
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
-        #rules-popup .setting-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0;
-            font-size: 12px;
-            /* Back */
-            margin-top: 8px;
-            font-weight: bold;
-            font-family: 'Press Start 2P', cursive;
-        }
-
-        #rules-popup .switch {
-            margin-left: 8px;
-        }
-
-        .popup-footer {
-            padding: 10px 20px;
-            text-align: right;
-            border-top: 1px solid var(--popup-footer-border);
-            background-color: var(--popup-footer-bg);
-            margin-top: auto;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
-        #mine-slider {
-            width: 100%;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        #mine-count-display {
-            font-weight: bold;
-            margin-left: 5px;
-            font-family: sans-serif;
-            font-size: 13px;
-        }
-
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            /* Back */
-            font-family: 'Press Start 2P', cursive;
-            margin-bottom: 5px;
-        }
-
-        #hide-rate-control {
-            margin-top: 10px;
-        }
-
-        #hide-rate-slider-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            /* Back */
-            margin-bottom: 3px;
-            font-weight: normal;
-        }
-
-        #hide-rate-display {
-            font-weight: bold;
-            margin-left: 5px;
-            font-family: sans-serif;
-            font-size: 12px;
-            /* Back */
-        }
-
-        #hide-rate-slider {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .setting-section[data-rule-id="hide"] > #hide-rate-control:not(.enabled) {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .pc-op-mode-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            /* Back */
-            cursor: pointer;
-        }
-
-        .pc-op-mode-label input[type="radio"] {
-            margin-right: 5px;
-        }
-
-        #pc-op-mode-section {
-            display: block;
-        }
-
-        body.touch-device #pc-op-mode-section {
-            display: none;
-        }
-
-        body:not(.touch-device)[data-pc-op-mode="mouse"] #mode-toggle-buttons {
-            display: none;
-        }
-
-        #timer-start-display {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(2);
-            font-size: 48px;
-            /* Back */
-            font-family: 'Press Start 2P', cursive;
-            color: var(--text-color);
-            border-radius: 5px;
-            z-index: 101;
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.4s ease-out, opacity 0.4s ease-out, top 0.4s ease-out, left 0.4s ease-out, font-size 0.4s ease-out, color 0.4s ease-out;
-            animation: start-blink 1s infinite;
-        }
-
-        #timer-start-display.visible {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        #timer-start-display.move-to-corner {
-            top: 25px;
-            /* Back */
-            left: 50%;
-            transform: translateX(-50%) scale(0.6);
-            /* Back */
-            font-size: 14px;
-            /* Back */
-            opacity: 0;
-            color: var(--text-color);
-            animation: none;
-        }
-
-        .timer.hide-during-intro {
-            visibility: hidden;
-        }
-
-        @keyframes start-blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0.5; }
-        }
-
-        body.timer-intro-active * {
-            pointer-events: none !important;
-        }
-
-        body.timer-intro-active #rules-popup,
-        body.timer-intro-active #popup-overlay {
-            pointer-events: auto !important;
-        }
-
-        body.timer-intro-active #rules-popup * {
-            pointer-events: auto !important;
-        }
-
-        #time-bomb-details {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed var(--popup-footer-border);
-        }
-
-        #time-bomb-details>div {
-            margin-bottom: 10px;
-        }
-
-        .time-input-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .time-input-group label {
-            display: inline-block;
-            width: 65px;
-            /* Back */
-            text-align: right;
-            margin-right: 5px;
-            font-size: 11px;
-            /* Back */
-            font-family: sans-serif;
-            font-weight: bold;
-            color: var(--popup-text);
-        }
-
-        .time-input-group input[type="number"] {
-            width: 40px;
-            /* Back */
-            padding: 4px;
-            /* Back */
-            font-size: 12px;
-            /* Back */
-            font-family: sans-serif;
-            border: 1px solid var(--popup-setting-border);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border-radius: 3px;
-            text-align: right;
-            -moz-appearance: textfield;
-            appearance: textfield;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        .time-input-group input[type="number"]::-webkit-outer-spin-button,
-        .time-input-group input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .time-input-group span.colon {
-            font-size: 14px;
-            /* Back */
-            font-weight: bold;
-            margin: 0 3px;
-            /* Back */
-            font-family: sans-serif;
-            color: var(--popup-text);
-        }
-
-        #time-bomb-random-switch-label,
-        #game-over-on-time-only-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-            /* Back */
-            font-weight: normal;
-            font-family: 'Press Start 2P', cursive;
-            margin-bottom: 5px;
-        }
-
-        .time-setting-note {
-            display: block;
-            font-size: 10px;
-            /* Back */
-            color: #666;
-            margin-top: 4px;
-            font-family: sans-serif;
-            text-align: center;
-        }
-
-        body[data-theme="dark"] .time-setting-note {
-            color: #aaa;
-        }
-
-        .hidden-setting {
-            display: none !important;
-        }
-
-        .disabled-setting {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .disabled-setting input,
-        .disabled-setting button,
-        .disabled-setting .switch {
-            cursor: not-allowed !important;
-        }
-
-        #rules-popup .setting-section[data-rule-id="blind"] {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid var(--popup-setting-border);
-            position: relative;
-        }
-
-        .disabled-reason {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(255, 220, 220, 0.9);
-            color: #8B0000;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-family: sans-serif;
-            font-weight: bold;
-            display: none;
-            z-index: 1;
-            white-space: nowrap;
-        }
-
-        body[data-theme="dark"] .disabled-reason {
-            background-color: rgba(60, 0, 0, 0.9);
-            color: #ffcccc;
-        }
-
-        .setting-section[data-rule-id="blind"].disabled-setting .disabled-reason {
-            display: block;
-        }
+        .disabled-reason { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: rgba(255, 220, 220, 0.9); color: #8B0000; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-family: sans-serif; font-weight: bold; display: none; z-index: 1; white-space: nowrap; }
+        body[data-theme="dark"] .disabled-reason { background-color: rgba(60, 0, 0, 0.9); color: #ffcccc; }
+        .setting-section[data-rule-id="blind"].disabled-setting .disabled-reason { display: block; }
     </style>
 </head>
 
@@ -1027,7 +331,7 @@
         <div id="board"></div>
 
         <div id="info-controls">
-            <div id="message-box">Click a square to start!</div>
+            <div id="message-box">Mines: 0</div>
             <div id="active-rules-display"></div>
             <button id="reset-button">Reset</button>
             <div id="debug-buttons">
@@ -1048,7 +352,7 @@
         <div class="rules-content">
             <h3>基本ルール</h3>
             <p>クリックしてマスを開きます。<b>最初にクリックしたマスは必ず安全地帯です。</b><br>
-                数字は周囲8マスにある地雷の数を示します。(ブラインド「あべこべ」有効時は安全地帯の数)<br>
+                数字は周囲8マスにある地雷の数を示します。(ブラインド「あべこべ」有効時は安全地帯の数、「近視眼」有効時は上下左右4マスの数)<br>
                 地雷のマスを開かずに、地雷以外のすべてのマスを開くとクリアです。<br>
                 通常は、右クリック(PC)または長押し/旗モード(スマホ)で旗 (🚩) を立てられます。<br>
                 <b>「フラグなしモード」</b>が有効な場合、旗を立てることはできません。<br>
@@ -1262,10 +566,13 @@
                 </div>
             </div>
 
+            <!-- Blind Mode Section -->
+            <h3>ブラインドモード設定</h3>
             <div class="setting-section" data-rule-id="blind">
                 <p class="disabled-reason">No Flags または Time Bomb 有効時は選択不可</p>
-                <h3>ブラインドモード (Blind Mode)</h3>
-                <p>マインスイーパーを遊び尽くした人向け。有効にすると一部の設定が固定され、ランダムな追加ルールが適用されます。</p>
+                <h4>ブラインドモード (Blind Mode)</h4>
+                <p>マインスイーパーを遊び尽くした人向け。有効にすると一部の設定が固定され、ランダムな追加ルールが適用されます。<br>
+                   追加ルール：バスケットボール、過失誤差、異常発生、隠密、トーラス、あべこべ、亡霊、近視眼、ブラックホール、てんこ盛り！(低確率)</p>
                 <div class="setting-label">
                     <span>有効</span>
                     <div>
@@ -1276,6 +583,19 @@
                         </label>
                     </div>
                 </div>
+
+                <!-- Megamori Mode Sub-section -->
+                <div id="megamori-setting-section" class="disabled-setting">
+                     <h4>メガ盛りモード</h4>
+                     <p style="margin-bottom: 5px;">有効にすると、ブラインドモード開始時に必ず「てんこ盛り！」ルールが適用されます。</p>
+                     <div class="setting-label sub-setting">
+                         <span>有効</span>
+                         <label class="switch">
+                            <input type="checkbox" id="megamori-switch">
+                            <span class="slider round"></span>
+                        </label>
+                     </div>
+                 </div>
             </div>
 
         </div>
@@ -1290,7 +610,9 @@
         const gridSize = 20;
         const MINE_PENALTY_MS = 15000;
         const BASKETBALL_INTERVAL_MS = 10000;
-
+        const GHOST_CLOSE_DELAY_MS = 30000;
+        const BLACK_HOLE_COUNT = 3;
+        const TENKOMORI_CHANCE = 0.05; // 5% chance for Tenkomori
         const defaultSettings = {
             numMines: 50,
             enableNoFlags: false,
@@ -1307,7 +629,8 @@
             enableOddEven: true,
             enableAreaValue: true,
             enableNaturalNumber: true,
-            enableBlind: false
+            enableBlind: false,
+            enableMegamori: false // Added Megamori default
         };
 
         // Blind Mode Constants
@@ -1325,46 +648,58 @@
                 id: 'basketball',
                 title: 'バスケットボール',
                 description: '10秒に1回は安全なマスを開けなければならない',
-                bgColor: '#ffe4e1',
-                borderColor: '#dc143c'
             },
             {
                 id: 'error',
                 title: '過失誤差',
                 description: '数字マスが±1されることがある',
-                bgColor: '#fffacd',
-                borderColor: '#ffd700'
             },
             {
                 id: 'anomaly',
                 title: '異常発生',
                 description: '特定の特殊マスの生成率が増加する',
-                bgColor: '#e6e6fa',
-                borderColor: '#9370db'
             },
             {
                 id: 'noChain',
-                title: '完璧な感染対策',
+                title: '隠密',
                 description: '0マスでの連鎖が発生しない',
-                bgColor: '#f0fff0',
-                borderColor: '#2e8b57'
             },
             {
                 id: 'torus',
                 title: 'トーラス',
                 description: '盤面の上下左右の端がつながる',
-                bgColor: '#add8e6',
-                borderColor: '#4682b4'
             },
             {
                 id: 'abekobe',
                 title: 'あべこべ',
                 description: '数字マスは安全地帯の数を示すようになる',
-                bgColor: '#fafad2',
-                borderColor: '#b8860b'
+            },
+            {
+                id: 'ghost', // New Rule
+                title: '亡霊',
+                description: '数字マスを開けても30秒後に再び閉じる',
+            },
+            {
+                id: 'myopia', // New Rule
+                title: '近視眼',
+                description: '数字マスは隣接した上下左右4マスの地雷の数を表示する',
+            },
+            {
+                id: 'blackHole', // New Rule
+                title: 'ブラックホール',
+                description: '3個あるブラックホールマスを開けると周囲のマスが強制的に開く',
+            },
+            {
+                id: 'tenkomori',
+                title: 'てんこ盛り！',
+                description: '全てのブラインドが適用される！',
             }
         ];
+
+        const allBlindRuleIds = blindRules.filter(r => r.id !== 'tenkomori').map(r => r.id);
+
         const specialSquareTypes = ['hide', 'directional', 'oddEven', 'areaValue', 'naturalNumber'];
+
         const specialSquareNamesJP = {
             hide: 'ハイドマス',
             directional: 'ディレクションマス',
@@ -1372,7 +707,6 @@
             areaValue: 'エリアバリューマス',
             naturalNumber: 'ナチュラルナンバーマス'
         };
-
         let numMines = defaultSettings.numMines;
         let currentMaxHideRate = defaultSettings.hideRateMax;
         let currentMaxOddEvenRate = 0.10;
@@ -1395,6 +729,7 @@
         let gameStarted = false;
         let startTime = 0;
         let penaltyOffsetMs = 0;
+        let activeGhostTimers = {}; // To manage Ghost rule timers { "r-c": timerId }
 
         // --- Interaction Mode State ---
         let currentInteractionMode = 'dig';
@@ -1403,7 +738,8 @@
         let justFlagged = false;
 
         // --- Blind Mode State ---
-        let activeBlindRule = null;
+        let activeBlindRule = null
+        let isTenkomoriActive = false;
         let basketballTimerInterval = null;
         let basketballRemainingMs = BASKETBALL_INTERVAL_MS;
         let basketballStartTime = 0;
@@ -1464,6 +800,8 @@
         const gameOverOnTimeOnlySwitch = document.getElementById('game-over-on-time-only-switch');
         const timerStartDisplay = document.getElementById('timer-start-display');
         const blindSwitch = document.getElementById('blind-switch');
+        const megamoriSwitch = document.getElementById('megamori-switch');
+        const megamoriSettingSection = document.getElementById('megamori-setting-section');
         const blindRuleDisplay = document.getElementById('blind-rule-display');
         const minesSettingSection = document.querySelector('.setting-section[data-rule-id="mines"]');
         const noFlagsSettingSection = document.querySelector('.setting-section[data-rule-id="noFlags"]');
@@ -1478,7 +816,7 @@
         const themeToggleSwitch = document.getElementById('theme-toggle-switch');
         const resetAllSettingsButton = document.getElementById('reset-all-settings-button');
 
-        // --- Settings (Current Applied) ---
+        // --- Settings (Current Applied) --
         let enableNoFlags = defaultSettings.enableNoFlags;
         let enableTimeBomb = defaultSettings.enableTimeBomb;
         let timeLimitRandom = defaultSettings.timeLimitRandom;
@@ -1494,12 +832,13 @@
         let enableAreaValue = defaultSettings.enableAreaValue;
         let enableNaturalNumber = defaultSettings.enableNaturalNumber;
         let enableBlind = defaultSettings.enableBlind;
+        let enableMegamori = defaultSettings.enableMegamori;
 
         let pendingSettings = { ...defaultSettings
         };
 
-        // --- Helper Functions ---
 
+        // --- Helper Functions ---
         function parseInputsToMs(hoursInput, minutesInput, secondsInput) {
             const h = parseInt(hoursInput?.value, 10) || 0;
             const m = parseInt(minutesInput?.value, 10) || 0;
@@ -1541,6 +880,7 @@
             const totalMinutes = Math.floor(totalSeconds / 60);
             const minutes = String(totalMinutes % 60).padStart(2, '0');
             const hours = Math.floor(totalMinutes / 60);
+            
             if (includeHoursForce || hours > 0) {
                 return `${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
             } else {
@@ -1551,7 +891,7 @@
 
         function initializeSliders() {
             const maxMines = gridSize * gridSize;
-            if (mineSlider) { // Check if slider exists
+            if (mineSlider) {
                 mineSlider.max = maxMines;
                 let currentMineValue = pendingSettings.numMines;
                 if (currentMineValue < 0) currentMineValue = 0;
@@ -1559,7 +899,7 @@
                 mineSlider.value = currentMineValue;
                 if (mineCountDisplay) mineCountDisplay.textContent = currentMineValue;
             }
-            if (hideRateSlider) { // Check if slider exists
+            if (hideRateSlider) {
                 let currentHideRate = pendingSettings.hideRateMax * 100;
                 const minHide = parseInt(hideRateSlider.min, 10);
                 const maxHide = parseInt(hideRateSlider.max, 10);
@@ -1571,7 +911,6 @@
             }
         }
 
-
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme(currentTheme);
             if (themeToggleSwitch) themeToggleSwitch.checked = (currentTheme === 'dark');
@@ -1582,7 +921,6 @@
 
 
         // --- Device Detection and UI Initialization ---
-
         function detectTouch() {
             isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
             if (isTouch) {
@@ -1590,6 +928,7 @@
                 pcOperationMode = 'button';
                 const buttonRadio = document.querySelector('input[name="pc-op-mode"][value="button"]');
                 if (buttonRadio) buttonRadio.checked = true;
+                if (pcOpModeSection) pcOpModeSection.style.display = 'none'; // Hide PC mode section on touch
             } else {
                 document.body.classList.remove('touch-device');
                 const currentPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
@@ -1599,10 +938,10 @@
                 const targetRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
                 if (targetRadio) targetRadio.checked = true;
                 document.body.dataset.pcOpMode = pcOperationMode;
+                if (pcOpModeSection) pcOpModeSection.style.display = 'block'; // Show PC mode section on non-touch
             }
             updateModeButtonsVisibility();
         }
-
 
         function updateModeButtonsVisibility() {
             modeToggleButtonsContainer.classList.toggle('visible', isTouch || pcOperationMode === 'button');
@@ -1611,13 +950,11 @@
 
 
         // --- Theme Functions ---
-
         function applyTheme(theme) {
             document.body.dataset.theme = theme;
             localStorage.setItem('minesweeperTheme', theme);
             currentTheme = theme;
         }
-
 
         function toggleTheme() {
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -1625,17 +962,27 @@
         }
 
 
-        // --- Helper: hasNeighborOfType ---
+        // --- Blind Mode Helper ---
+        function isRuleActive(ruleId) {
+            if (!enableBlind) return false;
+            if (isTenkomoriActive) {
+                // Tenkomori activates all *other* blind rules
+                return allBlindRuleIds.includes(ruleId);
+            }
+            return activeBlindRule?.id === ruleId;
+        }
 
+
+        // --- Helper: hasNeighborOfType ---
         function hasNeighborOfType(r, c, key) {
-            const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+            const checkTorus = isRuleActive('torus');
             for (let x = -1; x <= 1; x++) {
                 for (let y = -1; y <= 1; y++) {
                     if (x === 0 && y === 0) continue;
                     let ni = r + x;
                     let nj = c + y;
                     let checkSquare = null;
-                    if (isTorus) {
+                    if (checkTorus) {
                         ni = (ni + gridSize) % gridSize;
                         nj = (nj + gridSize) % gridSize;
                         checkSquare = board[ni]?.[nj];
@@ -1649,6 +996,7 @@
             }
             return false;
         }
+
 
 
         // --- Event Listeners ---
@@ -1668,6 +1016,7 @@
         if (directionalSwitch) directionalSwitch.addEventListener('change', () => {
             pendingSettings.enableDirectional = directionalSwitch.checked;
         });
+
         if (oddEvenSwitch) oddEvenSwitch.addEventListener('change', () => {
             pendingSettings.enableOddEven = oddEvenSwitch.checked;
         });
@@ -1696,6 +1045,9 @@
         if (blindSwitch) blindSwitch.addEventListener('change', () => {
             pendingSettings.enableBlind = blindSwitch.checked;
             updateSettingsUI(pendingSettings);
+        });
+        if (megamoriSwitch) megamoriSwitch.addEventListener('change', () => {
+            pendingSettings.enableMegamori = megamoriSwitch.checked;
         });
         if (mineSlider) mineSlider.addEventListener('input', () => {
             const maxMines = gridSize * gridSize;
@@ -1726,8 +1078,7 @@
                 if (maxMs !== null && minMs > maxMs) {
                     maxMs = minMs;
                     formatMsToInputs(maxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
-                }
-                pendingSettings.timeLimitMinMs = minMs;
+                } pendingSettings.timeLimitMinMs = minMs;
             } else {
                 formatMsToInputs(pendingSettings.timeLimitMinMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
             }
@@ -1736,8 +1087,7 @@
                     minMs = maxMs;
                     formatMsToInputs(minMs, timeBombMinHoursInput, timeBombMinMinutesInput, timeBombMinSecondsInput);
                     pendingSettings.timeLimitMinMs = minMs;
-                }
-                pendingSettings.timeLimitMaxMs = maxMs;
+                } pendingSettings.timeLimitMaxMs = maxMs;
             } else {
                 formatMsToInputs(pendingSettings.timeLimitMaxMs, timeBombMaxHoursInput, timeBombMaxMinutesInput, timeBombMaxSecondsInput);
             }
@@ -1745,8 +1095,7 @@
                 if (fixedMs <= 0) {
                     fixedMs = defaultSettings.timeLimitFixedMs;
                     formatMsToInputs(fixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
-                }
-                pendingSettings.timeLimitFixedMs = fixedMs;
+                } pendingSettings.timeLimitFixedMs = fixedMs;
             } else {
                 formatMsToInputs(pendingSettings.timeLimitFixedMs, timeBombFixedHoursInput, timeBombFixedMinutesInput, timeBombFixedSecondsInput);
             }
@@ -1759,8 +1108,8 @@
         });
 
 
-        // --- Popup Functions ---
 
+        // --- Popup Functions ---
         function updateTimeBombDetailsVisibility() {
             const showDetails = pendingSettings.enableTimeBomb && !pendingSettings.enableBlind;
             if (timeBombDetails) timeBombDetails.classList.toggle('hidden-setting', !showDetails);
@@ -1769,7 +1118,6 @@
             }
         }
 
-
         function updateTimeBombInputVisibility() {
             if (timeBombRandomSettings && timeBombFixedSettings) {
                 timeBombRandomSettings.classList.toggle('hidden-setting', !pendingSettings.timeLimitRandom);
@@ -1777,22 +1125,34 @@
             }
         }
 
-
         function updateSettingsUI(settingsToUpdate) {
-            const isBlindActive = settingsToUpdate.enableBlind;
+            const isBlindEnabled = settingsToUpdate.enableBlind;
             const isNoFlagsActive = settingsToUpdate.enableNoFlags;
             const isTimeBombActive = settingsToUpdate.enableTimeBomb;
-            const blindDisabledSections = [minesSettingSection, noFlagsSettingSection, timeBombSettingSection, numbersSettingSection, hideSettingSection, directionalSettingSection, oddEvenSettingSection, areaValueSettingSection, naturalNumberSettingSection];
-            blindDisabledSections.forEach(section => section?.classList.toggle('disabled-setting', isBlindActive));
+
+            // Disable non-blind settings if blind mode is active
+            const nonBlindSections = [minesSettingSection, noFlagsSettingSection, timeBombSettingSection, numbersSettingSection, hideSettingSection, directionalSettingSection, oddEvenSettingSection, areaValueSettingSection, naturalNumberSettingSection];
+            nonBlindSections.forEach(section => section?.classList.toggle('disabled-setting', isBlindEnabled));
+
+            // Disable Blind section if NoFlags or TimeBomb is active
             const disableBlindToggle = isNoFlagsActive || isTimeBombActive;
             if (blindSettingSection) blindSettingSection.classList.toggle('disabled-setting', disableBlindToggle);
+
+            // Automatically disable Blind mode if prerequisites are met
             if (disableBlindToggle && settingsToUpdate.enableBlind) {
                 settingsToUpdate.enableBlind = false;
                 if (blindSwitch) blindSwitch.checked = false;
+                // Also disable Megamori if Blind is disabled
+                settingsToUpdate.enableMegamori = false;
+                if (megamoriSwitch) megamoriSwitch.checked = false;
             }
-            if (noFlagsSettingSection) noFlagsSettingSection.classList.toggle('disabled-setting', isBlindActive);
-            if (timeBombSettingSection) timeBombSettingSection.classList.toggle('disabled-setting', isBlindActive);
-            if (isBlindActive) {
+            // Disable Megamori section if Blind mode itself is disabled
+            if (megamoriSettingSection) megamoriSettingSection.classList.toggle('disabled-setting', !settingsToUpdate.enableBlind);
+
+            // Disable NoFlags/TimeBomb if Blind is active
+            if (isBlindEnabled) {
+                if (noFlagsSettingSection) noFlagsSettingSection.classList.add('disabled-setting');
+                if (timeBombSettingSection) timeBombSettingSection.classList.add('disabled-setting');
                 if (settingsToUpdate.enableNoFlags) {
                     settingsToUpdate.enableNoFlags = false;
                     if (noFlagsSwitch) noFlagsSwitch.checked = false;
@@ -1801,11 +1161,13 @@
                     settingsToUpdate.enableTimeBomb = false;
                     if (timeBombSwitch) timeBombSwitch.checked = false;
                 }
+            } else {
+                if (noFlagsSettingSection) noFlagsSettingSection.classList.remove('disabled-setting');
+                if (timeBombSettingSection) timeBombSettingSection.classList.remove('disabled-setting');
             }
-            if (hideRateControl) hideRateControl.classList.toggle('enabled', settingsToUpdate.enableHide && !isBlindActive);
-            updateTimeBombDetailsVisibility();
+            if (hideRateControl) hideRateControl.classList.toggle('enabled', settingsToUpdate.enableHide && !isBlindEnabled);
+            updateTimeBombDetailsVisibility(); // Update time bomb specific UI
         }
-
 
         function getCurrentSettings() {
             return {
@@ -1824,10 +1186,10 @@
                 enableOddEven: enableOddEven,
                 enableAreaValue: enableAreaValue,
                 enableNaturalNumber: enableNaturalNumber,
-                enableBlind: enableBlind
+                enableBlind: enableBlind,
+                enableMegamori: enableMegamori
             };
         }
-
 
         function updatePopupUIFromSettings(settings) {
             pendingSettings = { ...settings
@@ -1840,6 +1202,7 @@
             if (areaValueSwitch) areaValueSwitch.checked = settings.enableAreaValue;
             if (naturalNumberSwitch) naturalNumberSwitch.checked = settings.enableNaturalNumber;
             if (blindSwitch) blindSwitch.checked = settings.enableBlind;
+            if (megamoriSwitch) megamoriSwitch.checked = settings.enableMegamori;
             if (timeBombSwitch) timeBombSwitch.checked = settings.enableTimeBomb;
             if (timeBombRandomSwitch) timeBombRandomSwitch.checked = settings.timeLimitRandom;
             if (gameOverOnTimeOnlySwitch) gameOverOnTimeOnlySwitch.checked = settings.gameOverOnTimeOnly;
@@ -1851,9 +1214,8 @@
             }
             const targetPcOpRadio = document.querySelector(`input[name="pc-op-mode"][value="${pcOperationMode}"]`);
             if (targetPcOpRadio) targetPcOpRadio.checked = true;
-            updateSettingsUI(pendingSettings);
+            updateSettingsUI(pendingSettings); // Update UI based on dependencies
         }
-
 
         function openPopup() {
             updatePopupUIFromSettings(getCurrentSettings());
@@ -1864,14 +1226,12 @@
             }
         }
 
-
         function closePopup() {
             if (rulesPopup && popupOverlay) {
                 rulesPopup.classList.remove('visible');
                 popupOverlay.classList.remove('visible');
             }
         }
-
 
         function handleResetRule(event) {
             const rule = event.target.dataset.rule;
@@ -1914,23 +1274,26 @@
                     break;
                 case 'blind':
                     pendingSettings.enableBlind = defaultSettings.enableBlind;
+                    pendingSettings.enableMegamori = defaultSettings.enableMegamori; // Also reset Megamori
                     break;
             }
             updatePopupUIFromSettings(pendingSettings);
         }
 
-
         function handleResetAllSettings() {
             updatePopupUIFromSettings(defaultSettings);
         }
 
-
         function saveSettingsAndReset() {
             if (pendingSettings.enableTimeBomb && !pendingSettings.enableBlind) {
-                handleTimeInputChange();
+                handleTimeInputChange(); // Ensure time inputs are parsed if TimeBomb is active
             }
+            // Apply settings from pendingSettings to active settings
             enableBlind = pendingSettings.enableBlind;
+            enableMegamori = pendingSettings.enableMegamori; // Apply Megamori
+
             if (enableBlind) {
+                // Blind Mode Specific Settings
                 numMines = Math.floor(Math.random() * (BLIND_MINE_MAX - BLIND_MINE_MIN + 1)) + BLIND_MINE_MIN;
                 enableNoFlags = false;
                 enableTimeBomb = false;
@@ -1942,7 +1305,9 @@
                 enableOddEven = true;
                 enableAreaValue = true;
                 enableNaturalNumber = true;
+                // Megamori setting is already applied above
             } else {
+                // Normal Mode Settings
                 numMines = pendingSettings.numMines;
                 enableNoFlags = pendingSettings.enableNoFlags;
                 enableTimeBomb = pendingSettings.enableTimeBomb;
@@ -1958,15 +1323,18 @@
                 enableOddEven = pendingSettings.enableOddEven;
                 enableAreaValue = pendingSettings.enableAreaValue;
                 enableNaturalNumber = pendingSettings.enableNaturalNumber;
+                enableMegamori = false; // Megamori only makes sense with Blind mode
             }
+
+            // Validate mine count
             const maxMines = gridSize * gridSize;
             if (numMines > maxMines) numMines = maxMines;
             if (numMines < 0) numMines = 0;
-            updateNoFlagsUI();
+
+            updateNoFlagsUI(); // Update UI based on final flag setting
             resetGame();
             closePopup();
         }
-
 
         function handlePcOperationModeChange(event) {
             pcOperationMode = event.target.value;
@@ -1989,74 +1357,87 @@
         function updateActiveRulesDisplay() {
             let rulesHtml = '';
             if (enableBlind) {
-                rulesHtml += `<div class="rule-display-blind">Blind Mode Active!</div>`;
-            } else {
-                if (enableNoFlags) {
-                    rulesHtml += `<div class="rule-display-noFlags">No Flags</div>`;
+                if (isTenkomoriActive || enableMegamori) { // Check if Tenkomori/Megamori is active
+                    rulesHtml += `<div class="rule-display-tenkomori">Megamix</div>`; // Display Megamix
+                } else if (activeBlindRule) {
+                    // Display "Blind Mode: [Rule ID]" e.g., "Blind Mode: ghost"
+                    rulesHtml += `<div class="rule-display-blind">Blind Mode: ${activeBlindRule.id}</div>`;
+                } else {
+                    rulesHtml += `<div class="rule-display-blind">Blind Mode Active!</div>`; // Fallback
                 }
+                // No separate Megamori indicator needed here
+            } else {
+                // Non-blind rule display (uses English names)
+                if (enableNoFlags) { rulesHtml += `<div class="rule-display-noFlags">No Flags</div>`; }
                 if (enableTimeBomb) {
                     const timeDesc = timeLimitMilliseconds > 0 ? formatMsToDisplayTime(timeLimitMilliseconds, true) : 'Setting...';
                     rulesHtml += `<div class="rule-display-timeBomb">Time Bomb (${timeDesc})</div>`;
-                    if (gameOverOnTimeOnly) {
-                        rulesHtml += `<div class="rule-display-gameOverOnTimeOnly">Game Over on Time Only</div>`;
-                    }
+                    if (gameOverOnTimeOnly) { rulesHtml += `<div class="rule-display-gameOverOnTimeOnly">Game Over on Time Only</div>`; }
                 }
-                if (!enableNumbers) {
-                    rulesHtml += `<div class="rule-display-noNumbers">No Numbers</div>`;
-                }
-                if (enableHide) {
-                    rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`;
-                }
-                if (enableDirectional) {
-                    rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`;
-                }
-                if (enableOddEven) {
-                    rulesHtml += `<div class="rule-display-oddEven">OddEven Squares</div>`;
-                }
-                if (enableAreaValue) {
-                    rulesHtml += `<div class="rule-display-areaValue">Range Value Squares</div>`;
-                }
-                if (enableNaturalNumber) {
-                    rulesHtml += `<div class="rule-display-naturalNumber">Natural Number Squares</div>`;
-                }
-                if (!rulesHtml) {
-                    rulesHtml = '<div class="rule-display-standard">Standard Rules</div>';
-                }
+                if (!enableNumbers) { rulesHtml += `<div class="rule-display-noNumbers">No Numbers</div>`; }
+                if (enableHide) { rulesHtml += `<div class="rule-display-hide">Concealment Sq. (${Math.round(hideRateMax*100)}% Max)</div>`; }
+                if (enableDirectional) { rulesHtml += `<div class="rule-display-directional">Directional Squares</div>`; }
+                if (enableOddEven) { rulesHtml += `<div class="rule-display-oddEven">OddEven Squares</div>`; }
+                if (enableAreaValue) { rulesHtml += `<div class="rule-display-areaValue">Range Value Squares</div>`; }
+                if (enableNaturalNumber) { rulesHtml += `<div class="rule-display-naturalNumber">Natural Number Squares</div>`; }
+                if (!rulesHtml) { rulesHtml = '<div class="rule-display-standard">Standard Rules</div>'; }
             }
             if (activeRulesDisplay) activeRulesDisplay.innerHTML = rulesHtml;
         }
 
-
         function updateBlindRuleDisplay() {
+            if (blindRuleDisplay) blindRuleDisplay.classList.remove('tenkomori');
             if (enableBlind && activeBlindRule) {
                 let description = activeBlindRule.description;
-                if (activeBlindRule.id === 'anomaly' && anomalyTargetType) {
+                let title = activeBlindRule.title;
+
+                if (isTenkomoriActive) {
+                    title = "てんこ盛り！";
+                    // Updated description for Tenkomori to include Anomaly target JP name
+                    let anomalyDesc = "";
+                    if(anomalyTargetType) {
+                        const targetNameJP = specialSquareNamesJP[anomalyTargetType] || anomalyTargetType;
+                        anomalyDesc = ` (異常発生: ${targetNameJP})`; // Use JP name here
+                    }
+                    description = `全てのブラインドが適用される！<br>${anomalyDesc}`;
+
+                    if (blindRuleDisplay) blindRuleDisplay.classList.add('tenkomori');
+                } else if (isRuleActive('anomaly') && anomalyTargetType) {
                     const targetNameJP = specialSquareNamesJP[anomalyTargetType] || anomalyTargetType;
                     description = `${targetNameJP}の最大生成率が${Math.round(currentAnomalyRate * 100)}%になる`;
                 }
                 if (blindRuleDisplay) {
-                    blindRuleDisplay.innerHTML = `<strong>Blind: ${activeBlindRule.title}</strong><span>${description}</span>`;
+                    blindRuleDisplay.innerHTML = `<strong>Blind: ${title}</strong><span>${description}</span>`;
                     blindRuleDisplay.classList.add('visible');
+                    blindRuleDisplay.style.borderColor = isTenkomoriActive ? 'var(--rule-tenkomori-color)' : activeBlindRule.borderColor || 'var(--blind-rule-border)';
+                    const bgColorMix = isTenkomoriActive ? 'var(--rule-tenkomori-color)' : activeBlindRule.bgColor || 'var(--blind-rule-bg)';
+                    blindRuleDisplay.style.backgroundColor = `color-mix(in srgb, var(--blind-rule-bg) 80%, ${bgColorMix} 20%)`;
+                    const strongEl = blindRuleDisplay.querySelector('strong');
+                    if (strongEl) {
+                        strongEl.style.color = isTenkomoriActive ? 'var(--rule-tenkomori-color)' : '';
+                    }
                 }
             } else {
                 if (blindRuleDisplay) {
                     blindRuleDisplay.classList.remove('visible');
                     blindRuleDisplay.innerHTML = '';
+                    blindRuleDisplay.style.borderColor = '';
+                    blindRuleDisplay.style.backgroundColor = '';
+                    const strongEl = blindRuleDisplay.querySelector('strong');
+                    if (strongEl) strongEl.style.color = '';
                 }
             }
         }
 
-
         function updateNoFlagsUI() {
             const flagsAllowed = !enableNoFlags;
-            body.setAttribute('data-flags-enabled', String(flagsAllowed)); // Use string for attribute
+            body.setAttribute('data-flags-enabled', String(flagsAllowed));
             if (flagModeButton) flagModeButton.disabled = !flagsAllowed;
             if (!flagsAllowed && currentInteractionMode === 'flag') {
                 switchMode('dig');
             }
             updateModeButtonsVisibility();
         }
-
 
         // --- Game Logic Functions ---
 
@@ -2067,6 +1448,10 @@
             timerInterval = null;
             clearInterval(basketballTimerInterval);
             basketballTimerInterval = null;
+            // Clear all active Ghost timers
+            Object.values(activeGhostTimers).forEach(clearTimeout);
+            activeGhostTimers = {};
+
             elapsedMilliseconds = 0;
             remainingMilliseconds = 0;
             timeLimitMilliseconds = 0;
@@ -2077,24 +1462,25 @@
             revealedNonMineCount = 0;
             clickedMineCount = 0;
             penaltyOffsetMs = 0;
-            minesLeft = numMines;
+            minesLeft = numMines; // Use current numMines value
             switchMode('dig');
             activeBlindRule = null;
+            isTenkomoriActive = false;
             anomalyTargetType = null;
             currentAnomalyRate = 0;
-            messageBox.textContent = 'Click a square to start!';
             body.classList.remove('game-over', 'low-time', 'timer-intro-active', 'game-clear');
             timerContainer.classList.remove('blinking-black', 'blinking-red', 'blinking-basketball', 'hide-during-intro');
             timerStartDisplay.classList.remove('visible', 'move-to-corner');
             timerStartDisplay.style.animation = 'none';
             debugButtonsContainer.classList.remove('visible');
+            
             updateBlindRuleDisplay();
             updateTimerDisplay();
             updateActiveRulesDisplay();
             updateNoFlagsUI();
+            updateMinesLeftDisplay(); // Show initial mine count
             setTimeout(createBoard, 50);
         }
-
 
         function createBoard() {
             board = [];
@@ -2105,25 +1491,50 @@
             penaltyOffsetMs = 0;
             boardElement.innerHTML = '';
             activeBlindRule = null;
+            isTenkomoriActive = false;
             anomalyTargetType = null;
             currentAnomalyRate = 0;
             minesLeft = numMines;
+            // Clear ghost timers from previous game state if any lingered
+            Object.values(activeGhostTimers).forEach(clearTimeout);
+            activeGhostTimers = {};
+
             if (enableBlind) {
-                activeBlindRule = blindRules[Math.floor(Math.random() * blindRules.length)];
+                if (enableMegamori) { // Check Megamori first
+                    activeBlindRule = blindRules.find(r => r.id === 'tenkomori');
+                    isTenkomoriActive = true;
+                    anomalyTargetType = specialSquareTypes[Math.floor(Math.random() * specialSquareTypes.length)];
+                    currentAnomalyRate = Math.random() * (0.75 - 0.50) + 0.50;
+                    console.log(`Megamori Active! Forced Tenkomori. Anomaly Target: ${anomalyTargetType}, Rate: ${currentAnomalyRate}`);
+                } else {
+                    // Normal Blind rule selection
+                    const rand = Math.random();
+                    if (rand < TENKOMORI_CHANCE) {
+                        activeBlindRule = blindRules.find(r => r.id === 'tenkomori');
+                        isTenkomoriActive = true;
+                        anomalyTargetType = specialSquareTypes[Math.floor(Math.random() * specialSquareTypes.length)];
+                        currentAnomalyRate = Math.random() * (0.75 - 0.50) + 0.50;
+                        console.log(`Tenkomori Active (Random)! Anomaly Target: ${anomalyTargetType}, Rate: ${currentAnomalyRate}`);
+                    } else {
+                        const availableRules = blindRules.filter(r => r.id !== 'tenkomori');
+                        activeBlindRule = availableRules[Math.floor(Math.random() * availableRules.length)];
+                        isTenkomoriActive = false;
+                        if (isRuleActive('anomaly')) {
+                            anomalyTargetType = specialSquareTypes[Math.floor(Math.random() * specialSquareTypes.length)];
+                            currentAnomalyRate = Math.random() * (0.75 - 0.50) + 0.50;
+                            console.log(`Anomaly Target: ${anomalyTargetType}, Rate: ${currentAnomalyRate}`);
+                        }
+                    }
+                }
                 minesLeft = numMines;
                 currentMaxHideRate = BLIND_HIDE_RATE;
                 currentMaxDirectionalRate = BLIND_DIRECTIONAL_RATE;
                 currentMaxOddEvenRate = BLIND_ODDEVEN_RATE;
                 currentMaxAreaValueRate = BLIND_AREAVALUE_RATE;
                 currentMaxNaturalNumberRate = BLIND_NATURALNUMBER_RATE;
-                if (activeBlindRule.id === 'anomaly') {
-                    anomalyTargetType = specialSquareTypes[Math.floor(Math.random() * specialSquareTypes.length)];
-                    currentAnomalyRate = Math.random() * (0.75 - 0.50) + 0.50;
-                    console.log(`Anomaly Target: ${anomalyTargetType}, Rate: ${currentAnomalyRate}`);
-                }
-                updateBlindRuleDisplay();
             } else {
-                updateBlindRuleDisplay();
+                isTenkomoriActive = false;
+                activeBlindRule = null;
                 currentMaxHideRate = hideRateMax;
                 currentMaxOddEvenRate = 0.10;
                 currentMaxAreaValueRate = 0.03;
@@ -2132,37 +1543,46 @@
                 if (enableTimeBomb) {
                     timeLimitMilliseconds = timeLimitRandom ? Math.floor(Math.random() * (Math.max(0, timeLimitMaxMs) - Math.max(0, timeLimitMinMs) + 1)) + Math.max(0, timeLimitMinMs) : Math.max(1000, timeLimitFixedMs);
                     remainingMilliseconds = timeLimitMilliseconds;
-                    updateTimerDisplay();
                 } else {
                     timeLimitMilliseconds = 0;
                     elapsedMilliseconds = 0;
-                    updateTimerDisplay();
                 }
+                updateTimerDisplay();
             }
-            for (let i = 0; i < gridSize; i++) {
+            updateBlindRuleDisplay();
+
+            for (let i = 0;
+                i < gridSize; i++) {
                 board[i] = [];
+
                 for (let j = 0; j < gridSize; j++) {
+                    // Add new properties for rules
                     board[i][j] = {
                         isMine: false,
                         isRevealed: false,
                         isFlagged: false,
-                        adjacentMines: 0,
-                        originalAdjacentMines: 0,
-                        adjacentSafe: 0,
+                        adjacentMines: 0,        // Final count displayed (potentially modified)
+                        originalAdjacentMines: 0,// Count from all 8 neighbors (unmodified)
+                        adjacentSafe: 0,         // Safe count from all 8 neighbors
+                        adjacentMines4Dir: 0,    // Count for Myopia (4 directions)
+                        adjacentSafe4Dir: 0,     // Safe count for Myopia (4 directions)
                         isHide: false,
                         isOddEven: false,
                         isAreaValue: false,
                         isDirectional: false,
                         isNaturalNumber: false,
+                        isBlackHole: false,      // Black Hole flag
+                        ghostTimerId: null,      // Ghost timer ID
                         oddEvenValue: null,
                         areaValue: null,
                         direction: null,
                         directionalCount: null,
                         directionalSymbol: null,
                         naturalNumberValue: null,
-                        isAdjusted: false,
+                        isAdjusted: false,       // Flag for Error rule adjustment
                         element: document.createElement('div')
                     };
+                    
                     const sq = board[i][j];
                     const el = sq.element;
                     el.classList.add('square', 'hidden');
@@ -2208,8 +1628,8 @@
             detectTouch();
         }
 
-
         function startTimerAnimation() {
+            /* ... (no changes) ... */
             if (!enableTimeBomb || enableBlind || timeLimitMilliseconds <= 0) {
                 return;
             }
@@ -2231,25 +1651,29 @@
                     body.classList.remove('timer-intro-active');
                 }
             }, 1600);
-        }
 
+        }
 
         function initializeBoardAfterFirstClick(firstClickRow, firstClickCol) {
             plantMines(firstClickRow, firstClickCol);
-            calculateAdjacentMines();
+            // Plant Black Holes *after* mines, ensuring they are on safe squares
+            plantBlackHoles(firstClickRow, firstClickCol);
+            calculateAdjacentMines(); // Calculate counts *after* mines & BH are placed
             applySpecialSquares();
             updateMinesLeftDisplay();
             debugButtonsContainer.classList.add('visible');
         }
 
-
         function plantMines(avoidRow, avoidCol) {
+            /* ... (No changes needed) ... */
             let minesPlanted = 0;
             const maxPossible = gridSize * gridSize;
-            let currentNumMines = numMines;
+            let currentNumMines = numMines; // Use the potentially modified numMines
             const forbidden = new Set();
-            for (let x = -1; x <= 1; x++) {
-                for (let y = -1; y <= 1; y++) {
+            for (let x = -1;
+                x <= 1; x++) {
+                for (let y = -1;
+                    y <= 1; y++) {
                     const nr = avoidRow + x;
                     const nc = avoidCol + y;
                     if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
@@ -2261,44 +1685,85 @@
             if (currentNumMines > availableSquares) {
                 console.warn(`Mine count reduced from ${currentNumMines} to ${availableSquares} due to safe start area.`);
                 currentNumMines = availableSquares;
-                numMines = currentNumMines;
-                minesLeft = currentNumMines;
+                numMines = currentNumMines; // Update the global numMines
+                minesLeft = currentNumMines; // Update minesLeft immediately
+                // Update UI if popup is open and not in blind mode
                 if (rulesPopup.classList.contains('visible') && !enableBlind && mineSlider) {
                     mineSlider.value = numMines;
                     if (mineCountDisplay) mineCountDisplay.textContent = numMines;
-                    pendingSettings.numMines = numMines;
+                    pendingSettings.numMines = numMines; // Also update pending setting
                 }
             } else {
-                minesLeft = currentNumMines;
+                minesLeft = currentNumMines; // Set minesLeft based on final mine count
             }
             if (currentNumMines < 0) currentNumMines = 0;
-            if (currentNumMines >= maxPossible) currentNumMines = maxPossible - 1;
+            // Allow placing mine on every square except the first clicked 9
+            if (currentNumMines > availableSquares) currentNumMines = availableSquares;
             while (minesPlanted < currentNumMines) {
                 const r = Math.floor(Math.random() * gridSize);
                 const c = Math.floor(Math.random() * gridSize);
                 const posKey = `${r}-${c}`;
+
                 if (board[r]?.[c] && !board[r][c].isMine && !forbidden.has(posKey)) {
                     board[r][c].isMine = true;
                     minesPlanted++;
                 }
             }
+            updateMinesLeftDisplay(); // Update display after planting
         }
 
+        function plantBlackHoles(avoidRow, avoidCol) {
+            if (!isRuleActive('blackHole')) return;
+
+            const safeSquares = [];
+            const forbidden = new Set();
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    const nr = avoidRow + x;
+                    const nc = avoidCol + y;
+                    if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
+                        forbidden.add(`${nr}-${nc}`);
+                    }
+                }
+            }
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                     const posKey = `${r}-${c}`;
+                    if (board[r]?.[c] && !board[r][c].isMine && !forbidden.has(posKey)) {
+                        safeSquares.push({ r, c });
+                    }
+                }
+            }
+            safeSquares.sort(() => Math.random() - 0.5); // Shuffle
+            let plantedCount = 0;
+            for (let i = 0; i < safeSquares.length && plantedCount < BLACK_HOLE_COUNT; i++) {
+                const { r, c } = safeSquares[i];
+                if (board[r]?.[c] && !board[r][c].isBlackHole) { // Double check just in case
+                     board[r][c].isBlackHole = true;
+                     plantedCount++;
+                     console.log(`Black hole planted at ${r}, ${c}`);
+                }
+            }
+            if (plantedCount < BLACK_HOLE_COUNT) {
+                 console.warn(`Could only plant ${plantedCount} black holes.`);
+            }
+        }
 
         function calculateAdjacentMines() {
-            const isTorus = enableBlind && activeBlindRule?.id === 'torus';
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
+            const checkTorus = isRuleActive('torus');
+            const checkMyopia = isRuleActive('myopia');
+
+            for (let i = 0;
+                i < gridSize; i++) {
+                for (let j = 0;
+                    j < gridSize; j++) {
                     const currentSquare = board[i]?.[j];
-                    if (!currentSquare) continue;
-                    if (currentSquare.isMine) {
-                        currentSquare.adjacentMines = -1;
-                        currentSquare.originalAdjacentMines = -1;
-                        currentSquare.adjacentSafe = -1;
-                        continue;
-                    }
-                    let mineCount = 0;
-                    let safeCount = 0;
+                    if (!currentSquare || currentSquare.isMine) continue;
+                    let mineCount8 = 0;
+                    let safeCount8 = 0;
+                    let mineCount4 = 0;
+                    let safeCount4 = 0;
+
                     for (let x = -1; x <= 1; x++) {
                         for (let y = -1; y <= 1; y++) {
                             if (x === 0 && y === 0) continue;
@@ -2306,7 +1771,8 @@
                             let nj = j + y;
                             let isValidNeighbor = false;
                             let neighborSquare = null;
-                            if (isTorus) {
+
+                            if (checkTorus) {
                                 ni = (ni + gridSize) % gridSize;
                                 nj = (nj + gridSize) % gridSize;
                                 isValidNeighbor = true;
@@ -2317,18 +1783,34 @@
                                     neighborSquare = board[ni]?.[nj];
                                 }
                             }
+
                             if (isValidNeighbor && neighborSquare) {
-                                if (neighborSquare.isMine) {
-                                    mineCount++;
+                                const isMineNeighbor = neighborSquare.isMine;
+                                // Count for 8 directions
+                                if (isMineNeighbor) {
+                                    mineCount8++;
                                 } else {
-                                    safeCount++;
+                                    safeCount8++;
+                                }
+
+                                // Count for 4 directions (Myopia)
+                                if (Math.abs(x) + Math.abs(y) === 1) {
+                                    if (isMineNeighbor) {
+                                        mineCount4++;
+                                    } else {
+                                        safeCount4++;
+                                    }
                                 }
                             }
                         }
                     }
-                    currentSquare.originalAdjacentMines = mineCount;
-                    currentSquare.adjacentSafe = safeCount;
-                    currentSquare.adjacentMines = mineCount;
+                    currentSquare.originalAdjacentMines = mineCount8;
+                    currentSquare.adjacentSafe = safeCount8;
+                    currentSquare.adjacentMines4Dir = mineCount4;
+                    currentSquare.adjacentSafe4Dir = safeCount4;
+
+                    // Set initial adjacentMines based on Myopia (Abekobe handled later in applySpecialSquares)
+                    currentSquare.adjacentMines = checkMyopia ? mineCount4 : mineCount8;
                     currentSquare.isAdjusted = false;
                 }
             }
@@ -2336,17 +1818,18 @@
 
 
         function countSafeInDirection(r, c, dx, dy) {
-            const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+            const checkTorus = isRuleActive('torus');
             let count = 0;
             let cr = r + dx;
             let cc = c + dy;
             let steps = 0;
             const maxSteps = gridSize * 2;
+
             while (steps < maxSteps) {
                 let checkR = cr;
                 let checkC = cc;
                 let inBounds = false;
-                if (isTorus) {
+                if (checkTorus) {
                     checkR = (cr + gridSize) % gridSize;
                     checkC = (cc + gridSize) % gridSize;
                     if (steps > 0 && checkR === r && checkC === c) break;
@@ -2355,7 +1838,10 @@
                     inBounds = checkR >= 0 && checkR < gridSize && checkC >= 0 && checkC < gridSize;
                 }
                 if (!inBounds) break;
-                if (board[checkR]?.[checkC] && !board[checkR][checkC].isMine) count++;
+                // Exclude black holes from safe count for directional squares
+                if (board[checkR]?.[checkC] && !board[checkR][checkC].isMine && !board[checkR][checkC].isBlackHole) {
+                     count++;
+                }
                 cr += dx;
                 cc += dy;
                 steps++;
@@ -2365,7 +1851,7 @@
 
 
         function countMinesInDirection(r, c, dx, dy) {
-            const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+            const checkTorus = isRuleActive('torus');
             let count = 0;
             let cr = r + dx;
             let cc = c + dy;
@@ -2375,7 +1861,7 @@
                 let checkR = cr;
                 let checkC = cc;
                 let inBounds = false;
-                if (isTorus) {
+                if (checkTorus) {
                     checkR = (cr + gridSize) % gridSize;
                     checkC = (cc + gridSize) % gridSize;
                     if (steps > 0 && checkR === r && checkC === c) break;
@@ -2392,8 +1878,8 @@
             return count;
         }
 
-
         function calculateNaturalNumberValue(n) {
+            /* ... (no changes) ... */
             const p = [2, 3, 5, 7];
             if (typeof n !== 'number' || n < 0 || n > 8) {
                 console.warn(`Unexpected value passed to calculateNaturalNumberValue: ${n}`);
@@ -2420,88 +1906,98 @@
         function applySpecialSquares() {
             const potentialSquares = [];
             const errorTargetSquares = [];
-            const isAbekobe = enableBlind && activeBlindRule?.id === 'abekobe';
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
+            const checkAbekobe = isRuleActive('abekobe');
+            const checkMyopia = isRuleActive('myopia');
+
+            for (let i = 0;
+                i < gridSize; i++) {
+                for (let j = 0;
+                    j < gridSize; j++) {
                     const square = board[i]?.[j];
-                    if (!square) continue;
+                    if (!square || square.isMine || square.isBlackHole) continue; // Exclude mines and BH
+
+                    // Reset flags
                     square.isHide = square.isOddEven = square.isAreaValue = square.isDirectional = square.isNaturalNumber = false;
                     square.oddEvenValue = square.areaValue = square.direction = square.directionalCount = square.directionalSymbol = square.naturalNumberValue = null;
                     square.isAdjusted = false;
-                    square.adjacentMines = isAbekobe ? square.adjacentSafe : square.originalAdjacentMines;
+
+
+                    // Determine the relevant count based on Abekobe and Myopia FIRST
+                    const baseMineCount = checkMyopia ? square.adjacentMines4Dir : square.originalAdjacentMines;
+                    const baseSafeCount = checkMyopia ? square.adjacentSafe4Dir : square.adjacentSafe;
+                    square.adjacentMines = checkAbekobe ? baseSafeCount : baseMineCount;
                     const relevantCount = square.adjacentMines;
-                    if (!square.isMine && relevantCount >= 0) {
-                        if (relevantCount > 0 || isAbekobe || enableHide || enableOddEven || enableNaturalNumber) {
-                            potentialSquares.push({
-                                r: i,
-                                c: j
-                            });
+
+                    // Determine if the square is a potential candidate for special types
+                    if (relevantCount >= 0) {
+                        if (relevantCount > 0 || checkAbekobe || enableHide || enableOddEven || enableNaturalNumber) {
+                             // Check if it has neighbors (relevant for some types like directional)
+                             let hasNeighbors = false;
+                             for (let x = -1; x <= 1; x++) {
+                                 for (let y = -1; y <= 1; y++) {
+                                     if (x === 0 && y === 0) continue;
+                                      let ni = i + x;
+                                      let nj = j + y;
+                                      const checkTorus = isRuleActive('torus'); // Check torus here
+                                      if (checkTorus) {
+                                            ni = (ni + gridSize) % gridSize;
+                                            nj = (nj + gridSize) % gridSize;
+                                            hasNeighbors = true; break; // Torus implies neighbors
+                                      } else {
+                                           if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize) {
+                                                hasNeighbors = true; break;
+                                           }
+                                      }
+                                 }
+                                if (hasNeighbors) break;
+                             }
+                             if(hasNeighbors) { // Only add if it has neighbors
+                                  potentialSquares.push({ r: i, c: j });
+                             }
                         }
                     }
-                    if (!square.isMine && square.originalAdjacentMines > 0 && !isAbekobe) {
-                        errorTargetSquares.push({
-                            r: i,
-                            c: j
-                        });
+
+                    // Error target squares are based on original 8-dir mine count, unaffected by Abekobe/Myopia
+                    if (square.originalAdjacentMines > 0) {
+                        errorTargetSquares.push({ r: i, c: j });
                     }
                 }
             }
+
             potentialSquares.sort(() => Math.random() - 0.5);
             errorTargetSquares.sort(() => Math.random() - 0.5);
+
             const assignedCoordinates = new Set();
             const numPotential = potentialSquares.length;
-            const isBlindAnomaly = enableBlind && activeBlindRule?.id === 'anomaly';
+            const checkAnomaly = isRuleActive('anomaly');
+
+
             let rateHide = currentMaxHideRate,
                 rateDirectional = currentMaxDirectionalRate,
                 rateOddEven = currentMaxOddEvenRate,
                 rateAreaValue = currentMaxAreaValueRate,
                 rateNaturalNumber = currentMaxNaturalNumberRate;
-            if (isBlindAnomaly && anomalyTargetType) {
+
+
+            // Apply anomaly rate increase
+            if (checkAnomaly && anomalyTargetType) {
                 switch (anomalyTargetType) {
-                    case 'hide':
-                        rateHide = currentAnomalyRate;
-                        break;
-                    case 'directional':
-                        rateDirectional = currentAnomalyRate;
-                        break;
-                    case 'oddEven':
-                        rateOddEven = currentAnomalyRate;
-                        break;
-                    case 'areaValue':
-                        rateAreaValue = currentAnomalyRate;
-                        break;
-                    case 'naturalNumber':
-                        rateNaturalNumber = currentAnomalyRate;
-                        break;
+                    case 'hide': rateHide = currentAnomalyRate; break;
+                    case 'directional': rateDirectional = currentAnomalyRate; break;
+                    case 'oddEven': rateOddEven = currentAnomalyRate; break;
+                    case 'areaValue': rateAreaValue = currentAnomalyRate; break;
+                    case 'naturalNumber': rateNaturalNumber = currentAnomalyRate; break;
                 }
             }
-            const baseDirections = [{
-                dx: -1,
-                dy: 0,
-                s: 'T',
-                n: 'up'
-            }, {
-                dx: 1,
-                dy: 0,
-                s: 'B',
-                n: 'down'
-            }, {
-                dx: 0,
-                dy: -1,
-                s: 'L',
-                n: 'left'
-            }, {
-                dx: 0,
-                dy: 1,
-                s: 'R',
-                n: 'right'
-            }];
+            const baseDirections = [{ dx: -1, dy: 0, s: 'T', n: 'up' }, { dx: 1, dy: 0, s: 'B', n: 'down' }, { dx: 0, dy: -1, s: 'L', n: 'left' }, { dx: 0, dy: 1, s: 'R', n: 'right' }];
 
-            function hasDirChain(r, c, dx, dy) {
-                const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+
+            function hasDirChain(r, c, dx, dy) { /* ... (no changes) ... */
+                const checkTorus = isRuleActive('torus');
                 let nr = r + dx;
                 let nc = c + dy;
-                if (isTorus) {
+
+                if (checkTorus) {
                     nr = (nr + gridSize) % gridSize;
                     nc = (nc + gridSize) % gridSize;
                 }
@@ -2510,57 +2006,48 @@
                     return nextSquare?.isDirectional && nextSquare.direction?.dx === dx && nextSquare.direction?.dy === dy;
                 }
                 return false;
-            }
+             }
 
-            function getValidDirs(r, c) {
-                const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+            function getValidDirs(r, c) { /* ... (no changes) ... */
+                const checkTorus = isRuleActive('torus');
+
                 return baseDirections.filter(dir => {
                     const nr = r + dir.dx;
                     const nc = c + dir.dy;
-                    if (isTorus) return true;
+
+                    if (checkTorus) return true;
                     return nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize;
                 });
-            }
-            const ruleOrder = [{
-                t: 'areaValue',
-                e: enableAreaValue,
-                r: rateAreaValue,
-                c: (s, r, c) => !hasNeighborOfType(r, c, 'isAreaValue')
-            }, {
-                t: 'naturalNumber',
-                e: enableNaturalNumber,
-                r: rateNaturalNumber,
-                c: (s, r, c) => !hasNeighborOfType(r, c, 'isNaturalNumber')
-            }, {
-                t: 'directional',
-                e: enableDirectional,
-                r: rateDirectional,
-                c: (s, r, c) => !hasNeighborOfType(r, c, 'isDirectional')
-            }, {
-                t: 'oddEven',
-                e: enableOddEven,
-                r: rateOddEven,
-                c: (s, r, c) => !hasNeighborOfType(r, c, 'isOddEven')
-            }, {
-                t: 'hide',
-                e: enableHide,
-                r: rateHide,
-                c: () => true
-            }];
+             }
+
+            const ruleOrder = [ /* ... (no changes) ... */
+                { t: 'areaValue', e: enableAreaValue, r: rateAreaValue, c: (s, r, c) => !hasNeighborOfType(r, c, 'isAreaValue') },
+                { t: 'naturalNumber', e: enableNaturalNumber, r: rateNaturalNumber, c: (s, r, c) => !hasNeighborOfType(r, c, 'isNaturalNumber') },
+                { t: 'directional', e: enableDirectional, r: rateDirectional, c: (s, r, c) => !hasNeighborOfType(r, c, 'isDirectional') },
+                { t: 'oddEven', e: enableOddEven, r: rateOddEven, c: (s, r, c) => !hasNeighborOfType(r, c, 'isOddEven') },
+                { t: 'hide', e: enableHide, r: rateHide, c: () => true }
+            ];
+
+
             for (const rule of ruleOrder) {
                 const ruleEnabled = enableBlind || rule.e;
                 const isActiveSetting = (rule.t === 'hide' && enableHide) || (rule.t === 'directional' && enableDirectional) || (rule.t === 'oddEven' && enableOddEven) || (rule.t === 'areaValue' && enableAreaValue) || (rule.t === 'naturalNumber' && enableNaturalNumber);
+
                 if (ruleEnabled && isActiveSetting && numPotential > 0) {
-                    const currentRate = (rule.t === 'hide' ? rateHide : rule.t === 'directional' ? rateDirectional : rule.t === 'oddEven' ? rateOddEven : rule.t === 'areaValue' ? rateAreaValue : rule.t === 'naturalNumber' ? rateNaturalNumber : 0);
+                    const currentRate = rule.r;
                     const maxCount = Math.floor(numPotential * currentRate);
                     let currentCount = 0;
-                    for (const { r, c } of potentialSquares) {
+                    for (const {
+                            r,
+                            c
+                        } of potentialSquares) {
                         if (currentCount >= maxCount) break;
                         const coordKey = `${r}-${c}`;
                         const square = board[r]?.[c];
                         if (!square || assignedCoordinates.has(coordKey)) continue;
-                        const neighborCheckPassed = enableBlind || rule.c(square, r, c);
+                        const neighborCheckPassed = (enableBlind && !isTenkomoriActive) || rule.c(square, r, c);
                         if (neighborCheckPassed) {
+                            // Use the already calculated adjacentMines (respects Abekobe/Myopia)
                             const countForCalc = square.adjacentMines;
                             let applied = false;
                             if (rule.t === 'directional') {
@@ -2569,10 +2056,11 @@
                                     const shuffledDirs = [...validDirs].sort(() => Math.random() - 0.5);
                                     for (const dir of shuffledDirs) {
                                         if (!hasDirChain(r, c, dir.dx, dir.dy)) {
-                                            const dirCount = isAbekobe ? countSafeInDirection(r, c, dir.dx, dir.dy) : countMinesInDirection(r, c, dir.dx, dir.dy);
+                                             // Directional count always uses 8 neighbors, respecting Abekobe if active
+                                            const dirCount = checkAbekobe ? countSafeInDirection(r, c, dir.dx, dir.dy) : countMinesInDirection(r, c, dir.dx, dir.dy);
                                             if (dirCount > 0) {
                                                 square.isDirectional = true;
-                                                square.isHide = true;
+                                                square.isHide = true; // Directional hides the number
                                                 square.direction = { dx: dir.dx, dy: dir.dy, name: dir.n };
                                                 square.directionalCount = dirCount;
                                                 square.directionalSymbol = dir.s;
@@ -2596,14 +2084,14 @@
                                 applied = true;
                             } else if (rule.t === 'naturalNumber' && countForCalc >= 0) {
                                 const nnValue = calculateNaturalNumberValue(countForCalc);
-                                if (nnValue !== '・') { // Apply only if calculation results in a valid NN symbol
+                                if (nnValue !== '・') {
                                     square.isNaturalNumber = true;
                                     square.isHide = true;
                                     square.naturalNumberValue = nnValue;
                                     applied = true;
-                                } else if (enableHide) { // If NN is 0 and Hide is enabled, make it a Hide square instead
+                                } else if (enableHide) {
                                     square.isHide = true;
-                                    square.isNaturalNumber = false; // Ensure it's not marked as NN
+                                    square.isNaturalNumber = false;
                                     applied = true;
                                 }
                             } else if (rule.t === 'hide') {
@@ -2618,56 +2106,59 @@
                     }
                 }
             }
-            if (enableBlind && activeBlindRule?.id === 'error') {
+
+            // Apply Error rule
+            const checkError = isRuleActive('error');
+            if (checkError) {
                 const numErrorTargets = errorTargetSquares.length;
                 const minAffectedCount = Math.ceil(numErrorTargets * MIN_ERROR_RATE);
                 let affectedCount = 0;
+
+                // First pass: guarantee minimum
                 for (let i = 0; i < numErrorTargets && affectedCount < minAffectedCount; i++) {
-                    const {
-                        r,
-                        c
-                    } = errorTargetSquares[i];
+                    const { r, c } = errorTargetSquares[i];
                     const square = board[r]?.[c];
-                    if (square && !square.isAdjusted && !square.isDirectional && !square.isAreaValue && !square.isOddEven && !square.isNaturalNumber) {
+                    // Apply error only if it's a standard number square (not special)
+                    // AND Abekobe is NOT active (Error doesn't affect safe count)
+                    if (square && !square.isHide && !square.isDirectional && !square.isAreaValue && !square.isOddEven && !square.isNaturalNumber && !square.isAdjusted && !checkAbekobe) {
                         const adjustUp = Math.random() < 0.5;
-                        const originalValue = square.adjacentMines;
-                        if (adjustUp && originalValue < 8) {
-                            square.adjacentMines++;
+                        // Error is based on the original 8-dir mine count
+                        const originalMineCount = square.originalAdjacentMines;
+                        if (adjustUp && originalMineCount < 8) {
+                            square.adjacentMines++; // Adjust the current count (which might be 4-dir or 8-dir)
                             square.isAdjusted = true;
                             affectedCount++;
-                        } else if (!adjustUp && originalValue > 0) {
+                        } else if (!adjustUp && originalMineCount > 0) {
                             square.adjacentMines--;
                             square.isAdjusted = true;
                             affectedCount++;
                         }
                     }
                 }
+                // Second pass: random adjustments
                 for (let i = 0; i < numErrorTargets; i++) {
-                    const {
-                        r,
-                        c
-                    } = errorTargetSquares[i];
-                    const square = board[r]?.[c];
-                    if (square && !square.isAdjusted && !square.isDirectional && !square.isAreaValue && !square.isOddEven && !square.isNaturalNumber) {
-                        const rand = Math.random();
-                        const originalValue = square.adjacentMines;
-                        if (rand < 0.25 && originalValue < 8) {
-                            square.adjacentMines++;
-                            square.isAdjusted = true;
-                        } else if (rand < 0.50 && originalValue > 0) {
-                            square.adjacentMines--;
-                            square.isAdjusted = true;
-                        }
-                    }
+                     const { r, c } = errorTargetSquares[i];
+                     const square = board[r]?.[c];
+                     if (square && !square.isHide && !square.isDirectional && !square.isAreaValue && !square.isOddEven && !square.isNaturalNumber && !square.isAdjusted && !checkAbekobe) {
+                         const rand = Math.random();
+                         const originalMineCount = square.originalAdjacentMines;
+                         if (rand < 0.25 && originalMineCount < 8) {
+                             square.adjacentMines++;
+                             square.isAdjusted = true;
+                         } else if (rand < 0.50 && originalMineCount > 0) {
+                             square.adjacentMines--;
+                             square.isAdjusted = true;
+                         }
+                     }
                 }
             }
         }
 
 
-        // --- Interaction and Rendering Functions ---
 
         function handleSquareInteraction(r, c) {
             const targetSquare = board[r]?.[c];
+
             if (gameOver || !targetSquare || targetSquare.isRevealed || justFlagged) {
                 return;
             }
@@ -2675,31 +2166,96 @@
                 firstClickDone = true;
                 initializeBoardAfterFirstClick(r, c);
                 startGameTimer();
-                messageBox.textContent = '';
+                messageBox.textContent = `Mines: ${minesLeft}`; // Update message box after init
+
+                // First click reveals normally, no black hole check needed here
                 revealSquare(r, c);
                 checkWinCondition();
                 return;
             }
             const square = targetSquare;
+
+
             if (currentInteractionMode === 'flag') {
                 if (!enableNoFlags) {
                     handleFlagAction(r, c);
                 }
-            } else {
+            } else { // Dig mode
                 if (square.isFlagged && !enableNoFlags) {
-                    return;
+                    return; // Cannot dig flagged squares unless No Flags mode
                 }
+
+                // Handle Black Hole first
+                if (square.isBlackHole && isRuleActive('blackHole')) {
+                     console.log(`Black Hole activated at ${r}, ${c}`);
+                     // Reveal the black hole square itself (as a 0)
+                      // Clear ghost timer *before* revealing
+                      clearGhostTimer(r, c);
+                     square.isRevealed = true;
+                     revealedNonMineCount++;
+                     renderSquareContent(square); // Render it (will show as 0 or blank)
+
+                     resetBasketballTimer(); // Count as an action
+
+                     // Reveal surrounding squares
+                     const checkTorus = isRuleActive('torus');
+                     let hitMine = false; // Flag to stop if a mine is hit
+
+                     for (let x = -1; x <= 1; x++) {
+                         for (let y = -1; y <= 1; y++) {
+                             if (x === 0 && y === 0) continue;
+
+                             let nr = r + x;
+                             let nc = c + y;
+
+                            if (checkTorus) {
+                                 nr = (nr + gridSize) % gridSize;
+                                 nc = (nc + gridSize) % gridSize;
+                                 if(nr < 0) nr += gridSize; // Ensure positive index
+                                 if(nc < 0) nc += gridSize; // Ensure positive index
+                            }
+
+                            const neighbor = board[nr]?.[nc];
+                            // Reveal if neighbor exists, is not revealed, and not flagged
+                             if (neighbor && !neighbor.isRevealed && !neighbor.isFlagged) {
+                                 // Directly reveal mine for immediate game over, otherwise use revealSquare
+                                 if (neighbor.isMine) {
+                                      revealMine(nr, nc); // Show the clicked mine
+                                      hitMine = true; // Set flag
+                                      break; // Stop revealing neighbors
+                                 } else {
+                                     // Use revealSquare for safe neighbors (handles Ghost, chaining etc.)
+                                      revealSquare(nr, nc);
+                                 }
+
+                                 // Check if revealSquare itself caused game over (e.g., Ghost closing last square)
+                                  if (gameOver) { hitMine = true; break; } // Treat as hitting a mine conceptually
+                             }
+                         }
+                         if (hitMine || gameOver) break; // Stop outer loop too
+                     }
+
+                     if (hitMine) {
+                          if (!gameOver) endGame(false); // Ensure game ends if mine was hit
+                     } else {
+                         checkWinCondition(); // Check win only if no mine was hit
+                     }
+                     return; // Black hole action is complete
+                }
+
+
+                // Normal dig action
                 if (square.isMine) {
                     if (!square.isRevealed) {
-                        revealMine(r, c);
+                        revealMine(r, c); // Also clears ghost timer
                         clickedMineCount++;
                         if (enableTimeBomb && !enableBlind && gameOverOnTimeOnly) {
                             penaltyOffsetMs += MINE_PENALTY_MS;
                             body.style.transition = 'background-color 0.1s ease-out';
-                            body.style.backgroundColor = '#ffdddd'; // Use direct color for flash
+                            body.style.backgroundColor = '#ffdddd';
                             setTimeout(() => {
                                 body.style.transition = 'background-color 0.3s ease';
-                                body.style.backgroundColor = ''; // Revert to theme color
+                                body.style.backgroundColor = '';
                                 const currentRemainingAfterPenalty = timeLimitMilliseconds - (Date.now() - startTime) - penaltyOffsetMs;
                                 const isStillLowTime = currentRemainingAfterPenalty < 60000 && currentRemainingAfterPenalty > 0;
                                 body.classList.toggle('low-time', isStillLowTime);
@@ -2715,7 +2271,7 @@
                             endGame(false);
                         }
                     }
-                } else {
+                } else { // Safe square (and not black hole)
                     revealSquare(r, c);
                     checkWinCondition();
                 }
@@ -2730,6 +2286,7 @@
             gameStarted = true;
             startTime = Date.now();
             penaltyOffsetMs = 0;
+
             if (enableTimeBomb && !enableBlind) {
                 if (timeLimitMilliseconds <= 0) {
                     console.warn("Time Bomb enabled but time limit is zero.");
@@ -2744,7 +2301,7 @@
                 clearInterval(basketballTimerInterval);
             }
             timerInterval = setInterval(updateTimer, timerUpdateInterval);
-            if (enableBlind && activeBlindRule?.id === 'basketball') {
+            if (isRuleActive('basketball')) { // Use isRuleActive
                 basketballStartTime = Date.now();
                 basketballRemainingMs = BASKETBALL_INTERVAL_MS;
                 basketballTimerInterval = setInterval(updateBasketballTimer, timerUpdateInterval);
@@ -2755,20 +2312,24 @@
 
 
         function resetBasketballTimer() {
-            if (enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver) {
+            if (isRuleActive('basketball') && gameStarted && !gameOver) { // Use isRuleActive
                 basketballStartTime = Date.now();
                 basketballRemainingMs = BASKETBALL_INTERVAL_MS;
                 timerContainer.classList.add('blinking-basketball');
                 updateTimerDisplay();
             }
         }
-
-
+        
         function handleFlagAction(r, c) {
+            /* ... (no changes) ... */
             const sq = board[r]?.[c];
+
             if (enableNoFlags || gameOver || !firstClickDone || !sq || sq.isRevealed) {
                 return;
             }
+             // Prevent flagging squares that are about to close (Ghost)
+            const key = `${r}-${c}`;
+            if (activeGhostTimers[key]) return;
             sq.isFlagged = !sq.isFlagged;
             if (sq.isFlagged) {
                 minesLeft--;
@@ -2781,6 +2342,8 @@
 
 
         function revealMine(r, c) {
+             // Clear ghost timer if revealing a mine that was closing
+            clearGhostTimer(r, c);
             const sq = board[r]?.[c];
             if (sq && !sq.isRevealed) {
                 sq.isRevealed = true;
@@ -2790,32 +2353,110 @@
         }
 
 
+        // Helper function to clear a ghost timer
+        function clearGhostTimer(r, c) {
+             const key = `${r}-${c}`;
+             if (activeGhostTimers[key]) {
+                 clearTimeout(activeGhostTimers[key]);
+                 delete activeGhostTimers[key];
+                 // console.log(`Cleared ghost timer for ${r}, ${c}`);
+             }
+        }
+
+        // Function to handle closing a square due to Ghost rule
+        function closeSquareGhost(r, c) {
+            const key = `${r}-${c}`;
+
+            if (gameOver || !board[r]?.[c] || !board[r][c].isRevealed) {
+                 // Game ended or square was already closed/modified, clean up timer reference
+                 if (activeGhostTimers[key]) delete activeGhostTimers[key];
+                 return;
+            }
+            const sq = board[r][c];
+            // console.log(`Ghost closing square ${r}, ${c}`);
+            sq.isRevealed = false;
+            revealedNonMineCount--; // Decrement revealed count
+            delete activeGhostTimers[key]; // Remove timer reference *before* rendering
+
+            // Apply closing animation before rendering as hidden
+             if (sq.element) {
+                 sq.element.classList.add('closing');
+                 // Render as hidden *after* animation (or short delay)
+                 setTimeout(() => {
+                    if(sq.element) sq.element.classList.remove('closing'); // Clean up animation class
+                    renderSquareContent(sq); // Now render as hidden
+                 }, 50); // Adjust delay slightly less than animation duration if needed
+             } else {
+                  renderSquareContent(sq); // Render immediately if no element somehow
+             }
+             updateMinesLeftDisplay(); // Update mine count display as revealed count changed
+
+        }
+
+
         function revealSquare(r, c) {
-            const isTorus = enableBlind && activeBlindRule?.id === 'torus';
+            const checkTorus = isRuleActive('torus');
             let checkR = r;
             let checkC = c;
-            if (isTorus) {
+
+            if (checkTorus) {
                 checkR = (r + gridSize) % gridSize;
                 checkC = (c + gridSize) % gridSize;
                 if (checkR < 0) checkR += gridSize;
                 if (checkC < 0) checkC += gridSize;
+
             }
             if (checkR < 0 || checkR >= gridSize || checkC < 0 || checkC >= gridSize || gameOver) {
                 return;
             }
+
             const sq = board[checkR]?.[checkC];
-            if (!sq || sq.isRevealed || sq.isMine || (sq.isFlagged && !enableNoFlags)) {
+
+            // Do not reveal if already revealed, is a mine, or is flagged (unless no flags mode)
+             // Also, do not reveal black holes directly via chaining (they are handled by clicking them)
+            if (!sq || sq.isRevealed || sq.isMine || (sq.isFlagged && !enableNoFlags) || sq.isBlackHole) {
                 return;
             }
+
+             // Clear any existing ghost timer for this square *before* revealing
+             clearGhostTimer(checkR, checkC);
+
             sq.isRevealed = true;
+
             revealedNonMineCount++;
-            resetBasketballTimer();
+
+            resetBasketballTimer(); // Count as an action
             renderSquareContent(sq);
-            const canChain = !(enableBlind && activeBlindRule?.id === 'noChain');
-            if (sq.originalAdjacentMines === 0 && canChain && !sq.isDirectional && !sq.isAreaValue && !sq.isOddEven && !sq.isNaturalNumber && !sq.isHide) {
-                for (let x = -1; x <= 1; x++) {
-                    for (let y = -1; y <= 1; y++) {
+
+
+            // Check if Ghost rule applies to this square
+             const isGhostActive = isRuleActive('ghost');
+             const isNumberedNonSpecialSquare = sq.adjacentMines > 0 && !sq.isHide && !sq.isDirectional && !sq.isAreaValue && !sq.isOddEven && !sq.isNaturalNumber;
+
+
+             if (isGhostActive && isNumberedNonSpecialSquare) {
+                 const key = `${checkR}-${checkC}`;
+
+                 // console.log(`Setting ghost timer for ${checkR}, ${checkC}`);
+                 activeGhostTimers[key] = setTimeout(() => {
+                     closeSquareGhost(checkR, checkC);
+                 }, GHOST_CLOSE_DELAY_MS);
+             }
+
+            // Chain reaction logic, considering NoChain (Hidden) rule
+            const canChain = !isRuleActive('noChain');
+
+
+             // Chain only if original 8-dir count is 0 (unaffected by myopia/abekobe/error)
+             // AND chaining is allowed
+             // AND it's not a special square type
+             if (sq.originalAdjacentMines === 0 && canChain && !sq.isHide && !sq.isDirectional && !sq.isAreaValue && !sq.isOddEven && !sq.isNaturalNumber) {
+                for (let x = -1;
+                    x <= 1; x++) {
+                    for (let y = -1;
+                        y <= 1; y++) {
                         if (x !== 0 || y !== 0) {
+                            // Pass the *potentially wrapped* coordinates for recursion
                             revealSquare(checkR + x, checkC + y);
                         }
                     }
@@ -2825,19 +2466,29 @@
 
 
         function renderSquareContent(sq) {
+            /* ... (no changes needed, black hole handled here) ... */
             const el = sq.element;
+
             if (!el) return;
+
             const keepClasses = ['mine-clicked', 'flag-wrong'].filter(cls => el.classList.contains(cls));
-            el.className = 'square';
+
+            el.className = 'square'; // Reset base classes
+
             keepClasses.forEach(cls => el.classList.add(cls));
+
             el.textContent = '';
             el.innerHTML = '';
             el.style.fontSize = '';
             el.style.lineHeight = '';
-            el.classList.remove('number-adjusted');
+            el.classList.remove('number-adjusted', 'closing'); // Remove dynamic classes
+
+
             if (!sq.isRevealed) {
                 el.classList.add('hidden');
+
                 const flagsAllowed = !enableNoFlags;
+
                 if (sq.isFlagged && flagsAllowed) {
                     el.textContent = '🚩';
                     el.classList.add('flagged');
@@ -2847,6 +2498,9 @@
                 if (sq.isMine) {
                     el.classList.add('mine');
                     el.textContent = el.classList.contains('mine-clicked') ? '💥' : '💣';
+                } else if (sq.isBlackHole && isRuleActive('blackHole')) { // Render revealed Black Hole as blank
+                     el.textContent = '';
+                     // el.classList.add('black-hole-revealed'); // Optional styling
                 } else {
                     if (el.classList.contains('flag-wrong')) {
                         el.textContent = '❌';
@@ -2871,15 +2525,18 @@
                         el.classList.add('special-square');
                         el.textContent = '・';
                     } else if (sq.adjacentMines >= 0) {
+                        // Display the potentially adjusted adjacentMines value
                         el.textContent = sq.adjacentMines > 0 ? sq.adjacentMines : '';
                         if (sq.adjacentMines > 0) {
                             el.classList.add(`number-${sq.adjacentMines}`);
                         }
-                        if (sq.isAdjusted && enableBlind && activeBlindRule?.id === 'error') {
+                        // Indicate if the number was adjusted by the Error rule
+                        if (sq.isAdjusted && isRuleActive('error')) {
                             el.classList.add('number-adjusted');
+                            // el.style.outline = '1px dashed red'; // Example
                         }
                     } else {
-                        el.textContent = '';
+                        el.textContent = ''; // Should not happen for safe squares?
                         el.classList.add('revealed');
                     }
                 }
@@ -2888,40 +2545,51 @@
 
 
         function updateMinesLeftDisplay() {
-            if (!firstClickDone) {
-                messageBox.textContent = 'Click a square to start!';
-            } else {
+            if (messageBox) {
                 messageBox.textContent = `Mines: ${minesLeft}`;
             }
         }
 
 
         function checkWinCondition() {
+             // Check if game is already over or not started
             if (gameOver || !firstClickDone) {
                 return;
             }
-            const totalNonMineSquares = (gridSize * gridSize) - numMines;
-            if (revealedNonMineCount >= totalNonMineSquares) {
-                let allSafeRevealed = true;
-                for (let i = 0; i < gridSize; i++) {
-                    for (let j = 0; j < gridSize; j++) {
-                        const sq = board[i]?.[j];
-                        if (sq && !sq.isMine && !sq.isRevealed) {
-                            allSafeRevealed = false;
-                            break;
-                        }
+
+             // Check if all non-mine, non-blackhole squares are revealed
+             let revealedCount = 0;
+             let totalSafeSquares = 0;
+
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    const sq = board[r]?.[c];
+                    if (sq && !sq.isMine && !sq.isBlackHole) { // Exclude mines AND black holes
+                         totalSafeSquares++;
+                         if (sq.isRevealed) {
+                             revealedCount++;
+                         }
                     }
-                    if (!allSafeRevealed) break;
                 }
-                if (allSafeRevealed) {
-                    if (enableTimeBomb && !enableBlind && remainingMilliseconds <= 0 && gameStarted) {
-                        return;
+            }
+
+
+             // Win condition: all safe (non-mine, non-BH) squares are currently revealed
+            if (revealedCount >= totalSafeSquares) {
+                // Double-check time limits if game has started
+                if (gameStarted) {
+                    if (enableTimeBomb && !enableBlind && remainingMilliseconds <= 0) {
+                        return; // Lost due to time
                     }
-                    if (enableBlind && activeBlindRule?.id === 'basketball' && basketballRemainingMs <= 0 && gameStarted) {
-                        return;
+                    if (isRuleActive('basketball') && basketballRemainingMs <= 0) {
+                        return; // Lost due to basketball timer
                     }
-                    endGame(true);
+                     // Check if any Ghost timers are still active (player hasn't won yet)
+                     if (isRuleActive('ghost') && Object.keys(activeGhostTimers).length > 0) {
+                         return; // Not won yet, squares are still closing
+                     }
                 }
+                endGame(true);
             }
         }
 
@@ -2931,14 +2599,29 @@
                 return;
             }
             gameOver = true;
+
             clearInterval(timerInterval);
+
             timerInterval = null;
+
             clearInterval(basketballTimerInterval);
+
             basketballTimerInterval = null;
+
+            // Clear all Ghost timers on game end
+             Object.values(activeGhostTimers).forEach(clearTimeout);
+
+             activeGhostTimers = {};
+
+
             body.classList.remove('low-time', 'timer-intro-active');
+
             timerContainer.classList.remove('blinking-black', 'blinking-red', 'blinking-basketball');
+
             debugButtonsContainer.classList.remove('visible');
+
             let finalDisplayMillis = 0;
+
             if (gameStarted) {
                 if (enableBlind || !enableTimeBomb) {
                     elapsedMilliseconds = Date.now() - startTime;
@@ -2952,13 +2635,20 @@
             }
             if (isWin) {
                 messageBox.textContent = 'Game Clear!';
+
                 body.classList.add('game-clear');
+
                 const flagsAllowed = !enableNoFlags;
+
                 if (flagsAllowed) {
                     let minesToFlag = 0;
-                    for (let i = 0; i < gridSize; i++) {
-                        for (let j = 0; j < gridSize; j++) {
+
+                    for (let i = 0;
+                        i < gridSize; i++) {
+                        for (let j = 0;
+                            j < gridSize; j++) {
                             const sq = board[i]?.[j];
+
                             if (sq && sq.isMine && !sq.isFlagged) {
                                 sq.isFlagged = true;
                                 renderSquareContent(sq);
@@ -2976,20 +2666,21 @@
                         const m = Math.floor((finalDisplayMillis % 3600000) / 60000);
                         const s = Math.floor((finalDisplayMillis % 60000) / 1000);
                         const cs = Math.floor((finalDisplayMillis % 1000) / 10);
+
                         if (finalDisplayMillis < 3600000) {
                             timerSpan.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
                         } else {
                             timerSpan.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
                         }
                     } else {
-                        updateTimerDisplay(finalDisplayMillis);
+                        updateTimerDisplay(finalDisplayMillis, true); // Force hundredths display
                     }
                 } else {
                     timerSpan.textContent = (enableTimeBomb && !enableBlind) ? formatMsToDisplayTime(timeLimitMilliseconds, true) : '00.00';
                 }
             } else {
                 if (messageBox.textContent !== 'Game Clear!') {
-                    if (enableBlind && activeBlindRule?.id === 'basketball' && basketballRemainingMs <= 0 && gameStarted) {
+                    if (isRuleActive('basketball') && basketballRemainingMs <= 0 && gameStarted) {
                         messageBox.textContent = 'Time Up! (Basketball)';
                     } else if (enableTimeBomb && !enableBlind && gameOverOnTimeOnly && clickedMineCount >= numMines) {
                         messageBox.textContent = 'All Mines Hit!';
@@ -3001,32 +2692,44 @@
                 }
                 body.classList.add('game-over');
                 revealAllMines(true);
-                updateTimerDisplay(finalDisplayMillis);
+                updateTimerDisplay(finalDisplayMillis); // Update timer display for loss
             }
         }
 
 
         function revealAllMines(showIncorrectFlags) {
+            /* ... (no changes needed) ... */
             const flagsAllowed = !enableNoFlags;
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
+
+            for (let i = 0;
+                i < gridSize; i++) {
+                for (let j = 0;
+                    j < gridSize; j++) {
                     const sq = board[i]?.[j];
+
                     if (!sq) continue;
+
                     const el = sq.element;
+
                     if (sq.isMine) {
-                        if ((sq.isFlagged && flagsAllowed) || el.classList.contains('mine-clicked')) {
-                            continue;
+                        // Only reveal if not flagged correctly or not the clicked mine
+                        if (!(sq.isFlagged && flagsAllowed) && !el.classList.contains('mine-clicked')) {
+                             // Also clear ghost timer if revealing closing mine
+                              clearGhostTimer(i, j);
+                            sq.isRevealed = true;
+                            renderSquareContent(sq); // Will show '💣'
                         }
-                        sq.isRevealed = true;
-                        renderSquareContent(sq);
                     } else {
                         if (showIncorrectFlags && sq.isFlagged && flagsAllowed) {
-                            sq.isRevealed = true;
+                             clearGhostTimer(i, j); // Clear timer before marking wrong
+                            sq.isRevealed = true; // Reveal to show the X
                             el.className = 'square revealed flag-wrong';
                             el.textContent = '❌';
-                        } else if (showIncorrectFlags && !sq.isRevealed) {
-                            sq.isRevealed = true;
-                            renderSquareContent(sq);
+                        } else if (showIncorrectFlags && !sq.isRevealed && !sq.isFlagged) {
+                             // Option: Reveal unopened safe squares on loss?
+                              // clearGhostTimer(i, j); // Clear timer if revealing
+                             // sq.isRevealed = true;
+                             // renderSquareContent(sq);
                         }
                     }
                 }
@@ -3034,9 +2737,8 @@
         }
 
 
-        // --- Timer Functions ---
-
         function updateTimer() {
+            /* ... (no changes needed) ... */
             if (!gameStarted || gameOver) {
                 if (timerInterval && gameOver) {
                     clearInterval(timerInterval);
@@ -3045,9 +2747,12 @@
                 return;
             }
             const now = Date.now();
+
             if (enableTimeBomb && !enableBlind) {
                 const elapsed = now - startTime;
+
                 remainingMilliseconds = timeLimitMilliseconds - elapsed - penaltyOffsetMs;
+
                 if (remainingMilliseconds <= 0) {
                     remainingMilliseconds = 0;
                     updateTimerDisplay();
@@ -3058,7 +2763,9 @@
                     }
                 } else {
                     updateTimerDisplay();
+
                     const isLowTime = remainingMilliseconds < 60000;
+
                     body.classList.toggle('low-time', isLowTime);
                     timerContainer.classList.toggle('blinking-red', isLowTime);
                     timerContainer.classList.toggle('blinking-black', !isLowTime);
@@ -3073,126 +2780,201 @@
 
 
         function updateBasketballTimer() {
-            if (!gameStarted || gameOver || !enableBlind || activeBlindRule?.id !== 'basketball') {
+            /* ... (no changes needed, uses isRuleActive) ... */
+            // Check if Basketball rule is active
+            if (!gameStarted || gameOver || !isRuleActive('basketball')) {
                 if (basketballTimerInterval) {
                     clearInterval(basketballTimerInterval);
                     basketballTimerInterval = null;
+                    timerContainer.classList.remove('blinking-basketball'); // Ensure blinking stops
+
                 }
                 return;
             }
             const elapsedBasketball = Date.now() - basketballStartTime;
+
             basketballRemainingMs = BASKETBALL_INTERVAL_MS - elapsedBasketball;
+
             if (basketballRemainingMs <= 0) {
                 basketballRemainingMs = 0;
+
                 updateTimerDisplay();
                 clearInterval(basketballTimerInterval);
+
                 basketballTimerInterval = null;
+
                 if (!gameOver) {
                     endGame(false);
                 }
             } else {
-                updateTimerDisplay();
+                updateTimerDisplay(); // Update display which will handle basketball time format
                 timerContainer.classList.toggle('blinking-basketball', basketballRemainingMs <= 3000);
             }
         }
 
 
-        function updateTimerDisplay(forceMillis = null) {
-            if (gameOver && enableTimeBomb && !enableBlind && messageBox.textContent === 'Game Clear!' && forceMillis === null) {
+        function updateTimerDisplay(forceMillis = null, forceHundredths = false) {
+            /* ... (no changes needed, uses isRuleActive) ... */
+            // Prevent timer update if game won and time bomb isn't active or blind mode isn't active
+            if (gameOver && messageBox.textContent === 'Game Clear!' && !(enableTimeBomb && !enableBlind) && !enableBlind && forceMillis === null) {
                 return;
             }
+
             let displayMillis;
-            let isBasketballActive = enableBlind && activeBlindRule?.id === 'basketball' && gameStarted && !gameOver;
+            let isBasketballDisplay = isRuleActive('basketball') && gameStarted && !gameOver;
+            let isTimeBombDisplay = enableTimeBomb && !enableBlind && gameStarted && !gameOver;
+
+
             if (forceMillis !== null) {
                 displayMillis = forceMillis;
-            } else if (isBasketballActive) {
+
+                // If forcing millis, determine context based on active rules or assume elapsed
+                isBasketballDisplay = isRuleActive('basketball') && !gameOver; // Check if basketball *would* be active
+                isTimeBombDisplay = enableTimeBomb && !enableBlind && !gameOver; // Check if timebomb *would* be active
+
+            } else if (isBasketballDisplay) {
                 displayMillis = basketballRemainingMs;
-            } else if (enableTimeBomb && !enableBlind) {
+            } else if (isTimeBombDisplay) {
                 displayMillis = remainingMilliseconds;
             } else {
-                displayMillis = elapsedMilliseconds;
+                displayMillis = elapsedMilliseconds; // Default to elapsed time
             }
+
             const safeMillis = Math.max(0, displayMillis);
+
             let formattedTime;
-            if (isBasketballActive) {
+
+
+            // Determine format based on context
+            if (isBasketballDisplay) {
                 const s = Math.floor(safeMillis / 1000);
                 const cs = Math.floor((safeMillis % 1000) / 10);
+
                 formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
-            } else if (safeMillis < 60000 && (enableTimeBomb && !enableBlind)) {
+
+            } else if ((isTimeBombDisplay && safeMillis < 60000) || forceHundredths) {
                 const s = Math.floor(safeMillis / 1000);
                 const cs = Math.floor((safeMillis % 1000) / 10);
-                formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
-            } else if (safeMillis < 3600000) {
+
+                // Show MM:SS.ss if under 1 min or forced
+                const m_cs = Math.floor(safeMillis / 60000);
+                const s_cs = Math.floor((safeMillis % 60000) / 1000);
+
+                if (safeMillis < 60000 || forceHundredths) {
+                    formattedTime = `${String(m_cs).padStart(2,'0')}:${String(s_cs).padStart(2,'0')}.${String(cs).padStart(2, '0')}`;
+                } else {
+                    formattedTime = `${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`; // Fallback if logic error
+                }
+
+            } else if (safeMillis < 3600000) { // Less than an hour
                 const m = Math.floor(safeMillis / 60000);
                 const s = Math.floor((safeMillis % 60000) / 1000);
+
                 formattedTime = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-            } else {
+
+            } else { // Hour or more
                 const h = Math.floor(safeMillis / 3600000);
                 const m = Math.floor((safeMillis % 3600000) / 60000);
                 const s = Math.floor((safeMillis % 60000) / 1000);
+
                 formattedTime = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
             }
+
+            // Handle initial state before game starts
             if (!gameStarted && !(enableTimeBomb && !enableBlind)) {
                 formattedTime = "00.00";
+            } else if (!gameStarted && (enableTimeBomb && !enableBlind)) {
+                // Show initial time limit if game not started
+                formattedTime = formatMsToDisplayTime(timeLimitMilliseconds, timeLimitMilliseconds >= 3600000);
             }
+
             if (timerSpan) timerSpan.textContent = formattedTime;
-            if (!isBasketballActive) {
+
+
+            // Manage blinking classes (remove basketball blink if not active)
+            if (!isBasketballDisplay) {
                 if (timerContainer) timerContainer.classList.remove('blinking-basketball');
-                if (enableTimeBomb && !enableBlind && gameStarted && !gameOver) {
-                    /* Blink handled in updateTimer */
-                } else {
-                    body.classList.remove('low-time');
-                    if (timerContainer) timerContainer.classList.remove('blinking-red', 'blinking-black');
-                }
-            } else {
+            }
+            // Other blinking handled in updateTimer/updateBasketballTimer
+            if (!isTimeBombDisplay && !isBasketballDisplay) {
                 body.classList.remove('low-time');
                 if (timerContainer) timerContainer.classList.remove('blinking-red', 'blinking-black');
             }
         }
 
 
-        // --- Debug Functions ---
-
         function revealNonMines() {
+            /* ... (no changes needed) ... */
             if (gameOver || !firstClickDone) {
                 return;
             }
             if (!gameStarted) {
                 startGameTimer();
             }
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
+            for (let i = 0;
+                i < gridSize; i++) {
+                for (let j = 0;
+                    j < gridSize; j++) {
                     const sq = board[i]?.[j];
+
                     if (sq && !sq.isMine && !sq.isRevealed) {
+                        // Use revealSquare to handle chaining and rule logic correctly
                         revealSquare(i, j);
                     }
                 }
             }
-            if (!gameOver) {
-                endGame(true);
+            // Check win condition after revealing non-mines
+            // endGame(true) might be called automatically by checkWinCondition if all safe squares revealed
+            checkWinCondition();
+
+            if (!gameOver) { // If checkWinCondition didn't end the game (e.g., time ran out simultaneously)
+                messageBox.textContent = 'All non-mines revealed!';
             }
-            messageBox.textContent = 'All non-mines revealed!';
         }
 
 
         function revealAll() {
+            /* ... (no changes needed) ... */
             if (gameOver || !firstClickDone) {
                 return;
             }
             if (!gameStarted) {
                 startGameTimer();
             }
+            // Reveal all mines and incorrect flags first
             revealAllMines(true);
-            if (!gameOver) {
-                endGame(false);
+
+            // Then reveal remaining safe squares
+            for (let i = 0;
+                i < gridSize; i++) {
+                for (let j = 0;
+                    j < gridSize; j++) {
+                    const sq = board[i]?.[j];
+
+                    if (sq && !sq.isMine && !sq.isRevealed) {
+                        // Directly reveal without chaining or win checks
+                         // Also clear ghost timer if revealing a closing square
+                         clearGhostTimer(i, j);
+                        sq.isRevealed = true;
+                        renderSquareContent(sq);
+
+                    }
+                }
             }
+            // Force game over as loss since revealAll is a debug action
+            if (!gameOver) {endGame(false)};
             messageBox.textContent = 'All squares revealed!';
+
         }
+
 
 
         // --- Initial Setup ---
         applyTheme(currentTheme);
+
         if (themeToggleSwitch) themeToggleSwitch.checked = (currentTheme === 'dark');
+
         updateTimerDisplay();
         updateActiveRulesDisplay();
         updateNoFlagsUI();
@@ -3200,5 +2982,4 @@
         createBoard();
     </script>
 </body>
-
 </html>
